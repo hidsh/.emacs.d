@@ -760,6 +760,7 @@
   (define-key evil-motion-state-map (kbd ";") #'evil-ex)    ; works as :
 
   ;; normal-state-map
+  (define-key evil-normal-state-map (kbd "!") #'shell-command)
   (define-key evil-normal-state-map (kbd "q") nil)
   (define-key evil-normal-state-map (kbd "m") nil)
   (define-key evil-normal-state-map (kbd "M-.") nil)        ; evil-repeat-pop-next
@@ -1920,7 +1921,8 @@ using a new file name regardless of the candidates"
          ("M-r"     . counsel-recentf)
          ("M-o"     . my-counsel-rg)
          ("C-x C-b" . counsel-ibuffer)
-         ("C-x C-w" . my-counsel-write-file)
+         ("C-x C-w" . write-file)
+         ;; ("C-x C-w" . my-counsel-write-file)
          ;; ("C-x C-f" . my-counsel-find-file)
          ;; ("C-s"     . swiper)
 
