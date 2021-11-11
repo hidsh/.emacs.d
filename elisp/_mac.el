@@ -21,7 +21,7 @@
 (set-default-font (myfont 'default))
 
 ;;;
-;;; external program
+;;; m
 ;;;
 (add-to-list 'exec-path (expand-file-name "~/bin"))
 (setq my-counsel-rg-exe (expand-file-name "~/bin/rg"))
@@ -35,7 +35,6 @@
 ;;; appearance adjust
 ;;;
 (setq my-face-adj-line-number-height 1.1)
-
 ;; (add-hook 'after-init-hook 'mac-change-language-to-us)          ;; emacs 起動時は英数モードから始める
 ;; (add-hook 'minibuffer-setup-hook 'mac-change-language-to-us)    ;; minibuffer 内は英数モードにする
 ;; (add-hook 'isearch-mode-hook 'mac-change-language-to-us)        ;; [migemo]isearch のとき IME を英数モードにする
@@ -127,6 +126,11 @@
 ;;
 (setq check-emacs-setting-diff-pgm "/Applications/Meld.app/Contents/MacOS/Meld")
 (setq check-emacs-setting-cmp-pgm "cmp")
+
+;; slime
+(setq ros-exe "/usr/local/bin/ros")
+(setq my-slime-helper "~/.roswell/helper.el")
+
 
 (message "<-- done    \"_mac.el\"")
 

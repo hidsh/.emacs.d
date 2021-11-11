@@ -197,8 +197,8 @@
 
  ;; mode-line
  (column-number-mode t)
- (set-face-attribute 'mode-line          nil :box nil :height 1.0)   ; モードラインを非3D化
- (set-face-attribute 'mode-line-inactive nil :box nil :height 1.0 :background (mycolor 'charcoal) :foreground "#5f5f6f")
+ (set-face-attribute 'mode-line          nil :box nil :height 1.1)   ; モードラインを非3D化
+ (set-face-attribute 'mode-line-inactive nil :inherit 'mode-line)
 
  ;; モードラインの割合表示を総行数表示に
  (defvar my-mode-line-position-format "%%3c:%%l/%d")
@@ -348,7 +348,7 @@
                              mode-line-inactive
                              mode-line))
 
- (my-font-lighter (remove-if (lambda (x) (member x exclude-face-list)) (face-list)))
+ ;; (my-font-lighter (remove-if (lambda (x) (member x exclude-face-list)) (face-list)))
 
  ;; (zerodark-setup-modeline-format)
  (my-load-frame)
@@ -1149,10 +1149,19 @@ If COUNT is given, move COUNT - 1 lines downward first."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package my-zerodark-theme
+;; (use-package my-zerodark-theme
+;;   :load-path "~/.emacs.d/themes"
+;;   :config
+;;   (load-theme 'my-zerodark t)
+
+;;   ;; (global-tab-line-mode 1) ; for emacs27
+;;   )
+
+;; ----------------------------------------------------------------------
+(use-package my-doom-material-theme
   :load-path "~/.emacs.d/themes"
   :config
-  (load-theme 'my-zerodark t)
+  (load-theme 'my-doom-material t)
 
   ;; (global-tab-line-mode 1) ; for emacs27
   )
@@ -1165,66 +1174,66 @@ If COUNT is given, move COUNT - 1 lines downward first."
   :config
   (tabbar-mode)
 
-  (defun my-adv-load-theme--tabbar-reset-appearance (&rest _)
+; (defun my-adv-load-theme--tabbar-reset-appearance (&rest _)
   (set-face-attribute 'tabbar-default nil
-                      :height 0.9
+                      :height 1.1
                       :family (myfont 'ui)
-                      :background (face-background 'mode-line)
-                      :slant 'normal
-                      :weight 'light
-                      :box nil
-                      :overline (face-background 'mode-line)
+;                       :background (face-background 'mode-line)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline (face-background 'mode-line)
                       )
-
-  (set-face-attribute 'tabbar-selected nil
-                      ;; :inherit 'tabbar-default
-                      :foreground (face-background 'mode-line)
-                      :background (face-foreground 'line-number-current-line)
-                      :slant 'normal
-                      :weight 'light
-                      :box nil
-                      :overline (face-foreground 'line-number-current-line)
-                      )
-
-  (set-face-attribute 'tabbar-unselected nil
-                      ;; :inherit 'tabbar-default
-                      :background (face-foreground 'tabbar-selected)
-                      :foreground (face-background 'tabbar-selected)
-                      :slant 'normal
-                      :weight 'light
-                      :box nil
-                      :overline (face-foreground 'tabbar-selected)
-                      )
-
-  (set-face-attribute 'tabbar-selected-modified nil
-                      ;; :inherit 'tabbar-default
-                      :background (face-background 'tabbar-selected)
-                      :foreground (face-foreground 'tabbar-selected)
-                      :slant 'normal
-                      :weight 'light
-                      :box nil
-                      :overline "orange"
-                      )
-
-  (set-face-attribute 'tabbar-modified nil
-                      ;; :inherit 'tabbar-default
-                      :background (face-attribute 'tabbar-unselected :background)
-                      :foreground (face-attribute 'tabbar-unselected :foreground)
-                      :slant 'normal
-                      :weight 'light
-                      :box nil
-                      :overline "orange"
-                      )
-
+; 
+;   (set-face-attribute 'tabbar-selected nil
+;                       ;; :inherit 'tabbar-default
+;                       :foreground (face-background 'mode-line)
+;                       :background (face-foreground 'line-number-current-line)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline (face-foreground 'line-number-current-line)
+;                       )
+; 
+;   (set-face-attribute 'tabbar-unselected nil
+;                       ;; :inherit 'tabbar-default
+;                       :background (face-foreground 'tabbar-selected)
+;                       :foreground (face-background 'tabbar-selected)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline (face-foreground 'tabbar-selected)
+;                       )
+; 
+;   (set-face-attribute 'tabbar-selected-modified nil
+;                       ;; :inherit 'tabbar-default
+;                       :background (face-background 'tabbar-selected)
+;                       :foreground (face-foreground 'tabbar-selected)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline "orange"
+;                       )
+; 
+;   (set-face-attribute 'tabbar-modified nil
+;                       ;; :inherit 'tabbar-default
+;                       :background (face-attribute 'tabbar-unselected :background)
+;                       :foreground (face-attribute 'tabbar-unselected :foreground)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline "orange"
+;                       )
+; 
   (set-face-attribute 'tabbar-separator nil
                       ;; :inherit 'tabbar-default
                       :background (face-attribute 'tabbar-selected :background))
 
-  ;; (setq tabbar-separator '(0.2))
-  )
+    (setq tabbar-separator '(0.2))
+;  )
 
-  (my-adv-load-theme--tabbar-reset-appearance)
-  (advice-add 'load-theme :after #'my-adv-load-theme--tabbar-reset-appearance)
+; (my-adv-load-theme--tabbar-reset-appearance)
+; (advice-add 'load-theme :after #'my-adv-load-theme--tabbar-reset-appearance)
 
   (global-set-key (kbd "M-j") 'tabbar-backward-tab)
   (global-set-key (kbd "M-k") 'tabbar-forward-tab)
@@ -1879,13 +1888,23 @@ using a new file name regardless of the candidates"
              (write-file fn))
             (t (write-file fn)))))
 
+(defun win-path-p (path)
+  (string= (substring (first dirs) -1 nil) ":"))
+
+(defun win-ulp-path-p (path)
+  (or (string= (substring (first dirs) 0 1) "\\\\")
+      (string= (substring (first dirs) 0 1) "////")))
+
 (defun create-directory-recursive (path)
   (let* ((slash "/")
          (full-path (expand-file-name path))
          (dirs (split-string full-path slash t))
          (s ""))
-    (when (string= (substring (first dirs) -1 nil) ":")
-      (setq dirs (push (concat (first dirs) slash (second dirs)) (cl-subseq dirs 2 ))))
+    (cond ((win-path-p path)
+           (setq dirs (push (concat (first dirs) slash (second dirs)) (cl-subseq dirs 2 ))))
+          ((win-ulp-path-p path)
+           ())
+          (t nil))
     (dolist (d dirs)
       (if (and (> (length d) 1) (string= (substring d 1 2) ":"))
           (setq s (concat s d))
@@ -2534,7 +2553,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (copy-face 'org-done 'org-checkbox-statistics-done)
 
   (defface my-org-done-date-face
-    `((t (:inhelit org-todo :foreground ,(face-background 'org-done) :background ,(face-foreground 'org-done) :weight bold))) "")
+    `((t (:inherit org-todo :foreground ,(face-background 'org-done) :background ,(face-foreground 'org-done) :weight bold))) "")
 
   (defun font-lock-user-keywords (mode &optional keywords)
     "Add user highlighting to KEYWORDS to MODE.
@@ -3088,6 +3107,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
       (funcall orig-fun)))
 
   (advice-add 'flymake-posframe-display :around #'my-flymake-posframe-display-adv-delay)
+  (add-hook 'find-file-hook #'flymake-posframe-hide)
   )
 
 ;; ----------------------------------------------------------------------
