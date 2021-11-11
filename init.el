@@ -1702,8 +1702,8 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (set-face-foreground 'ivy-action (mycolor 'red))
   (set-face-background 'ivy-confirm-face "'green")
   ;; (set-face-background 'ivy-current-match "#0a5770")
-  (set-face-attribute  'ivy-current-match nil
-                    :foreground (mycolor 'black) :background (mycolor 'red))
+  ;; (set-face-attribute  'ivy-current-match nil
+  ;;                   :foreground (mycolor 'black) :background (mycolor 'red))
   (set-face-background 'ivy-cursor "'brown")
   (set-face-background 'ivy-highlight-face "'SkyBlue")
   (set-face-background 'ivy-match-required-face "#ce123e")
@@ -2251,7 +2251,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :diminish beacon-mode
   :config
   (setq beacon-blink-when-focused t)
-  (setq beacon-color "SteelBlue3")
+  ;; (setq beacon-color "SteelBlue3")
   (setq beacon-blink-delay 0.2)
   (beacon-mode t)
   )

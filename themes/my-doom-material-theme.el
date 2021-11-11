@@ -172,6 +172,12 @@ Can be an integer to determine the exact padding."
    (tabbar-selected-modified :inherit 'tabbar-selected)
    (tabbar-modified          :inherit 'tabbar-default)
 
+   ;; ivy, counsel
+   (ivy-current-match :inherit 'cursor :foreground bg)
+
+   ;; beacon
+   (beacon-color :inherit 'cursor)
+
    ;; tooltip
    (tooltip              :background (doom-darken bg-alt 0.2) :foreground fg)))
 
