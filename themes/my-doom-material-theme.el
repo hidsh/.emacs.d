@@ -19,7 +19,7 @@ Can be an integer to determine the exact padding."
   ;; name        default   256       16
   ((bg         '("#263238" nil       nil))
    (bg-alt     '("#1C262B" nil       nil))
-   (base0      '("#171F24" "black"   "black"))
+   (base0      '("#171F24" nil       nil))
    (base1      '("#1C262B" "#262626" "brightblack"))
    (base2      '("#222D32" "#303030" "brightblack"))
    (base3      '("#171F24" "#3a3a3a" "brightblack"))
@@ -33,6 +33,7 @@ Can be an integer to determine the exact padding."
 
    (grey base5)
 
+   (black       '("#000000" nil nil))
    (red         '("#ff5370" "#ff0000" "red"))
    (orange      '("#f78c6c" "#ff5f00" "brightred"))
    (green       '("#c3e88d" "#afff00" "green"))
@@ -48,7 +49,8 @@ Can be an integer to determine the exact padding."
    ;; face categories -- required for all themes
    (highlight      yellow)
    (vertical-bar   base2)
-   (selection      base4)
+;; (selection      base4)
+   (selection      nil)
    (builtin        blue)
 ;; (comments       base6)
    (comments       base8)
@@ -72,10 +74,11 @@ Can be an integer to determine the exact padding."
    (vc-deleted     red)
 
    ;; custom categories
-   (modeline-fg     base8)
+;; (modeline-fg     base8)
+   (modeline-fg     fg-alt)
    (modeline-bg     base4)
 
-   (modeline-fg-alt base6)
+   (modeline-fg-alt base7)
 ;; (modeline-bg-alt (doom-darken bg 0.01))
    (modeline-bg-alt bg)
 
@@ -95,11 +98,11 @@ Can be an integer to determine the exact padding."
    (highlight-thing :background region :distant-foreground fg-alt)
 
    (mode-line
-    :background modeline-bg :foreground modeline-fg
+    :background modeline-bg :foreground modeline-fg :overline yellow
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
 
    (mode-line-inactive
-    :background modeline-bg-alt :foreground modeline-fg-alt
+    :background modeline-bg-alt :foreground modeline-fg-alt :overline nil
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg-alt)))
 
    (solaire-mode-line-face
@@ -111,8 +114,6 @@ Can be an integer to determine the exact padding."
 
    (line-number :foreground base7 :background base1)
    (line-number-current-line      :background base1)
-   (paren-face-mismatch :inherit 'paren-face-match)
-   (paren-face-no-match :inherit 'paren-face-match)
 
 ;; (fringe :background base2)
    (fringe :background base1)
@@ -166,7 +167,7 @@ Can be an integer to determine the exact padding."
    (rjsx-attr :foreground yellow :slant 'italic :weight 'medium)
 
    ;; tabbar
-   (tabbar-default :foreground comments)
+   (tabbar-default :foreground fg-alt)
    (tabbar-selected          :inherit 'tabbar-default :foreground bg-alt :background yellow)
    (tabbar-unselected        :inherit 'tabbar-default)
    (tabbar-selected-modified :inherit 'tabbar-selected)
@@ -174,6 +175,10 @@ Can be an integer to determine the exact padding."
 
    ;; ivy, counsel
    (ivy-current-match :inherit 'cursor :foreground bg)
+
+   ;; paren
+   ;; (paren-face-match :foreground nil :background base0)
+   (paren-face-match :foreground nil :background nil)
 
    ;; beacon
    (beacon-color :inherit 'cursor)
