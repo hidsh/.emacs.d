@@ -30,3 +30,4 @@ tutorial
 .check-emacs-setting/last-load/*
 .check-emacs-setting/log.txt
 \.check-emacs-setting/batch-script\.el
+*.elc
