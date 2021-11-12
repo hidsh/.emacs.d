@@ -1103,7 +1103,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
   :after evil
   :config
   ;; (evil-collection-init '(edebug dired neotree slime help re-builder)) ;; fixme
-  (evil-collection-init '(edebug dired neotree slime help))
+  (evil-collection-init '(edebug dired neotree slime help paren))
 
   (evil-define-key 'normal help-mode-map (kbd "C-o") 'other-window)
   (evil-define-key 'normal help-mode-map (kbd "C-0") 'delete-window)
@@ -2056,7 +2056,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
   ;; use show-paren to hilight content in parenthesis
   (setq show-paren-style 'expression)
-  (set-face-background 'show-paren-match "#263652")
+  (set-face-background 'show-paren-match "#3A537E")
   (setq show-paren-delay 0.2)
   (show-paren-mode 1)
 
