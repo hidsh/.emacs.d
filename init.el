@@ -604,6 +604,7 @@
   ;; major mode
   (diminish-major-mode 'emacs-lisp-mode-hook "Elisp")
   (diminish-major-mode 'lisp-interaction-mode-hook "LispInt")
+  (diminish-major-mode 'js-mode-hook "JS")
 
   (defun flymake--transform-mode-line-format (ret)
     "Change the output of `flymake--mode-line-format'."
@@ -783,7 +784,7 @@
 
   ;; visual-state-map
   (define-key evil-visual-state-map (kbd "e") #'my-evil-visual-eval-region)
-  (define-key evil-visual-state-map (kbd "w") #'my-evil-visual-write-region)
+  ;; (define-key evil-visual-state-map (kbd "w") #'my-evil-visual-write-region)
   (define-key evil-visual-state-map (kbd "a") #'my-evil-visual-align-region)
   (define-key evil-visual-state-map (kbd "c") #'my-evil-visual-comment-region)
   (define-key evil-visual-state-map (kbd "i") #'my-evil-visual-indent-region)
@@ -2461,6 +2462,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package mql-mode
+  :disabled
   :mode (("\\.mq4$" . mql-mode)
          ("\\.mqh$" . mql-mode))
   :bind (([S-down] . flymake-goto-next-error)
