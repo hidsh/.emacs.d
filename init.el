@@ -2053,7 +2053,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (smartparens-global-mode)
   (show-smartparens-global-mode t)
   (setq sp-autoinsert-pair nil)
-  (set-face-background 'sp-show-pair-match-face "#4C6DA6")
+  ;; (set-face-background 'sp-show-pair-match-face "#4C6DA6")
 
   (ad-disable-advice 'delete-backward-char 'before 'sp-delete-pair-advice) ; disable C-h
   (ad-activate 'delete-backward-char)

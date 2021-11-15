@@ -98,7 +98,7 @@ Can be an integer to determine the exact padding."
    (highlight-thing :background region :distant-foreground fg-alt)
 
    (mode-line
-    :background modeline-bg :foreground modeline-fg :overline yellow
+    :background modeline-bg :foreground modeline-fg :overline highlight
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
 
    (mode-line-inactive
@@ -117,6 +117,9 @@ Can be an integer to determine the exact padding."
 
 ;; (fringe :background base2)
    (fringe :background base1)
+
+   ;; selection (region)
+   (region :foreground nil :background nil :underline highlight)
 
    ;; --- major-mode faces ------------------------
    ;; man-mode
@@ -152,15 +155,15 @@ Can be an integer to determine the exact padding."
    (js2-jsdoc-value            :foreground cyan)
 
    ;; rainbow-delimiters
-   (rainbow-delimiters-depth-1-face :foreground magenta)
-   (rainbow-delimiters-depth-2-face :foreground orange)
-   (rainbow-delimiters-depth-3-face :foreground green)
-   (rainbow-delimiters-depth-4-face :foreground cyan)
-   (rainbow-delimiters-depth-5-face :foreground violet)
-   (rainbow-delimiters-depth-6-face :foreground yellow)
-   (rainbow-delimiters-depth-7-face :foreground blue)
-   (rainbow-delimiters-depth-8-face :foreground teal)
-   (rainbow-delimiters-depth-9-face :foreground dark-cyan)
+   ;; (rainbow-delimiters-depth-1-face :foreground magenta)
+   ;; (rainbow-delimiters-depth-2-face :foreground orange)
+   ;; (rainbow-delimiters-depth-3-face :foreground green)
+   ;; (rainbow-delimiters-depth-4-face :foreground cyan)
+   ;; (rainbow-delimiters-depth-5-face :foreground violet)
+   ;; (rainbow-delimiters-depth-6-face :foreground yellow)
+   ;; (rainbow-delimiters-depth-7-face :foreground blue)
+   ;; (rainbow-delimiters-depth-8-face :foreground teal)
+   ;; (rainbow-delimiters-depth-9-face :foreground dark-cyan)
 
    ;; rjsx-mode
    (rjsx-tag :foreground red)
@@ -168,7 +171,7 @@ Can be an integer to determine the exact padding."
 
    ;; tabbar
    (tabbar-default :foreground fg-alt)
-   (tabbar-selected          :inherit 'tabbar-default :foreground bg-alt :background yellow)
+   (tabbar-selected          :inherit 'tabbar-default :foreground bg-alt :background highlight)
    (tabbar-unselected        :inherit 'tabbar-default)
    (tabbar-selected-modified :inherit 'tabbar-selected)
    (tabbar-modified          :inherit 'tabbar-default)
@@ -179,6 +182,10 @@ Can be an integer to determine the exact padding."
    ;; paren
    ;; (paren-face-match :foreground nil :background base0)
    (paren-face-match :foreground nil :background nil)
+   (sp-show-pair-match-face :background (doom-darken highlight 0.4))
+
+   ;; company
+   (company-tooltip-selection :foreground bg :background highlight)
 
    ;; beacon
    (beacon-color :inherit 'cursor)
