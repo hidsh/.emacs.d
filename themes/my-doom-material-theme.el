@@ -170,7 +170,7 @@ Can be an integer to determine the exact padding."
    (rjsx-attr :foreground yellow :slant 'italic :weight 'medium)
 
    ;; tabbar
-   (tabbar-default :foreground fg-alt)
+   (tabbar-default :foreground fg-alt :background base1)
    (tabbar-selected          :inherit 'tabbar-default :foreground bg-alt :background highlight)
    (tabbar-unselected        :inherit 'tabbar-default)
    (tabbar-selected-modified :inherit 'tabbar-selected)
