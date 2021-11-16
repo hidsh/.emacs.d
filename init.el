@@ -3091,6 +3091,11 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   )
 
 ;; ----------------------------------------------------------------------
+(use-package flymake-eslint
+  :hook ((js-mode . flymake-eslint-enable))
+  )
+
+;; ----------------------------------------------------------------------
 (use-package posframe
   :config
   (setq posframe-mouse-banish nil)
@@ -3104,8 +3109,8 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   (set-face-attribute 'flymake-error nil :underline `(:color ,(mycolor 'red) :style wave))
   (set-face-attribute 'flymake-warning nil :underline '(:color "orange" :style wave))
 
-  (setq flymake-posframe-error-prefix (propertize "󿞟" 'face `(foreground-color . ,(mycolor 'red))))
-  (setq flymake-posframe-warning-prefix (propertize "" 'face '(foreground-color . "orange")))
+  (setq flymake-posframe-error-prefix (propertize "" 'face `(foreground-color . ,(mycolor 'red))))
+  (setq flymake-posframe-warning-prefix (propertize "" 'face '(foreground-color . "orange")))
   (setq flymake-posframe-note-prefix (propertize "" 'face `(foreground-color . "yellow green")))
 
   (defun my-flymake-posframe-display-adv-delay (orig-fun)
