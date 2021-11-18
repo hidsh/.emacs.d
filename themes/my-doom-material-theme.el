@@ -48,6 +48,7 @@ Can be an integer to determine the exact padding."
 
    ;; face categories -- required for all themes
    (highlight      yellow)
+   (highlight-dark (doom-darken highlight 0.4))
    (vertical-bar   base2)
 ;; (selection      base4)
    (selection      nil)
@@ -87,7 +88,8 @@ Can be an integer to determine the exact padding."
       (if (integerp doom-material-padded-modeline) doom-material-padded-modeline 4))))
 
   ;; --- base faces ------------------------
-  (((lazy-highlight &override) :background base4 :foreground fg :distant-foreground fg :bold bold)
+  ;; (((lazy-highlight &override) :background base4 :foreground fg :distant-foreground fg :bold bold)
+  ((lazy-highlight :background base6 :foreground nil :distant-foreground nil :bold nil)
    (doom-modeline-buffer-path       :foreground green :weight 'bold)
    (doom-modeline-buffer-major-mode :inherit 'doom-modeline-buffer-path)
 
@@ -120,6 +122,8 @@ Can be an integer to determine the exact padding."
 
    ;; selection (region)
    (region :foreground nil :background nil :underline highlight)
+
+   (isearch :inherit 'lazy-highlight :foreground nil :background highlight-dark)
 
    ;; --- major-mode faces ------------------------
    ;; man-mode
@@ -182,7 +186,7 @@ Can be an integer to determine the exact padding."
    ;; paren
    ;; (paren-face-match :foreground nil :background base0)
    (paren-face-match :foreground nil :background nil)
-   (sp-show-pair-match-face :background (doom-darken highlight 0.4))
+   (sp-show-pair-match-face :background highlight-dark)
 
    ;; company
    (company-tooltip-selection :foreground bg :background highlight)

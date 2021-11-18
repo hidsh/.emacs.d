@@ -3093,10 +3093,10 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
 ;; ----------------------------------------------------------------------
 (use-package web-mode
   :mode (("html" . web-mode))
-  :config
-    (setq web-mode-markup-indent-offset 2)
-    (setq web-mode-css-indent-offset 2)
-    (setq web-mode-code-indent-offset 2)
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
   )
 
 ;; ----------------------------------------------------------------------
