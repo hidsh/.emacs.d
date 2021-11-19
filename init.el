@@ -642,6 +642,12 @@
   (setcdr evil-insert-state-map nil)
   (define-key evil-insert-state-map [escape] #'evil-normal-state)
 
+  ;; swith-buffer後になぜかevil-visual-stateになっても強制的にnormal-stateに戻す
+  (defun my-adv-switch-to-bufffer--disable-evil-visual-state (&rest args)
+    (evil-visual-state -1)
+    (evil-normal-state 1))
+  (advice-add 'switch-to-buffer :after #'my-adv-switch-to-bufffer--disable-evil-visual-state)
+
   ;; for package-mode
   (evil-add-hjkl-bindings package-menu-mode-map 'emacs
     (kbd "/")       'evil-search-forward
