@@ -1715,9 +1715,9 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   ;; (set-face-background 'ivy-current-match "#0a5770")
   ;; (set-face-attribute  'ivy-current-match nil
   ;;                   :foreground (mycolor 'black) :background (mycolor 'red))
-  (set-face-background 'ivy-cursor "'brown")
-  (set-face-background 'ivy-highlight-face "'SkyBlue")
-  (set-face-background 'ivy-match-required-face "#ce123e")
+  ;; (set-face-background 'ivy-cursor "'brown")
+  ;; (set-face-background 'ivy-highlight-face "'SkyBlue")
+  ;; (set-face-background 'ivy-match-required-face "#ce123e")
 
   ;; (set-face-background 'ivy-minibuffer-match-face-1 "#cc8800")
   ;; (set-face-background 'ivy-minibuffer-match-face-2 "#0a5770")
@@ -1940,7 +1940,7 @@ using a new file name regardless of the candidates"
          ("M-r"     . counsel-recentf)
          ("M-o"     . my-counsel-rg)
          ("C-x C-b" . counsel-ibuffer)
-         ("C-x C-w" . my-counsel-write-file)
+         ;; ("C-x C-w" . my-counsel-write-file)
          ;; ("C-x C-f" . my-counsel-find-file)
          ;; ("C-s"     . swiper)
 
@@ -3130,11 +3130,13 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   (setq flymake-posframe-note-prefix (propertize "" 'face `(foreground-color . "yellow green")))
 
   (defun my-flymake-posframe-display-adv-delay (orig-fun)
-    (when (sit-for 0)
-      (funcall orig-fun)))
+    (unless (company--active-p)
+      (when (sit-for 0)
+        (funcall orig-fun))))
 
   (advice-add 'flymake-posframe-display :around #'my-flymake-posframe-display-adv-delay)
   (add-hook 'find-file-hook #'flymake-posframe-hide)
+  ;; (advice-add 'switch-to-buffer :after #'flymake-posframe-hide)
   )
 
 ;; ----------------------------------------------------------------------
