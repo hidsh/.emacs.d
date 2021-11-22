@@ -8,6 +8,7 @@ GTAGS
 *.zip
 *.org
 url/*
+.cache/*
 auto-save-list/*
 \.scratch-log*
 scratch-log*

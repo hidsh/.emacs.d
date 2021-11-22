@@ -427,6 +427,18 @@
                      (,(length (gethash :warning diags-by-type)) "%d " warning)
                      (,(length (gethash :note diags-by-type)) "%d" success))))))
 
+(defun my-flycheck-mode-line ()
+  (let-alist (flycheck-count-errors flycheck-current-errors)
+    (let* ((status flycheck-last-status-change)
+           (info (or .info 0))
+           (warnings (or .warning 0))
+           (errors (or .error 0)))
+      (when status
+        (concat
+         (propertize (int-to-string errors)   'face 'flycheck-error-list-error) " "
+         (propertize (int-to-string warnings) 'face 'flycheck-error-list-warning) " "
+         (propertize (int-to-string info)     'face 'flycheck-error-list-info))))))
+
  ;; -----------
 ;;  (defun simple-mode-line-render (left right)
 ;;    "Return a string of `window-width' length.
@@ -475,7 +487,10 @@
                        (my-mode-line-vc-string)
                        ;; (format-mode-line "%l:%c")
                        " "
-                       (if flymake-mode (moon-flymake-mode-line) "")
+                       (cond
+                        (flycheck-mode (my-flycheck-mode-line))     ; todo sum count flymake + flycheck
+                        (flymake-mode (moon-flymake-mode-line))
+                        (t " / / "))
                        " "
                        (propertize mode-name 'face '(:weight bold))
                        " "
@@ -484,12 +499,16 @@
                        ;; (vc-mode vc-mode)
                        ;; mode-line-modes))
                        ))
-          (margin-env 8)    ;; windows
+          (margin-env (case system-type
+                        (darwin 1)
+                        (windows-nt 8)
+                        (t 0)))
           (margin
            (propertize " "
                        'display `(space :align-to (- (+ scroll-bar scroll-bar) ,(string-width right-part) ,margin-env)))))
      (concat left-part margin right-part)))
  (setq-default mode-line-format '(:eval (my-mode-line--form)))
+
  ;; (kill-local-variable 'mode-line-format)
 
  ;; ;; modeline の右端が切れる問題 East Asian Ambiguous Width
@@ -504,6 +523,9 @@
  ;; (setq file-name-coding-system 'utf-8)
  ;; (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
  ;; (require 'my-utf-8-eaw-fullwidth)
+
+ ;; disable mhtml-mode so avoiding conflict with web-mode
+ (delete-if #'(lambda (elm) (eq (cdr elm) 'mhtml-mode)) auto-mode-alist)
 
  (message "<-- startup-hook")
 
@@ -1960,7 +1982,7 @@ using a new file name regardless of the candidates"
          ;; ("C-f" . ivy-avy)
 
          :map counsel-find-file-map
-         ("M-RET" . ivy-immediate-done)
+         ("M-c" . ivy-immediate-done)                   ; M-c == M-RET
 
          :map counsel-mode-map
          ("M-RET" . ivy-immediate-done)
@@ -2350,6 +2372,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
     (setq flycheck-check-syntax-automatically '(mode-enabled save)) ;; new-line also possible
     )
 
+  ;; (add-hook 'after-init-hook #'global-flycheck-mode)
+
+  :config
+  (setq flycheck-display-errors-delay 0.1)
+  (setq flycheck-idle-change-delay 0.1)
+  (setq flycheck-idle-buffer-switch-delay 0.1)
+
   ;; :config
   ;; (flycheck-define-checker my-c
   ;;   "My C checker using gcc"
@@ -2362,9 +2391,9 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;;                              (file-name) ":" line ":" column ":" " warning: " (message)
   ;;                              line-end))
   ;;   :modes (c-mode c++-mode))
-
-  :bind (([S-down] . flycheck-next-error)
-         ([S-up]   . flycheck-previous-error))
+  ;;
+  ;; :bind (([S-down] . flycheck-next-error)
+  ;;        ([S-up]   . flycheck-previous-error))
   )
 
 ;; ----------------------------------------------------------------------
@@ -2375,8 +2404,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
          ("\\.cpp$"     . c++-mode)
          ("\\.c\\+\\+$" . c++-mode)
          ("\\.hpp$"     . c++-mode))
-  :bind (([S-down] . flymake-goto-next-error)
+  :bind (:map c-mode-map
+         ([S-down] . flymake-goto-next-error)
+         ([S-up]   . flymake-goto-prev-error)
+         :map c++-mode-map
+         ([S-down] . flymake-goto-next-error)
          ([S-up]   . flymake-goto-prev-error))
+
   :config
   (advice-add 'c-update-modeline :around #'ignore)      ;; C++//l => C++
 
@@ -2475,7 +2509,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :disabled
   :mode (("\\.mq4$" . mql-mode)
          ("\\.mqh$" . mql-mode))
-  :bind (([S-down] . flymake-goto-next-error)
+  :bind (:map mql-mode-map
+         ([S-down] . flymake-goto-next-error)
          ([S-up]   . flymake-goto-prev-error))
   :config
   (setq mq4-compiler "C:/Users/g/AppData/Roaming/MetaQuotes/WebInstall/mt4clw/metaeditor.exe")
@@ -3098,11 +3133,67 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
 
 ;; ----------------------------------------------------------------------
 (use-package web-mode
-  :mode (("html" . web-mode))
+  :mode (("\\.html$" . web-mode))
+  ;; :hook ((web-mode . lsp))
+  ;; :commands lsp
+
+  :hook (web-mode . flycheck-mode)
   :custom
   (web-mode-markup-indent-offset 2)
   (web-mode-css-indent-offset 2)
   (web-mode-code-indent-offset 2)
+
+  ;; :config
+  ;; ;; flymake setting
+  ;; :if (executable-find "tidy")      ;; html
+  ;; :config
+  ;; (delete '("\\.html?\\'" flymake-proc-xml-init) flymake-proc-allowed-file-name-masks)
+  ;; (defun flymake-proc-html-init ()
+  ;;   (let* ((temp-file (flymake-proc-init-create-temp-buffer-copy
+  ;;                      'flymake-proc-create-temp-inplace))
+  ;;          (local-file (file-relative-name
+  ;;                       temp-file
+  ;;                       (file-name-directory buffer-file-name))))
+  ;;     ;; (list "tidy" (list local-file))))
+  ;;     (list "tidy" (list "-utf8" "-eq" local-file))))
+
+  ;; (add-to-list 'flymake-proc-allowed-file-name-masks
+  ;;              '("\\.html$\\|\\.ctp" flymake-proc-html-init))
+
+  ;; (setq flymake-proc-err-line-patterns '())
+  ;; (add-to-list 'flymake-proc-err-line-patterns
+  ;;              '("line \\([0-9]+\\) column \\([0-9]+\\) - \\(Warning\\|Error\\): \\(.*\\)"
+  ;;                nil 1 2 4))
+
+  :after flycheck
+  :config
+  ;; (flycheck-add-mode 'html-tidy 'web-mode)
+
+  ;; re-defined
+  (flycheck-define-checker html-tidy
+    "A HTML syntax and style checker using Tidy.
+
+See URL `https://github.com/htacg/tidy-html5'."
+    :command ("tidy" (config-file "-config" flycheck-tidyrc)
+           ;; "-lang" "en"
+              "-utf8"
+              "-e" "-q")
+    :standard-input t
+    :error-patterns
+    ((error line-start
+            "line " line
+            " column " column
+            " - Error: " (message) line-end)
+     (warning line-start
+              "line " line
+              " column " column
+              " - Warning: " (message) line-end))
+ ;; :modes (html-mode mhtml-mode nxhtml-mode))
+    :modes (web-mode))
+
+  :bind (:map web-mode-map
+         ([S-down] . flycheck-next-error)
+         ([S-up]   . flycheck-previous-error))
   )
 
 ;; ----------------------------------------------------------------------
@@ -3115,6 +3206,18 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
 (use-package posframe
   :config
   (setq posframe-mouse-banish nil)
+  )
+
+;; ----------------------------------------------------------------------
+(use-package flycheck-posframe
+  :ensure t
+  :after flycheck
+  :config
+  (setq flycheck-posframe-error-prefix "")
+  (setq flycheck-posframe-warning-prefix "")
+  (setq flycheck-posframe-info-prefix "")
+  (set-face-attribute 'flycheck-posframe-background-face nil :background "dim gray")
+  (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
   )
 
 ;; ----------------------------------------------------------------------
@@ -3528,8 +3631,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :custom
   ((lsp-enable-snippet t)
    (lsp-enable-indentation nil)     ;; disable when using ccls
-   (lsp-prefer-flymake nil)
-   (lsp-prefer-capf nil)              ;; use with company
+   (lsp-prefer-flymake t)
+   (lsp-prefer-capf t)              ;; use capf instead of company
    (lsp-headerline-breadcrumb-mode t)
    (lsp-document-sync-method 2)
    (lsp-inhibit-message t)
