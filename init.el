@@ -563,6 +563,14 @@
 ;; (add-hook 'focus-out-hook #'im-off)
 ;; (add-hook 'evil-insert-state-exit-hook #'im-off)
 
+;; ----------------------------------------------------------------------
+;; Stop "Active processes exist; kill them and exit anyway?"
+(require 'cl-lib)
+(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+  (cl-letf (((symbol-function #'process-list) (lambda ())))
+    ad-do-it))
+
 ;; fixme need this?
 ;; ----------------------------------------------------------------------
 ;; utility for use-package
@@ -3142,6 +3150,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   (web-mode-markup-indent-offset 2)
   (web-mode-css-indent-offset 2)
   (web-mode-code-indent-offset 2)
+  (web-mode-enable-current-element-highlight t)
 
   ;; :config
   ;; ;; flymake setting
