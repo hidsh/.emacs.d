@@ -17,7 +17,8 @@ Can be an integer to determine the exact padding."
   "A dark theme inspired by Material Theme by equinusocio"
 
   ;; name        default   256       16
-  ((bg         '("#263238" nil       nil))
+  ;; ((bg         '("#263238" nil       nil))
+  ((bg         '("#212B31" nil       nil))
    (bg-alt     '("#1C262B" nil       nil))
    (base0      '("#171F24" nil       nil))
    (base1      '("#1C262B" "#262626" "brightblack"))
@@ -114,11 +115,11 @@ Can be an integer to determine the exact padding."
     :background modeline-bg-alt :foreground modeline-fg-alt
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg-alt)))
 
-   (line-number :foreground base7 :background base1)
-   (line-number-current-line      :background base1)
+   (line-number :foreground base7 :background base3)
+   (line-number-current-line      :background base3)
 
 ;; (fringe :background base2)
-   (fringe :background base1)
+   (fringe :background base3)
 
    ;; selection (region)
    (region :foreground nil :background nil :underline highlight)
@@ -140,6 +141,9 @@ Can be an integer to determine the exact padding."
    (css-proprietary-property :foreground orange)
    (css-property             :foreground green)
    (css-selector             :foreground blue)
+
+   ;; web-mode
+   ((web-mode-current-element-highlight-face &override) :underline highlight)
 
    ;; dired-k
    (dired-k-commited :foreground base4)
