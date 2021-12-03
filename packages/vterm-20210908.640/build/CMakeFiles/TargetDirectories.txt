@@ -1,0 +1,4 @@
+/Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles/vterm-module.dir
+/Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles/run.dir
+/Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles/edit_cache.dir
+/Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles/rebuild_cache.dir
