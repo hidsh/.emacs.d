@@ -3752,7 +3752,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
     (lambda () (interactive) (vterm-send-key (kbd "C-w"))))
 
   ;; unbinding keys
-  (dolist (k '("M-o" "M-j" "M-k" "C-o" "C-0" "C-1" "C-2"))
+  (dolist (k '("M-r" "M-o" "M-j" "M-k"
+               "C-o" "C-0" "C-1" "C-2"))
     (define-key vterm-mode-map (kbd k) nil))
 
   ;; force emacs-state
