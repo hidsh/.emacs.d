@@ -110,7 +110,6 @@
   left-margin-width 1 right-margin-width 1         ; Add left and right margins
   select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
   sentence-end-double-space nil                    ; End a sentence after a dot and a space
-  show-trailing-whitespace t                       ; Display trailing whitespaces
   uniquify-buffer-name-style 'forward              ; Uniquify buffer names
   window-combination-resize t                      ; Resize windows proportionally
 
@@ -179,10 +178,8 @@
  (setq-default left-margin-width 0 right-margin-width 0) ; Define new widths.
  (set-window-buffer nil (current-buffer))                ; Use them now.
 
+ (add-hook 'prog-mode-hook #'(lambda () (setq-local show-trailing-whitespace t)))
  (set-face-background 'trailing-whitespace (mycolor 'red))
- ;; disable show-trailing-whitespace in any case
- (add-hook 'minibuffer-setup-hook (lambda () (setq-local show-trailing-whitespace nil)))
- (add-hook 'counsel-mode-hook (lambda () (setq-local show-trailing-whitespace nil)))
 
  ;; save-place
  (setq save-place-file "~/.emacs.d/.emacs-places")
@@ -2528,7 +2525,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
                              (counsel-gtags-mode -1)
                              (symbol-overlay-mode t)
                              (which-function-mode 1)
-                             (setq-local show-trailing-whitespace nil)
                              ))
   )
 
@@ -3404,7 +3400,6 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
       (setq org-tree-slide-header nil)
       (setq org-tree-slide-slide-in-effect nil)
       (setq org-tree-slide-exit-at-next-last-slide t)
-      (setq-local show-trailing-whitespace nil)
       (org-display-inline-images))
 
     (defun presen-exit ()
@@ -3757,8 +3752,16 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
     (lambda () (interactive) (vterm-send-key (kbd "C-w"))))
 
   ;; unbinding keys
-  (dolist (k '("M-j" "M-k" "C-o" "C-0" "C-1" "C-2"))
+  (dolist (k '("M-o" "M-j" "M-k" "C-o" "C-0" "C-1" "C-2"))
     (define-key vterm-mode-map (kbd k) nil))
+
+  ;; force emacs-state
+  (defun my-adv-switch-to-bufffer--force-evil-emacs-state-in-vterm (&rest _)
+    (when (eq major-mode 'vterm-mode)
+      (evil-emacs-state nil)))
+  (advice-add 'switch-to-buffer :after #'my-adv-switch-to-bufffer--force-evil-emacs-state-in-vterm)
+
+  (add-to-list 'evil-emacs-state-modes 'vterm-mode)
 
   )
 
