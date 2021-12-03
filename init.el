@@ -3747,6 +3747,22 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 (use-package minibuffer-timer)
 
 ;; ----------------------------------------------------------------------
+(use-package vterm
+  :ensure t
+  :config
+  (setq vterm-buffer-name-string "%s")
+
+  ;; send keys to terminal directly
+  (define-key vterm-mode-map (kbd "M-h")
+    (lambda () (interactive) (vterm-send-key (kbd "C-w"))))
+
+  ;; unbinding keys
+  (dolist (k '("M-j" "M-k" "C-o" "C-0" "C-1" "C-2"))
+    (define-key vterm-mode-map (kbd k) nil))
+
+  )
+
+;; ----------------------------------------------------------------------
 (use-package re-builder
   :ensure t
   :config
