@@ -1848,7 +1848,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (defun my-find ()
     (interactive)
     (let ((my-ivy-immediate-flag t))
-      (ivy-read "find dir: " 'read-file-name-internal
+      (ivy-read "Find: " 'read-file-name-internal
                 :matcher #'counsel--find-file-matcher
                 :action #'my-find-1
                 :preselect (counsel--preselect-file)
