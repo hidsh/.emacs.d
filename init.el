@@ -1142,14 +1142,21 @@ If COUNT is given, move COUNT - 1 lines downward first."
 ;; ----------------------------------------------------------------------
 (use-package evil-collection
   ;; :disabled
-  :after evil
+  :after evil dired
   :config
   ;; (evil-collection-init '(edebug dired neotree slime help re-builder)) ;; fixme
   (evil-collection-init '(edebug dired neotree slime help paren))
 
   (evil-define-key 'normal help-mode-map (kbd "C-o") 'other-window)
   (evil-define-key 'normal help-mode-map (kbd "C-0") 'delete-window)
-  )
+  (evil-collection-define-key 'normal 'dired-mode-map
+    [return]   'dired-open-in-accordance-with-situation
+    [right]    'dired-open-in-accordance-with-situation
+    "."        'dired-open-in-accordance-with-situation
+    [left]     'kill-current-buffer-and-dired-up-directory
+    ","        'kill-current-buffer-and-dired-up-directory
+    "r"        'revert-buffer)                                    ; reload
+)
 
 ;; ----------------------------------------------------------------------
 (use-package evil-escape
@@ -1176,9 +1183,10 @@ If COUNT is given, move COUNT - 1 lines downward first."
 (use-package evil-matchit
   :ensure t
   :after evil
+  :hook ((prog-mode . turn-on-evil-matchit-mode))
   :config
   (setq evilmi-shortcut "]")
-  (global-evil-matchit-mode 1)
+  ;; (global-evil-matchit-mode 1)
 
   )
 
@@ -1864,6 +1872,22 @@ directory, the file name, and its state (modified, read-only or non-existent)."
     (let* ((my-ivy-immediate-flag nil))
       (counsel-file-jump "" dir)))
 
+  (defun my-dired ()
+    (interactive)
+    (let ((my-ivy-immediate-flag t))
+      (ivy-read "Dired: " 'read-file-name-internal
+                :matcher #'counsel--find-file-matcher
+                :action #'my-dired-1
+                :preselect (counsel--preselect-file)
+                :require-match 'confirm-after-completion
+                :history 'file-name-history
+                :keymap counsel-find-file-map
+                :caller 'my-dired)))
+
+  (defun my-dired-1 (dir)
+    (let ((my-ivy-immediate-flag nil))
+      (dired dir)))
+
   ;; re-defun rom counsel.el
   ;; Usage: C-x C-f M-x m
   (defun counsel-find-file-move (x)
@@ -2367,19 +2391,28 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;; http://nishikawasasaki.hatenablog.com/entry/20120222/1329932699
   (defun dired-open-in-accordance-with-situation ()
     (interactive)
-    (let ((file (dired-get-filename)))
+    (let ((file (dired-get-filename nil t)))
       (if (file-directory-p file)
           (dired-find-alternate-file)
         (dired-find-file))))
 
   (put 'dired-find-alternate-file 'disabled nil) ;; dired-find-alternate-file の有効化
 
-  :bind (:map dired-mode-map
-             ("a"     . dired-find-file)
-             ("RET"   . dired-open-in-accordance-with-situation)
-             ([right] . dired-open-in-accordance-with-situation)
-             ([left]  . dired-up-directory)
-             ("r"     . revert-buffer))                                    ; reload
+  (defun kill-current-buffer-and-dired-up-directory (&optional other-window)
+    "In Dired, dired-up-directory and kill previously selected buffer."
+    (interactive "P")
+    (let ((b (current-buffer)))
+      (dired-up-directory other-window)
+      (kill-buffer b)))
+
+  :bind (("C-x d"    . my-dired)
+         ("C-x C-d"  . my-dired)
+         :map dired-mode-map
+         ("a"     . dired-find-file)
+         ("RET"   . dired-open-in-accordance-with-situation)
+         ([right] . dired-open-in-accordance-with-situation)
+         ([left]  . kill-current-buffer-and-dired-up-directory)
+         ("r"     . revert-buffer))                                    ; reload
 
   )
 
