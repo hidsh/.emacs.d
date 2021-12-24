@@ -41,7 +41,7 @@
                   (purple      . "#c678dd")
                   (orange      . "#e3b23c")
                   ;; (charcoal . "#3d363e"))))
-                  ;; (charcoal . "#362f37"))))
+                  ;; (charcoal . "#362f37")))
                   (charcoal    . "#2b262c"))))
     (cdr (assoc name colors))))
 
@@ -524,6 +524,8 @@
  ;; disable mhtml-mode so avoiding conflict with web-mode
  (delete-if #'(lambda (elm) (eq (cdr elm) 'mhtml-mode)) auto-mode-alist)
 
+ (setq enable-local-variables nil)  ;; disable "emacs the local variables list in..." when find-file
+
  (message "<-- startup-hook")
 
  ;; show emacs version and startup time in mini-buffer
@@ -794,6 +796,7 @@
   (define-key evil-motion-state-map (kbd ";") #'evil-ex)    ; works as :
 
   ;; normal-state-map
+  (define-key evil-normal-state-map (kbd "!") #'shell-command)
   (define-key evil-normal-state-map (kbd "q") nil)
   (define-key evil-normal-state-map (kbd "m") nil)
   (define-key evil-normal-state-map (kbd "M-.") nil)        ; evil-repeat-pop-next
@@ -1835,7 +1838,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
 
   (defun my-counsel-rg-1 (dir)
     (let  ((counsel-ag-base-command (concat my-counsel-rg-exe
-                                            " -i --no-heading --line-number --color never %s ."))
+                                            " -i --smart-case --no-heading --line-number --color never %s ."))
            (initial-input (if (symbol-at-point) (symbol-name (symbol-at-point)) ""))
            (initial-directory dir)
            (extra-rg-args nil)
@@ -1973,6 +1976,7 @@ using a new file name regardless of the candidates"
          ("M-o"     . my-counsel-rg)
          ("C-x C-g" . my-find)
          ("C-x C-b" . counsel-ibuffer)
+         ("C-x C-w" . write-file)
          ;; ("C-x C-w" . my-counsel-write-file)
          ;; ("C-x C-f" . my-counsel-find-file)
          ;; ("C-s"     . swiper)
@@ -2519,8 +2523,27 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package arduino-mode
+  :hook (arduino-mode . flymake-mode)
   :mode (("\\.pde$" . arduino-mode)
          ("\\.ino$" . arduino-mode))
+  :config
+  (defun flymake-arduino-init ()
+    (unless arduino-exe-path
+      (error "Not defined arduino-exe-path"))
+    (unless (file-exists-p arduino-exe-path)
+      (error "Not found %s" arduino-exe-path))
+    (unless (file-executable-p arduino-exe-path)
+      (error "Not found %s" arduino-exe-path))
+    (let* ((temp-file   (flymake-proc-init-create-temp-buffer-copy
+                         ;; 'flymake-create-temp-inplace))
+                         'flymake-proc-create-temp-with-folder-structure))
+           (local-dir   (file-name-directory buffer-file-name)))
+      (list arduino-exe-path (list "compile"
+                                   (concat "--fqbn=" arduino-fqbn)
+                                   (substring local-dir 0 -1)))))
+
+  (push '("\\.ino$" flymake-arduino-init) flymake-proc-allowed-file-name-masks)
+  (push '("^\\(.+\.ino\\):\\([0-9]+\\):\\([0-9]+\\): \\(.+\\)$" 1 2 3 4) flymake-err-line-patterns)
   )
 
 ;; ----------------------------------------------------------------------
@@ -3656,7 +3679,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :ensure t
   :commands lsp
   :custom
-  ((lsp-enable-snippet t)
+  ((lsp-print-io t)                     ;; => *lsp-log*
+   (lsp-enable-snippet t)
    (lsp-enable-indentation nil)     ;; disable when using ccls
    (lsp-prefer-flymake t)
    (lsp-prefer-capf t)              ;; use capf instead of company
@@ -3760,6 +3784,18 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
           my-beginning-of-defun
           my-beginning-of-line my-end-of-line
           ))
+  )
+;; ----------------------------------------------------------------------
+(use-package arduino-cli-mode
+  :ensure t
+  ;; :hook arduino-mode
+  ;; :mode "\\.ino\\'"
+  :config
+  (push "D:/pgm/" exec-path)
+  
+  :custom
+  (arduino-cli-warnings 'all)
+  (arduino-cli-verify t)
   )
 ;; ----------------------------------------------------------------------
 (use-package minibuffer-timer)
