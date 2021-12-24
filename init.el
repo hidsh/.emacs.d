@@ -16,12 +16,12 @@
 (setq my-backup-directory "~/bak")
 
 ;; check-emacs-setting
-(require 'check-emacs-setting)
-(setq check-emacs-setting-files '("~/.emacs.d/init.el"
-                                  "~/.emacs.d/elisp/discrete.el"
-                                  "~/.emacs.d/elisp/_mac.el"
-                                  "~/.emacs.d/elisp/_ubuntu.el"
-                                  "~/.emacs.d/elisp/_windows.el"))
+;; (require 'check-emacs-setting)
+;; (setq check-emacs-setting-files '("~/.emacs.d/init.el"
+;;                                   "~/.emacs.d/elisp/discrete.el"
+;;                                   "~/.emacs.d/elisp/_mac.el"
+;;                                   "~/.emacs.d/elisp/_ubuntu.el"
+;;                                   "~/.emacs.d/elisp/_windows.el"))
 
 ;; ----------------------------------------------------------------------
 (defun mycolor (name)
@@ -544,21 +544,23 @@
 ;; im-ctl
 ;; (defun im-ctl (on) (do-depends-on-each-os))
 
-(defun im-on ()
-  (interactive)
-  (if (fboundp 'im-ctl)
-      (im-ctl t)
-    (message "Error: Not defined function \"im-ctl\"")))
+(when window-system
+  (defun im-on ()
+    (interactive)
+    (if (fboundp 'im-ctl)
+        (im-ctl t)
+      (message "Error: Not defined function \"im-ctl\"")))
 
-(defun im-off ()
-  (interactive)
-  (if (fboundp 'im-ctl)
-      (im-ctl nil)
-    (message "Error: Not defined function \"im-ctl\"")))
+  (defun im-off ()
+    (interactive)
+    (if (fboundp 'im-ctl)
+        (im-ctl nil)
+      (message "Error: Not defined function \"im-ctl\"")))
 
-(add-hook 'minibuffer-exit-hook #'im-off)
-;; (add-hook 'focus-out-hook #'im-off)
-;; (add-hook 'evil-insert-state-exit-hook #'im-off)
+  (add-hook 'minibuffer-exit-hook #'im-off)
+  ;; (add-hook 'focus-out-hook #'im-off)
+  ;; (add-hook 'evil-insert-state-exit-hook #'im-off)
+)
 
 ;; ----------------------------------------------------------------------
 ;; Stop "Active processes exist; kill them and exit anyway?"
@@ -1197,6 +1199,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 ;; ----------------------------------------------------------------------
 (use-package my-doom-material-theme
+  :if window-system
   :load-path "~/.emacs.d/themes"
   :config
   (load-theme 'my-doom-material t)
@@ -1206,6 +1209,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 ;; ----------------------------------------------------------------------
 (use-package tabbar
+  :if window-system
   ;; :disabled
   :hook ((after-save   . tabbar-on-saving-buffer)
          (first-change . tabbar-on-modifying-buffer))
@@ -1666,6 +1670,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
 
 ;; ----------------------------------------------------------------------
 (use-package hide-mode-line
+  :if window-system
   :hook ((neotree-mode) . hide-mode-line-mode)
   )
 
@@ -1684,6 +1689,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
 
 ;; ----------------------------------------------------------------------
 (use-package all-the-icons
+  :if window-system
   :config
   (setq inhibit-compacting-font-caches t)
   (setq all-the-icons-color-icons nil)
@@ -1691,6 +1697,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
 
 ;; ----------------------------------------------------------------------
 (use-package neotree
+  :if window-system
   ;; :disabled
   :after evil all-the-icons
   :config
@@ -1824,7 +1831,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
               :keymap counsel-find-file-map
               :caller 'my-counsel-rg)))
 
-  (defvar my-counsel-rg-exe "")  ;; overridden by _windows.el or _mac.el
+  (defvar my-counsel-rg-exe "")  ;; will be overridden by _windows.el or _mac.el
 
   (defun my-counsel-rg-1 (dir)
     (let  ((counsel-ag-base-command (concat my-counsel-rg-exe
@@ -1838,12 +1845,11 @@ directory, the file name, and its state (modified, read-only or non-existent)."
 
   (cl-pushnew 'my-counsel-rg-1 ivy-highlight-grep-commands)
 
-  (defun my-find (&optional initial-input)
+  (defun my-find ()
     (interactive)
     (let ((my-ivy-immediate-flag t))
       (ivy-read "find dir: " 'read-file-name-internal
                 :matcher #'counsel--find-file-matcher
-                :initial-input initial-input
                 :action #'my-find-1
                 :preselect (counsel--preselect-file)
                 :require-match 'confirm-after-completion
@@ -1852,9 +1858,8 @@ directory, the file name, and its state (modified, read-only or non-existent)."
                 :caller 'my-find)))
 
   (defun my-find-1 (dir)
-    (let* ((my-ivy-immediate-flag nil)
-           (initial-input (or (thing-at-point 'filename) "")))
-      (counsel-file-jump initial-input dir)))
+    (let* ((my-ivy-immediate-flag nil))
+      (counsel-file-jump "" dir)))
 
   ;; re-defun rom counsel.el
   ;; Usage: C-x C-f M-x m
@@ -1966,6 +1971,7 @@ using a new file name regardless of the candidates"
   :bind (("M-z"     . ivy-resume)
          ("M-r"     . counsel-recentf)
          ("M-o"     . my-counsel-rg)
+         ("C-x C-g" . my-find)
          ("C-x C-b" . counsel-ibuffer)
          ;; ("C-x C-w" . my-counsel-write-file)
          ;; ("C-x C-f" . my-counsel-find-file)
@@ -2210,6 +2216,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package scratch-log
+  :if window-system
   :ensure t
   :config
   (add-to-list 'recentf-exclude "scratch-log-autoloads.el")
@@ -2225,6 +2232,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package gist
+  :if window-system
   :after evil
   :config
   (evil-add-hjkl-bindings gist-list-menu-mode-map 'emacs
@@ -2242,6 +2250,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package git-gutter
+  :if window-system
   :ensure t
   :hook ((focus-in . git-gutter))
   :init
@@ -2285,6 +2294,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package beacon
+  :if window-system
   ;; :disabled
   :diminish beacon-mode
   :config
@@ -2296,6 +2306,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package org-bullets
+  :if window-system
   :after org
   :config
   (setq org-bullets-bullet-list '("❖" "☯" "✪" "✿" "✜" "⬟" "⬢" "⬣"))
@@ -2304,6 +2315,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package google-translate
+  :if window-system
   :config
   (defvar google-translate-english-chars "[:ascii:]`‘’“”–'\"`"
     "これらの文字が含まれているときは英語とみなす")
@@ -2340,6 +2352,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package dired
+  :if window-system
   ;; :disabled
   :config
   (setq dired-dwim-target t                   ; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
@@ -2368,6 +2381,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package flycheck
+  :if window-system
   :disabled
   :hook ((c-mode . flycheck-c-mode-hook-func))
   :init
@@ -2530,6 +2544,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package slime
+  :if window-system
   :disabled
   :init
   (load (expand-file-name "~/.roswell/helper.el"))
@@ -2584,6 +2599,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package org
+  :if window-system
   :config
   ;; (setq org-directory "~/Dropbox/org")       ;; defined in _windows.el or _mac.el
   (setq org-default-notes-file (expand-file-name (path-join org-directory "notes.org")))
@@ -3117,6 +3133,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
 
 ;; ----------------------------------------------------------------------
 (use-package org-fold
+  :if window-system
   :disabled
   :defer t
   :load-path "~/.emacs.d/elisp"
@@ -3209,12 +3226,14 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package posframe
+  :if window-system
   :config
   (setq posframe-mouse-banish nil)
   )
 
 ;; ----------------------------------------------------------------------
 (use-package flycheck-posframe
+  :if window-system
   :ensure t
   :after flycheck
   :config
@@ -3227,6 +3246,7 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flymake-posframe
+  :if window-system
   :load-path "elisp/flymake-posframe"
   :hook (flymake-mode . flymake-posframe-mode)
   :config
@@ -3336,6 +3356,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package default-text-scale
+  :if window-system
   :config
   (setq default-text-scale-amount 30)
   (default-text-scale-mode 1)
@@ -3348,6 +3369,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package org-tree-slide
+  :if window-system
   ;; :defer t
   :bind (:map org-mode-map
          ([f5] . org-tree-slide-on)
@@ -3463,6 +3485,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;;; ----------------------------------------------------------------------
 (use-package slime
+  :if window-system
   :config
   (setq slime-startup-animation nil)
   (defalias 'slime-reset 'slime-restart-inferior-lisp)
@@ -3743,6 +3766,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package vterm
+  :if window-system
   :ensure t
   :config
   (setq vterm-buffer-name-string "%s")
