@@ -1137,6 +1137,11 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; ----------
   (add-hook 'evil-visual-state-entry-hook #'(lambda () (show-paren-mode -1)))
   (add-hook 'evil-visual-state-exit-hook  #'(lambda () (show-paren-mode 1)))
+
+  ;; re-defined
+  (evil-define-command evil-quit (&optional force)
+    (message "nop"))        ;; do *not* exit from emacs after :q and :wq
+
 )
 
 ;; ----------------------------------------------------------------------
