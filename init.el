@@ -1140,7 +1140,24 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   ;; re-defined
   (evil-define-command evil-quit (&optional force)
-    (message "nop"))        ;; do *not* exit from emacs after :q and :wq
+    (nop))        ;; do *not* exit from emacs after :q and :wq
+
+  ;; paste in evil-normal-state
+    (evil-define-command my-evil-normal-paste-to-prev-line ()
+    (evil-first-non-blank)
+    (yank)
+    (newline)
+    (call-interactively #'evil-indent-line))
+
+  (evil-global-set-key 'normal "P" #'my-evil-normal-paste-to-prev-line)
+
+  (evil-define-command my-evil-normal-paste-to-next-line ()
+    (end-of-line)
+    (newline)
+    (call-interactively #'evil-indent-line)
+    (yank))
+
+  (evil-global-set-key 'normal "p" #'my-evil-normal-paste-to-next-line)
 
 )
 
