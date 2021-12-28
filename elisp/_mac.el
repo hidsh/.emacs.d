@@ -31,11 +31,11 @@
 
 ;; 以降はGUIのときのみ
 (when window-system
-  ; server 起動
-  ; ターミナルからは `$ emacsclient -nw hogefile` で使う
-  (require 'server)
-  (unless (server-running-p)
-    (server-start))
+  ;; server 起動
+  ;; ターミナルからは `$ emacsclient -nw hogefile` で使う
+  ;; (require 'server)
+  ;; (unless (server-running-p)
+  ;;   (server-start))
 
   ;; window size and position
   (setq initial-frame-alist '(

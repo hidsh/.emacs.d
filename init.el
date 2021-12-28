@@ -3220,12 +3220,26 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   ;; :hook ((web-mode . lsp))
   ;; :commands lsp
 
-  :hook (web-mode . flycheck-mode)
+  ;; :hook (web-mode . flycheck-mode)
   :custom
   (web-mode-markup-indent-offset 2)
   (web-mode-css-indent-offset 2)
   (web-mode-code-indent-offset 2)
   (web-mode-enable-current-element-highlight t)
+  (web-mode-engines-alist '(("django" . "\\.html$")))     ;; django template (this is temporary)
+
+  (web-mode-extra-snippets
+   '(("django" . (("{" . "{{ | }}")
+                  ("%" . "{% | %}\n\n{% end %}\n")
+                  ("ext" . "{% extends '|' %}\n")
+                  ("if" . "{% if | %}\n\n{% else %}\n\n{% endif %}\n")
+                  ("for" . "{% for x in | %}\n\n{% endfor %}\n")
+                  ("block" . "{% block | %}\n\n{% endblock %}\n")
+                  ))))
+
+  :config
+  (evil-define-key 'normal web-mode-map "[" 'web-mode-snippet-insert)
+
 
   ;; :config
   ;; ;; flymake setting
