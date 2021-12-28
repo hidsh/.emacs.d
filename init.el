@@ -2407,7 +2407,11 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :config
   (setq dired-dwim-target t                   ; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
         dired-recursive-copies 'always        ; ディレクトリを再帰的にコピーする
-        dired-isearch-filenames t)            ; diredバッファでC-sした時にファイル名だけにマッチするように
+        dired-isearch-filenames t             ; diredバッファでC-sした時にファイル名だけにマッチするように
+        ls-lisp-ignore-case t                 ; ファイル名の大文字小文字無視でソート
+        ls-lisp-dirs-first t                  ; ディレクトリとファイルを分けて表示
+        dired-listing-switches "-AlGh"        ; グループ表示なし、'.'/'..'を非表示、サイズをK/Mに変換
+        )
 
   ;; ファイルなら別バッファで、ディレクトリなら同じバッファで開く
   ;; http://nishikawasasaki.hatenablog.com/entry/20120222/1329932699
