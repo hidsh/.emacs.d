@@ -3150,6 +3150,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
 
   ;; ----------
   (define-key evil-normal-state-map (kbd "M-c") #'ffap)                       ; M-RET
+  (define-key evil-insert-state-map (kbd "M-v") #'nop)                        ; prevent paste in Mac
   (define-key evil-normal-state-map (kbd "t d") #'my-org-capture-add-todo)
   (define-key evil-normal-state-map (kbd "t m") #'my-org-capture-add-memo)
   (define-key evil-normal-state-map (kbd "t t") #'my-org-notes-open)          ; toggle org buffer
