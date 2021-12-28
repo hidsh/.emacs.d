@@ -3228,17 +3228,21 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   (web-mode-enable-current-element-highlight t)
   (web-mode-engines-alist '(("django" . "\\.html$")))     ;; django template (this is temporary)
 
-  (web-mode-extra-snippets
+  :config
+  (setq web-mode-extra-snippets
    '(("django" . (("{" . "{{ | }}")
+                  ("c" . "{# -- | -- #}")
                   ("%" . "{% | %}\n\n{% end %}\n")
                   ("ext" . "{% extends '|' %}\n")
                   ("if" . "{% if | %}\n\n{% else %}\n\n{% endif %}\n")
-                  ("for" . "{% for x in | %}\n\n{% endfor %}\n")
+                  ("for" . "{% for | in  %}\n\n{% endfor %}\n")
                   ("block" . "{% block | %}\n\n{% endblock %}\n")
+
+                  ("<" . "<|>")
                   ))))
 
-  :config
-  (evil-define-key 'normal web-mode-map "[" 'web-mode-snippet-insert)
+  (evil-define-key 'normal web-mode-map (kbd "M-[") 'web-mode-snippet-insert)
+  (evil-define-key 'insert web-mode-map (kbd "M-[") 'web-mode-snippet-insert)
 
 
   ;; :config
