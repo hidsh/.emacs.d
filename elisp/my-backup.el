@@ -174,8 +174,10 @@ nilの場合は編集中のファイルと同じ場所とみなす。")
 	; ﾃﾞﾌｫﾙﾄのﾊﾞｯｸｱｯﾌﾟ先が指定されてない場合は編集中のﾌｧｲﾙと同じ場所とする
 	(setq dir (file-name-directory (buffer-file-name)))))
     (when dir
-	(setq wild (concat (file-name-nondirectory orig) "*"))
-	(dired (concat dir wild)))))
+      (setq wild (concat (file-name-nondirectory orig) "*"))
+
+      (let ((dired-listing-switches "-lt"))
+        (dired (concat dir wild))))))
 
 
 (defalias 'bak 'my-backup)
