@@ -243,7 +243,7 @@
  (global-set-key "{" 'my-insert-brace)                   ; {}
  (global-set-key "[" 'my-insert-bracket)                 ; []
  ;; (global-set-key "<" 'my-insert-angle)                   ; <>
- ;; (global-set-key "'" 'my-insert-squote)                  ; ''
+ (global-set-key "'" 'my-insert-squote)                  ; ''
  (global-set-key "\"" 'my-insert-dquote)                 ; ""
 
  (global-set-key (kbd "C-m") 'newline-and-indent)             ; Returnキーで改行＋オートインデント
@@ -1011,7 +1011,9 @@
     (let* ((s (buffer-substring-no-properties beg end))
            (head (aref s 0))
            (tail (aref s (1- (length s)))))
-      (cond ((or (eq head tail) (eq tail (my-evil-visual-surround-get-tail head)))
+      (cond ((= (- end beg) 1)
+             (my-evil-visual-surround-add beg end))
+            ((or (= head tail) (= tail (my-evil-visual-surround-get-tail head)))
              (my-evil-visual-surround-change beg end))
             (t (my-evil-visual-surround-add beg end)))))
 
@@ -1151,7 +1153,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
       (newline)
       (call-interactively #'evil-indent-line)))
 
-  (define-key evil-normal-state-map "P" #'my-evil-normal-paste-to-prev-line)
+  ;; (define-key evil-normal-state-map "P" #'my-evil-normal-paste-to-prev-line)
 
   (evil-define-command my-evil-normal-paste-to-next-line ()
     (if (evil-visual-state-p)
@@ -1161,7 +1163,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
       (call-interactively #'evil-indent-line)
       (yank)))
 
-  (define-key evil-normal-state-map "p" #'my-evil-normal-paste-to-next-line)
+  ;; (define-key evil-normal-state-map "p" #'my-evil-normal-paste-to-next-line)
 
 )
 
