@@ -2440,6 +2440,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :bind (("C-x d"    . my-dired)
          ("C-x C-d"  . my-dired)
          :map dired-mode-map
+         ("H"     . dired-up-directory)
+         ("L"     . nop)
          ("a"     . dired-find-file)
          ("RET"   . dired-open-in-accordance-with-situation)
          ([right] . dired-open-in-accordance-with-situation)
