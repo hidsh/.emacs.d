@@ -2139,6 +2139,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 
   )
+
+;; ----------------------------------------------------------------------
+(use-package swap-buffers
+  :config
+  ;; (global-set-key (kbd "C-c b") 'swap-buffers)
+
+  )
 ;; ----------------------------------------------------------------------
 (use-package recentf
   :config
