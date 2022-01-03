@@ -32,3 +32,4 @@ tutorial
 .check-emacs-setting/log.txt
 \.check-emacs-setting/batch-script\.el
 *.elc
+projectile-bookmarks.eld

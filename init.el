@@ -2132,6 +2132,14 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 )
 
 ;; ----------------------------------------------------------------------
+(use-package projectile
+  :config
+  (projectile-mode +1)
+  ;; Recommended keymap prefix on macOS
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+
+  )
+;; ----------------------------------------------------------------------
 (use-package recentf
   :config
   (setq recentf-max-saved-items 5000) ;; 履歴保存の数
