@@ -2144,7 +2144,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package swap-buffers
   :config
   ;; (global-set-key (kbd "C-c b") 'swap-buffers)
-
+  (defun my-swap-buffer ()
+    (interactive)
+    (let ((current-prefix-arg 4)) ;; emulate C-u
+      (call-interactively 'swap-buffers)))
   )
 ;; ----------------------------------------------------------------------
 (use-package recentf
