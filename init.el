@@ -2473,8 +2473,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; ----------------------------------------------------------------------
 (use-package flycheck
   :if window-system
-  :disabled
-  :hook ((c-mode . flycheck-c-mode-hook-func))
   :init
   (defun flycheck-c-mode-hook-func ()
     ;; (flycheck-select-checker 'my-c)
@@ -2482,12 +2480,18 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
     (setq flycheck-check-syntax-automatically '(mode-enabled save)) ;; new-line also possible
     )
 
+  :hook ((c-mode   . flycheck-c-mode-hook-func)
+         (js-mode  . flycheck-c-mode-hook-func)
+         (web-mode . flycheck-c-mode-hook-func))
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
   :config
   (setq flycheck-display-errors-delay 0.1)
   (setq flycheck-idle-change-delay 0.1)
-  (setq flycheck-idle-buffer-switch-delay 0.1)
+  (setq flycheck-idle-buffer-switch-delay 0.0)
+
+  (let ((color (face-foreground 'error)))
+    (set-face-underline 'flycheck-error `(:style wave :color ,color)))
 
   ;; :config
   ;; (flycheck-define-checker my-c
@@ -3348,12 +3352,6 @@ See URL `https://github.com/htacg/tidy-html5'."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package flymake-eslint
-  :hook ((js-mode  . flymake-eslint-enable)
-         (web-mode . flymake-eslint-enable))
-  )
-
-;; ----------------------------------------------------------------------
 (use-package posframe
   :if window-system
   :config
@@ -3369,7 +3367,7 @@ See URL `https://github.com/htacg/tidy-html5'."
   (setq flycheck-posframe-error-prefix "")
   (setq flycheck-posframe-warning-prefix "")
   (setq flycheck-posframe-info-prefix "")
-  (set-face-attribute 'flycheck-posframe-background-face nil :background "dim gray")
+  (set-face-background 'flycheck-posframe-background-face "dim gray")
   (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
   )
 

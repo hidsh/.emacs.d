@@ -13,7 +13,7 @@
  '(org-startup-indented t)
  '(package-selected-packages
    (quote
-    (swap-buffers projectile ah vterm flycheck-posframe web-mode flymake-eslint ccls lsp-mode smartparens company-quickhelp company yasnippet org-tree-slide default-text-scale migemo dimmer zone-rainbow super-save hide-mode-line doom-themes doom-modeline all-the-icons all-the-icons-ivy git-gutter symbol-overlay slime clojure-mode wgrep-ag tabbar common-header-mode-line use-package evil-lion org-bullets arduino-mode beacon anzu evil-tutor-ja evil-collection evil google-translate guide-key-tip rainbow-delimiters fringe-helper git-gutter-fringe counsel-etags counsel-gtags neotree gist hiwin rainbow-mode telephone-line scratch-log markdown-mode expand-region dashboard ag ido-yes-or-no atom-one-dark-theme))))
+    (swap-buffers projectile ah vterm flycheck-posframe web-mode ccls lsp-mode smartparens company-quickhelp company yasnippet org-tree-slide default-text-scale migemo dimmer zone-rainbow super-save hide-mode-line doom-themes doom-modeline all-the-icons all-the-icons-ivy git-gutter symbol-overlay slime clojure-mode wgrep-ag tabbar common-header-mode-line use-package evil-lion org-bullets arduino-mode beacon anzu evil-tutor-ja evil-collection evil google-translate guide-key-tip rainbow-delimiters fringe-helper git-gutter-fringe counsel-etags counsel-gtags neotree gist hiwin rainbow-mode telephone-line scratch-log markdown-mode expand-region dashboard ag ido-yes-or-no atom-one-dark-theme))))
 
 (put 'narrow-to-region 'disabled nil)
 (custom-set-faces

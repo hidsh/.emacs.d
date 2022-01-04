@@ -36,6 +36,8 @@ Can be an integer to determine the exact padding."
 
    (black       '("#000000" nil nil))
    (red         '("#ff5370" "#ff0000" "red"))
+   (pink        '("#FF8599" nil nil))
+   ;; (pink        '("#FF99AA" nil nil))
    (orange      '("#f78c6c" "#ff5f00" "brightred"))
    (green       '("#c3e88d" "#afff00" "green"))
    (teal        '("#44b9b1" "#00d7af" "brightgreen"))
@@ -68,7 +70,7 @@ Can be an integer to determine the exact padding."
    (variables      yellow)
    (numbers        orange)
    (region         base3)
-   (error          red)
+   (error          pink)
    (warning        yellow)
    (success        green)
    (vc-modified    blue)
