@@ -1165,6 +1165,8 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   ;; (define-key evil-normal-state-map "p" #'my-evil-normal-paste-to-next-line)
 
+  (fset 'evil-backward-section-begin #'nop)     ;; disabled
+
 )
 
 ;; ----------------------------------------------------------------------
