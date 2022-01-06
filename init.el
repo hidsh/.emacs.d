@@ -679,6 +679,11 @@
     (evil-normal-state 1))
   (advice-add 'switch-to-buffer :after #'my-adv-switch-to-bufffer--disable-evil-visual-state)
 
+  ;; evil keybindings
+  (define-key evil-normal-state-map (kbd "M-c") #'ffap)                       ; M-RET
+  (define-key evil-insert-state-map (kbd "M-v") #'nop)                        ; prevent paste in Mac
+  (define-key evil-visual-state-map (kbd "x") #'evil-delete)                  ; prevent paste in Mac
+
   ;; for package-mode
   (evil-add-hjkl-bindings package-menu-mode-map 'emacs
     (kbd "/")       'evil-search-forward
@@ -3219,8 +3224,6 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   (set-face-attribute 'org-link nil :foreground (face-foreground 'default) :underline t)
 
   ;; ----------
-  (define-key evil-normal-state-map (kbd "M-c") #'ffap)                       ; M-RET
-  (define-key evil-insert-state-map (kbd "M-v") #'nop)                        ; prevent paste in Mac
   (define-key evil-normal-state-map (kbd "t d") #'my-org-capture-add-todo)
   (define-key evil-normal-state-map (kbd "t m") #'my-org-capture-add-memo)
   (define-key evil-normal-state-map (kbd "t t") #'my-org-notes-open)          ; toggle org buffer
