@@ -2477,7 +2477,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (defun flycheck-c-mode-hook-func ()
     ;; (flycheck-select-checker 'my-c)
     (flycheck-mode t)
-    (setq flycheck-check-syntax-automatically '(mode-enabled save)) ;; new-line also possible
+    ;; (setq flycheck-check-syntax-automatically '(mode-enabled save)) ;; new-line also possible
     )
 
   :hook ((c-mode   . flycheck-c-mode-hook-func)
@@ -2493,6 +2493,25 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (let ((color (face-foreground 'error)))
     (set-face-underline 'flycheck-error `(:style wave :color ,color)))
 
+  (define-key evil-motion-state-map (kbd "g j") 'flycheck-next-error)
+  (define-key evil-motion-state-map (kbd "g k") 'flycheck-previous-error)
+
+;;   (load "~/.emacs.d/packages/flycheck-tip-20171020.1048/error-tip.el")
+;;   (defun flycheck-tip-cycle (&optional reverse)
+;;     "Move to next error if it's exists.
+;; If it wasn't exists then move to previous error.
+;; Move to previous error if REVERSE is non-nil."
+;;     (interactive)
+;;   (error-tip-cycle
+;;    (error-tip-collect-current-file-errors flycheck-current-errors) reverse))
+
+;;   (defun flycheck-tip-cycle-reverse ()
+;;     "Do `flycheck-tip-cycle by reverse order."
+;;     (interactive)
+;;     (flycheck-tip-cycle t))
+;;   (define-key evil-motion-state-map (kbd "g j") 'flycheck-tip-cycle)
+;;   (define-key evil-motion-state-map (kbd "g k") 'flycheck-tip-cycle-reverse)
+
   ;; :config
   ;; (flycheck-define-checker my-c
   ;;   "My C checker using gcc"
@@ -2506,8 +2525,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;;                              line-end))
   ;;   :modes (c-mode c++-mode))
   ;;
-  ;; :bind (([S-down] . flycheck-next-error)
-  ;;        ([S-up]   . flycheck-previous-error))
   )
 
 ;; ----------------------------------------------------------------------
@@ -3346,9 +3363,9 @@ See URL `https://github.com/htacg/tidy-html5'."
  ;; :modes (html-mode mhtml-mode nxhtml-mode))
     :modes (web-mode))
 
-  :bind (:map web-mode-map
-         ([S-down] . flycheck-next-error)
-         ([S-up]   . flycheck-previous-error))
+  ;; :bind (:map web-mode-map
+  ;;        ([S-down] . flycheck-next-error)
+  ;;        ([S-up]   . flycheck-previous-error))
   )
 
 ;; ----------------------------------------------------------------------
