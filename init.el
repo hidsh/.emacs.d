@@ -9,6 +9,8 @@
 ;; to hide message "ad-handle-definition: ‘vc-revert’ got redefined"
 (setq ad-redefinition-action 'accept)
 
+;; (require 'cl) を見逃す
+(setq byte-compile-warnings '(not cl-functions obsolete))
 ;; ----------------------------------------------------------------------
 ;; my-elisp
 (require 'discrete)

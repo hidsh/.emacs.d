@@ -47,7 +47,8 @@
   (setq default-frame-alist initial-frame-alist)
 
   ;; font
-  (set-default-font (myfont 'default))
+  ;(set-default-font (myfont 'default)) ;; ~26.3
+  (set-frame-font (myfont 'default))	;; 27.2~
 
   ;; for im-on/off
   (defun im-ctl (on)
