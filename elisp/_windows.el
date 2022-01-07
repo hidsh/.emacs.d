@@ -62,14 +62,14 @@
 ;; IME ON/OFF時のカーソルカラーの設定
 ;; （wrap-function-to-control-ime コマンド内等で、ime-force-on や ime-force-off が単独で
 ;; 　呼ばれた際もカーソルカラーの変更が機能するように hook ではなく advice に変更した）
-(defvar my-windows-cursor-color-bak nil)
+(defvar my-cursor-color-bak nil)
 (advice-add 'ime-force-on :before (lambda (&rest args)
-                      (unless my-windows-cursor-color-bak
-                        (setq my-windows-cursor-color-bak (face-background 'cursor)))
+                      (unless my-cursor-color-bak
+                        (setq my-cursor-color-bak (face-background 'cursor)))
                       (set-cursor-color (mycolor 'red))))
 (advice-add 'ime-force-off :before (lambda (&rest args)
                       (set-cursor-color
-                       (or my-windows-cursor-color-bak (mycolor 'blue)))))
+                       (or my-cursor-color-bak (mycolor 'blue)))))
 
 ;; バッファ切り替え時に IME の状態を引き継がない
 (setq w32-ime-buffer-switch-p t)
@@ -86,11 +86,11 @@
 (wrap-function-to-control-ime 'read-char nil nil)
 
 ;; for im-on/off
-(defun im-ctl (on)
-  (let ((code (if on 104 102)))
-    ;; (start-process "im-ctl" nil "osascript" "-e"
-    ;;     (format "tell application \"System Events\" to key code %d" code))))
-    ))  ;; todo
+;; todo
+;; (defun im-ctl (on)
+;;   (let ((code (if on 104 102)))
+;;     (start-process "im-ctl" nil "osascript" "-e"
+;;                    (format "tell application \"System Events\" to key code %d" code))))
 
 ;; isearch の設定
 ;; http://d.hatena.ne.jp/ksugita0510/20110103/p1

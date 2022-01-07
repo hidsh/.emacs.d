@@ -50,16 +50,16 @@
   ;(set-default-font (myfont 'default)) ;; ~26.3
   (set-frame-font (myfont 'default))	;; 27.2~
 
-  ;; for im-on/off
+  ;; for im-on/off in init.el
   (defun im-ctl (on)
-    (let ((code (if on 104 102)))
-      (start-process "im-ctl" nil "osascript" "-e"
-                     (format "tell application \"System Events\" to key code %d" code))))
-  ;; (call-process
-  ;;  "osascript" nil t nil "-e"
-  ;;  (format "tell application \"System Events\" to key code %d" code))))
+    ;; (mac-input-source)
+    (mac-select-input-source
+     (if on
+         ;; google 日本語入力
+         "com.google.inputmethod.Japanese.base"
+       "com.apple.keylayout.US")))
 
-  (defun im-enabled-p ()
+  (defun im-on-p ()
     (not (string-match "\\.US$" (mac-input-source))))
 
   ;; migemo
@@ -89,9 +89,12 @@
   ;; (set-language-environment "japanese")
 
   ;; 入力モードが日本語の時はカーソルの色を変える
+  (defvar my-cursor-color-bak nil)
   (defun my-mac-selected-keyboard-input-source-change ()
+    (unless my-cursor-color-bak
+      (setq my-cursor-color-bak (face-background 'cursor)))
     (set-cursor-color (if (string-match "\\.US$" (mac-input-source))
-                          (mycolor 'blue)
+                          my-cursor-color-bak
                         (mycolor 'red))))
 
   (add-hook 'mac-selected-keyboard-input-source-change-hook 'my-mac-selected-keyboard-input-source-change)
