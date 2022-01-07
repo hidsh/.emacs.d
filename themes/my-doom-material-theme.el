@@ -35,22 +35,42 @@ Can be an integer to determine the exact padding."
    (grey base5)
 
    (black       '("#000000" nil nil))
-   (red         '("#ff5370" "#ff0000" "red"))
-   (pink        '("#FF8599" nil nil))
-   ;; (pink        '("#FF99AA" nil nil))
-   (orange      '("#f78c6c" "#ff5f00" "brightred"))
-   (green       '("#c3e88d" "#afff00" "green"))
-   (teal        '("#44b9b1" "#00d7af" "brightgreen"))
-   (yellow      '("#ffcb6b" "#ffd700" "brightyellow"))
-   (blue        '("#82aaff" "#5fafff" "brightblue"))
+   ;; (red         '("#ff5370" "#ff0000" "red"))               ;; orig
+   ;; (red         '("#FF8599" "#ffd700" "brightyellow"))
+   ;; (red         '("#FF99AA" "#ffd700" "brightyellow"))
+   (red         '("#FFADBB" "#ffd700" "brightyellow"))
+   ;; (orange      '("#f78c6c" "#ff5f00" "brightred"))     ;; orig
+   (orange      '("#ffcb6b" "#ffd700" "brightyellow"))
+   ;; (orange      '("#FFD485" "#ffd700" "brightyellow"))
+   ;; (yellow      '("#FFF3C2" "#ffd700" "brightyellow"))
+   ;; (yellow      '("#FFEFAD" "#ffd700" "brightyellow"))
+   ;; (yellow      '("#FFEB99" "#ffd700" "brightyellow"))
+   (yellow      '("#FFE785" "#ffd700" "brightyellow"))
+   ;; (green       '("#7ECCC4" "#afff00" "green"))
+   ;; (green       '("#c3e88d" "#afff00" "green"))
+   (green       '("#D3EEAA" "#afff00" "green"))
+   ;; (teal        '("#44b9b1" "#00d7af" "brightgreen"))
+   (light-teal     '("#B6E2DE" "#afff00" "green"))
+   (teal           '("#A7DCD8" "#afff00" "green"))
+   (deep-teal      '("#7FCCC4" "#afff00" "green"))
+   ;; (blue        '("#82aaff" "#5fafff" "brightblue"))
+   ;; (blue        '("#99B9FF" "#5fafff" "brightblue"))
+   (blue        '("#ADC7FF" "#5fafff" "brightblue"))
+   ;; (blue        '("#A7DCD7" "#afff00" "green"))
    (dark-blue   '("#7986E7" "#d7ffff" "blue"))
-   (magenta     '("#c792ea" "#d787d7" "brightmagenta"))
-   (violet      '("#bb80b3" "#d787af" "magenta"))
+   ;; (magenta     '("#c792ea" "#d787d7" "brightmagenta"))
+   ;; (magenta     '("#D3A9EF" "#d787d7" "brightmagenta"))
+   (magenta     '("#DCBAF2" "#d787d7" "brightmagenta"))
+   ;; (violet      '("#bb80b3" "#d787af" "magenta"))
+   ;; (violet      '("#C695BF" "#d787af" "magenta"))
+   (violet      '("#CDA2C7" "#d787af" "magenta"))
+   ;; (violet      '("#D4AFCF" "#d787af" "magenta"))
+   ;; (cyan        '("#89DDFF" "#5fd7ff" "brightcyan"))
    (cyan        '("#89DDFF" "#5fd7ff" "brightcyan"))
    (dark-cyan   '("#80cbc4" "#00d7af" "cyan"))
 
    ;; face categories -- required for all themes
-   (highlight      yellow)
+   (highlight      teal)
    (highlight-dark (doom-darken highlight 0.4))
    (vertical-bar   base2)
 ;; (selection      base4)
@@ -60,7 +80,7 @@ Can be an integer to determine the exact padding."
    (comments       base8)
 ;; (doc-comments   base6)
    (doc-comments   base8)
-   (constants      orange)
+   (constants      red)
    (functions      blue)
    (keywords       cyan)
    (methods        blue)
@@ -68,9 +88,9 @@ Can be an integer to determine the exact padding."
    (type           magenta)
    (strings        green)
    (variables      yellow)
-   (numbers        orange)
+   (numbers        yellow)
    (region         base3)
-   (error          pink)
+   (error          red)
    (warning        yellow)
    (success        green)
    (vc-modified    blue)
@@ -103,7 +123,7 @@ Can be an integer to determine the exact padding."
    (highlight-thing :background region :distant-foreground fg-alt)
 
    (mode-line
-    :background modeline-bg :foreground modeline-fg :overline highlight
+    :background modeline-bg :foreground modeline-fg :overline teal
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
 
    (mode-line-inactive
@@ -139,6 +159,14 @@ Can be an integer to determine the exact padding."
    ((org-block-begin-line &override) :background base2)
 
    ;; --- plugin faces -------------------
+   ;; evil
+   (my-evil-normal-tag-face :foreground black :background teal)
+   (my-evil-emacs-tag-face :inherit 'my-evil-normal-tag-face :background yellow)
+   (my-evil-insert-tag-face :inherit 'my-evil-normal-tag-face :background red)
+   (my-evil-motion-tag-face :inherit 'my-evil-normal-tag-face :background base7)
+   (my-evil-visual-tag-face :inherit 'my-evil-normal-tag-face :background green)
+   (my-evil-operator-tag-face :inherit 'my-evil-normal-tag-face :background violet)
+
    ;; css-mode / scss-mode
    (css-proprietary-property :foreground orange)
    (css-property             :foreground green)
@@ -180,8 +208,8 @@ Can be an integer to determine the exact padding."
    (rjsx-attr :foreground yellow :slant 'italic :weight 'medium)
 
    ;; tabbar
-   (tabbar-default :foreground fg-alt :background base1)
-   (tabbar-selected          :inherit 'tabbar-default :foreground bg-alt :background highlight)
+   (tabbar-default :foreground teal :background base1)
+   (tabbar-selected          :inherit 'tabbar-default :foreground bg-alt :background teal)
    (tabbar-unselected        :inherit 'tabbar-default)
    (tabbar-selected-modified :inherit 'tabbar-selected)
    (tabbar-modified          :inherit 'tabbar-default)

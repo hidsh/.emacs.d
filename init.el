@@ -181,7 +181,7 @@
  (set-window-buffer nil (current-buffer))                ; Use them now.
 
  (add-hook 'prog-mode-hook #'(lambda () (setq-local show-trailing-whitespace t)))
- (set-face-background 'trailing-whitespace (mycolor 'red))
+ (set-face-background 'trailing-whitespace (face-background 'error))
 
  ;; save-place
  (setq save-place-file "~/.emacs.d/.emacs-places")
@@ -200,8 +200,7 @@
  (set-face-attribute 'mode-line-inactive nil :inherit 'mode-line)
 
  ;; モードラインの割合表示を総行数表示に
- (defvar my-mode-line-position-format "%%3c:%%l/%d")
- (setq mode-line-position '(:eval (format my-mode-line-position-format
+ (setq mode-line-position '(:eval (format "%%3c:%%l/%d"
                                           (count-lines (point-max) (point-min)))))
 
  ;; タイトルバーにファイルのフルパス表示
@@ -653,6 +652,504 @@
 )
 
 ;; ----------------------------------------------------------------------
+;; (use-package my-zerodark-theme
+;;   :load-path "~/.emacs.d/themes"
+;;   :config
+;;   (load-theme 'my-zerodark t)
+
+;;   ;; (global-tab-line-mode 1) ; for emacs27
+;;   )
+
+;; ----------------------------------------------------------------------
+(use-package my-doom-material-theme
+  :if window-system
+  :load-path "~/.emacs.d/themes"
+  :config
+  (defface my-evil-normal-tag-face `((t (:inherit default) :weight bold)) "")
+  (copy-face 'my-evil-normal-tag-face 'my-evil-emacs-tag-face)
+  (copy-face 'my-evil-normal-tag-face 'my-evil-insert-tag-face)
+  (copy-face 'my-evil-normal-tag-face 'my-evil-motion-tag-face)
+  (copy-face 'my-evil-normal-tag-face 'my-evil-visual-tag-face)
+  (copy-face 'my-evil-normal-tag-face 'my-evil-operator-tag-face)
+  ;; (defface my-evil-emacs-tag-face `((t (:inherit my-evil-normal-tag-face))) "")
+  ;; (defface my-evil-insert-tag-face `((t (:inherit my-evil-normal-tag-face))) "")
+  ;; (defface my-evil-motion-tag-face `((t (:inherit my-evil-normal-tag-face))) "")
+  ;; (defface my-evil-visual-tag-face `((t (:inherit my-evil-normal-tag-face))) "")
+  ;; (defface my-evil-operator-tag-face `((t (:inherit my-evil-normal-tag-face))) "")
+
+  (load-theme 'my-doom-material t)
+  ;; (global-tab-line-mode 1) ; for emacs27
+  )
+
+;; ----------------------------------------------------------------------
+(use-package tabbar
+  :if window-system
+  ;; :disabled
+  :hook ((after-save   . tabbar-on-saving-buffer)
+         (first-change . tabbar-on-modifying-buffer))
+  :config
+  (tabbar-mode)
+
+; (defun my-adv-load-theme--tabbar-reset-appearance (&rest _)
+  (set-face-attribute 'tabbar-default nil
+                      :height 1.1
+                      :family (myfont 'ui)
+;                       :background (face-background 'mode-line)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline (face-background 'mode-line)
+                      )
+; 
+;   (set-face-attribute 'tabbar-selected nil
+;                       ;; :inherit 'tabbar-default
+;                       :foreground (face-background 'mode-line)
+;                       :background (face-foreground 'line-number-current-line)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline (face-foreground 'line-number-current-line)
+;                       )
+; 
+;   (set-face-attribute 'tabbar-unselected nil
+;                       ;; :inherit 'tabbar-default
+;                       :background (face-foreground 'tabbar-selected)
+;                       :foreground (face-background 'tabbar-selected)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline (face-foreground 'tabbar-selected)
+;                       )
+; 
+;   (set-face-attribute 'tabbar-selected-modified nil
+;                       ;; :inherit 'tabbar-default
+;                       :background (face-background 'tabbar-selected)
+;                       :foreground (face-foreground 'tabbar-selected)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline "orange"
+;                       )
+; 
+;   (set-face-attribute 'tabbar-modified nil
+;                       ;; :inherit 'tabbar-default
+;                       :background (face-attribute 'tabbar-unselected :background)
+;                       :foreground (face-attribute 'tabbar-unselected :foreground)
+;                       :slant 'normal
+;                       :weight 'light
+;                       :box nil
+;                       :overline "orange"
+;                       )
+; 
+  (set-face-attribute 'tabbar-separator nil
+                      ;; :inherit 'tabbar-default
+                      :background (face-attribute 'tabbar-selected :background))
+
+    (setq tabbar-separator '(0.2))
+;  )
+
+; (my-adv-load-theme--tabbar-reset-appearance)
+; (advice-add 'load-theme :after #'my-adv-load-theme--tabbar-reset-appearance)
+
+  (global-set-key (kbd "M-j") 'tabbar-backward-tab)
+  (global-set-key (kbd "M-k") 'tabbar-forward-tab)
+
+  (tabbar-mwheel-mode nil)                  ;; マウスホイール無効
+  (setq tabbar-buffer-groups-function nil)  ;; グループ無効             ;; モードラインがちらつく原因
+  (setq tabbar-buffer-groups-function '(lambda () (list "")))
+  (setq tabbar-use-images nil)              ;; 画像を使わない
+
+  ;;----- 左側のボタンを消す
+  (dolist (btn '(tabbar-buffer-home-button
+                 tabbar-scroll-left-button
+                 tabbar-scroll-right-button))
+    (set btn (cons (cons "" nil)
+                   (cons "" nil))))
+
+  (defun my-tabbar-buffer-list ()
+    (delq nil
+          (mapcar #'(lambda (b)
+                      (cond
+                       ;; Always include the current buffer.
+                       ((eq (current-buffer) b) b)
+                       ((string= (buffer-name b) (file-name-nondirectory org-default-notes-file)) nil)  ; hide "notes.org"
+                       ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
+                       ((buffer-file-name b) b)
+                       ((char-equal ?\  (aref (buffer-name b) 0)) nil)
+                       ((equal "*scratch*" (buffer-name b)) b)              ; *scratch*バッファは表示する
+                       ((char-equal ?* (aref (buffer-name b) 0)) nil)       ; それ以外の * で始まるバッファは表示しない
+                       ((string-match "^magit" (buffer-name b)) nil)        ; magit が開くバッファは表示しない
+                       ((buffer-live-p b) b)))
+                  (buffer-list))))
+
+  (setq tabbar-buffer-list-function 'my-tabbar-buffer-list)
+
+  ;; mod
+  (defun tabbar-buffer-tab-label (tab)
+    "Return a label for TAB.
+That is, a string used to represent it on the tab bar."
+    (let ((label  (if tabbar--buffer-show-groups
+                      (format " [%s] " (tabbar-tab-tabset tab))
+                    (format " %s " (tabbar-tab-value tab)))))
+      ;; Unless the tab bar auto scrolls to keep the selected tab
+      ;; visible, shorten the tab label to keep as many tabs as possible
+      ;; in the visible area of the tab bar.
+      (if tabbar-auto-scroll-flag
+          label
+        (tabbar-shorten
+         label (max 1 (/ (window-width)
+                         (length (tabbar-view
+                                  (tabbar-current-tabset)))))))))
+
+  (defun tabbar-on-saving-buffer ()
+    (tabbar-set-template tabbar-current-tabset nil)
+    (tabbar-display-update))
+
+  (defun tabbar-on-modifying-buffer ()
+    (set-buffer-modified-p (buffer-modified-p))
+    (tabbar-set-template tabbar-current-tabset nil)
+    (tabbar-display-update))
+
+  (defun tabbar-after-modifying-buffer (begin end length)
+    (set-buffer-modified-p (buffer-modified-p))
+    (tabbar-set-template tabbar-current-tabset nil)
+    (tabbar-display-update))
+
+  )
+
+;; ----------------------------------------------------------------------
+(use-package centaur-tabs
+  :disabled
+  :demand
+  :config
+  (setq centaur-tabs-set-close-button nil
+        centaur-tabs-set-icons nil
+        centaur-tabs-set-modified-marker nil
+        centaur-tabs-left-edge-margin nil
+        centaur-tabs-right-edge-margin nil)
+
+  (set-face-attribute 'centaur-tabs-default nil
+                      :height 0.8
+                      :family (myfont 'ui)
+                      :foreground (face-background 'mode-line)
+                      :background (face-background 'mode-line)
+                      :slant 'normal
+                      :weight 'normal
+                      :box nil
+                      :overline (face-background 'mode-line)
+                      )
+  (set-face-attribute 'centaur-tabs-selected nil
+                      :foreground (face-background 'mode-line)
+                      :background (face-foreground 'line-number-current-line)
+                      :slant 'normal
+                      :weight 'normal
+                      :box nil
+                      :overline (face-foreground 'line-number-current-line)
+                      )
+  (set-face-attribute 'centaur-tabs-unselected nil
+                      :background (face-foreground 'centaur-tabs-selected)
+                      :foreground (face-background 'centaur-tabs-selected)
+                      :slant 'normal
+                      :weight 'normal
+                      :box nil
+                      :overline (face-foreground 'centaur-tabs-selected)
+                      )
+  (set-face-attribute 'centaur-tabs-selected-modified nil
+                      ;; :inherit 'tabbar-default
+                      :background (face-background 'centaur-tabs-selected)
+                      :foreground (face-foreground 'centaur-tabs-selected)
+                      :slant 'normal
+                      :weight 'normal
+                      :box nil
+                      :overline '(:color "orange" :style 'wave)
+                      ;; :overline "orange"
+                      )
+  (set-face-attribute 'centaur-tabs-unselected-modified nil
+                      ;; :inherit 'tabbar-default
+                      :background (face-background 'centaur-tabs-unselected)
+                      :foreground (face-foreground 'centaur-tabs-unselected)
+                      :slant 'normal
+                      :weight 'normal
+                      :box nil
+                      :overline '(:color "orange" :style 'wave)
+                      ;; :overline "orange"
+                      )
+  (set-face-attribute 'centaur-tabs-modified-marker-selected nil
+                      :background (face-foreground 'centaur-tabs-selected)
+                      :foreground (face-background 'centaur-tabs-selected)
+                      :slant 'normal
+                      :weight 'normal
+                      :box nil
+                      :overline '(:color "orange" :style 'wave)
+                      )
+
+  (setq centaur-tabs-buffer-groups-function '(lambda () (list "-")))
+  ;; (setq centaur-tabs-buffer-groups-function nil)
+
+  (defun my-centaur-tabs-hide-func (b)
+    (not (cond
+          ;; Always include the current buffer.
+          ((eq (current-buffer) b) b)
+          ((string= (buffer-name b) (file-name-nondirectory org-default-notes-file)) nil)  ; hide "notes.org"
+          ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
+          ((buffer-file-name b) b)
+          ((char-equal ?\  (aref (buffer-name b) 0)) nil)
+          ((equal "*scratch*" (buffer-name b)) b)              ; *scratch*バッファは表示する
+          ((char-equal ?* (aref (buffer-name b) 0)) nil)       ; それ以外の * で始まるバッファは表示しない
+          ((string-match "^magit" (buffer-name b)) nil)        ; magit が開くバッファは表示しない
+          ((buffer-live-p b) b)
+          (t b))))
+
+  (setq centaur-tabs-hide-tab-function 'my-centaur-tabs-hide-func)
+
+  ;; from tabbar
+  (defun centaur-shorten (str width)
+    "Return a shortened string from STR that fits in the given display WIDTH.
+WIDTH is specified in terms of character display width in the current
+buffer; see also `char-width'.  If STR display width is greater than
+WIDTH, STR is truncated and an ellipsis string \"...\" is inserted at
+end or in the middle of the returned string, depending on available
+room."
+    (let* ((n  (length str))
+           (sw (string-width str))
+           (el "...")
+           (ew (string-width el))
+           (w  0)
+           (i  0))
+      (cond
+       ;; STR fit in WIDTH, return it.
+       ((<= sw width)
+        str)
+       ;; There isn't enough room for the ellipsis, STR is just
+       ;; truncated to fit in WIDTH.
+       ((<= width ew)
+        (while (< w width)
+          (setq w (+ w (char-width (aref str i)))
+                i (1+ i)))
+        (substring str 0 i))
+       ;; There isn't enough room to insert the ellipsis in the middle
+       ;; of the truncated string, so put the ellipsis at end.
+       ((zerop (setq sw (/ (- width ew) 2)))
+        (setq width (- width ew))
+        (while (< w width)
+          (setq w (+ w (char-width (aref str i)))
+                i (1+ i)))
+        (concat (substring str 0 i) el))
+       ;; Put the ellipsis in the middle of the truncated string.
+       (t
+        (while (< w sw)
+          (setq w (+ w (char-width (aref str i)))
+                i (1+ i)))
+        (setq w (+ w ew))
+        (while (< w width)
+          (setq n (1- n)
+                w (+ w (char-width (aref str n)))))
+        (concat (substring str 0 i) el (substring str n)))
+       )))
+
+  ;; mod
+  (defun centaur-tabs-buffer-tab-label (tab)
+    "Return a label for TAB.
+That is, a string used to represent it on the tab bar."
+    (let ((label  (if centaur-tabs--buffer-show-groups
+                      (format " [%s] " (centaur-tabs-tab-tabset tab))
+                    (format " %s " (centaur-tabs-tab-value tab)))))
+      ;; Unless the tab bar auto scrolls to keep the selected tab
+      ;; visible, shorten the tab label to keep as many tabs as possible
+      ;; in the visible area of the tab bar.
+      (if centaur-tabs-auto-scroll-flag
+          label
+        (centaur-shorten
+         label (max 1 (/ (window-width)
+                         (length (centaur-tabs-view
+                                  (centaur-tabs-current-tabset)))))))))
+
+  ;; (defun tabbar-on-saving-buffer () centaur-tabs-line-tab)
+
+  (centaur-tabs-headline-match)
+  (centaur-tabs-mode t)
+
+  :bind
+  ("M-j" . centaur-tabs-backward)
+  ("M-k" . centaur-tabs-forward)
+  )
+
+;; ----------------------------------------------------------------------
+(use-package doom-modeline
+  :disabled
+  :ensure t
+  :after evil
+  :hook (after-init . doom-modeline-mode)
+
+  :custom
+  (doom-modeline-buffer-file-name-style 'truncate-with-project)
+  (doom-modeline-icon t)
+  (doom-modeline-major-mode-icon t)
+  (doom-modeline-minor-modes nil)
+  (doom-modeline-height 18)
+
+  :config
+  (set-face-attribute 'doom-modeline-project-dir nil :foreground (mycolor 'blue) :weight 'light)
+  (set-face-attribute 'doom-modeline-buffer-file nil :foreground (mycolor 'blue) :weight 'bold)
+
+  (let ((bg (face-background 'mode-line)))
+    (setq evil-normal-state-tag   (propertize " NORMAL " 'face `((:background ,(mycolor 'blue)    :foreground ,bg :weight bold)))
+          evil-emacs-state-tag    (propertize " EMACS  " 'face `((:background ,(mycolor 'orange)  :foreground ,bg :weight bold)))
+          evil-insert-state-tag   (propertize " INSERT " 'face `((:background ,(mycolor 'red)     :foreground ,bg :weight bold)))
+          evil-motion-state-tag   (propertize " MOTION " 'face `((:background ,(mycolor 'purple)  :foreground ,bg :weight bold)))
+          evil-visual-state-tag   (propertize " VISUAL " 'face `((:background ,(mycolor 'green)   :foreground ,bg :weight bold)))
+          evil-operator-state-tag (propertize " OPERATOR " 'face `((:background ,(mycolor 'pink)    :foreground ,bg :weight bold)))))
+
+  (doom-modeline-def-segment evil-state
+    "The current evil state.  Requires `evil-mode' to be enabled."
+    (when (bound-and-true-p evil-local-mode)
+      ;; (s-trim-right (evil-state-property evil-state :tag t))))
+      (when (doom-modeline--active)
+          (evil-state-property evil-state :tag t))))
+
+  (doom-modeline-def-segment linum-colnum
+    "Display current linum/colnum"
+    (propertize (format " %4s/%d,%-3s"
+                        (format-mode-line "%l")
+                        (line-number-at-pos (point-max))
+                        (format-mode-line "%c"))))
+
+  ;; ;; fixme, doesn't work
+  ;; (doom-modeline-def-segment linum-colnum
+  ;;   "Display current linum/colnum"
+  ;;   (if (and (bound-and-true-p evil-local-mode) (eq 'visual evil-state))
+  ;;       (prog1
+  ;;         (cond ((eq (evil-visual-type) 'block)
+  ;;                (format " [H%4d, W%3d]" (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))
+  ;;                        (1+ (abs (- (save-excursion (goto-char (region-beginning)) (current-column))
+  ;;                                    (save-excursion (goto-char (region-end)) (current-column)))))))
+  ;;               ((eq (evil-visual-type) 'line)
+  ;;                (format " [LINE %-4d]  " (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))))
+  ;;               (t
+  ;;                (format " [CHAR %-4d]  "
+  ;;                        (1+ (abs (- (region-beginning) (region-end)))))))
+  ;;         (force-mode-line-update t))
+  ;;     (format " %4s/%d,%-3s"
+  ;;                         (format-mode-line "%l")
+  ;;                         (line-number-at-pos (point-max))
+  ;;                         (format-mode-line "%c"))))
+
+  ;; mod
+  (defun doom-modeline-update-buffer-file-state-icon (&rest _)
+  "Update the buffer or file state in mode-line."
+  (setq doom-modeline--buffer-file-state-icon
+        (when doom-modeline-buffer-state-icon
+          (ignore-errors
+            (concat
+             (cond (buffer-read-only
+                    (doom-modeline-buffer-file-state-icon
+                  ;; "lock" "🔒" "%1*" `(:inherit doom-modeline-warning
+                     "lock" "🔒" "%1*" `(:inherit doom-modeline-buffer-modified
+                                         :weight ,(if doom-modeline-icon
+                                                      'normal
+                                                    'bold))))
+                   ((and buffer-file-name (buffer-modified-p)
+                         doom-modeline-buffer-modification-icon)
+                    (doom-modeline-buffer-file-state-icon
+                     "save" "💾" "%1*" `(:inherit doom-modeline-buffer-modified
+                                         :weight ,(if doom-modeline-icon
+                                                      'normal
+                                                    'bold))))
+                   ((and buffer-file-name
+                         (not (file-exists-p buffer-file-name)))
+                    (doom-modeline-buffer-file-state-icon
+                     "do_not_disturb_alt" "🚫" "!" 'doom-modeline-urgent))
+                   (t ""))
+             ;; add
+             (when (eq major-mode 'org-mode)
+               (doom-modeline-icon 'material
+                (cond ((eq my-org-global-fold-cycle-state 'hide-all) "more_horiz")
+                      ((eq my-org-global-fold-cycle-state 'show-all) "format_align_left")
+                      (t "person"))
+                   "↕" "><" :face 'doom-modeline-warning :height  1.1 :v-adjust -0.3))
+             (when (or (buffer-narrowed-p)
+                       (and (bound-and-true-p fancy-narrow-mode)
+                            (fancy-narrow-active-p))
+                       (bound-and-true-p dired-narrow-mode))
+               (doom-modeline-buffer-file-state-icon
+                "unfold_less" "↕" "><" 'doom-modeline-warning)))))))
+
+  ;; mod
+  (doom-modeline-def-segment buffer-info
+  "Combined information about the current buffer, including the current working
+directory, the file name, and its state (modified, read-only or non-existent)."
+  (concat
+   (doom-modeline-spc)
+   (doom-modeline--buffer-mode-icon)
+   (doom-modeline--buffer-name)
+   (doom-modeline--buffer-state-icon)))
+
+  ;; mod
+  (doom-modeline-def-segment buffer-encoding
+  "Displays the eol and the encoding style of the buffer the same way Atom does."
+  (when doom-modeline-buffer-encoding
+    (let ((face (if (doom-modeline--active) 'mode-line 'mode-line-inactive))
+          (eouse-face 'mode-line-highlight))
+      (concat
+       (doom-modeline-spc)
+
+       ;; coding system
+       (propertize
+        (let ((sys (coding-system-plist buffer-file-coding-system)))
+          (cond ((memq (plist-get sys :category)
+                       '(coding-category-undecided coding-category-utf-8))
+                 "UTF-8")
+                (t (upcase (symbol-name (plist-get sys :name))))))
+        'face face
+        ;; 'mouse-face mouse-face
+        ;; 'help-echo 'mode-line-mule-info-help-echo
+        ;; 'local-map mode-line-coding-system-map
+        )
+
+       ;; eol type
+       (let ((eol (coding-system-eol-type buffer-file-coding-system)))
+         (propertize
+          (pcase eol
+            (0 "/LF")
+            (1 "/CRLF")
+            (2 "/CR")
+            (_ ""))
+          'face face
+          ;; 'mouse-face mouse-face
+          ;; 'help-echo (format "End-of-line style: %s\nmouse-1: Cycle"
+          ;;                    (pcase eol
+          ;;                      (0 "Unix-style LF")
+          ;;                      (1 "DOS-style CRLF")
+          ;;                      (2 "Mac-style CR")
+          ;;                      (_ "Undecided")))
+          ;; 'local-map (let ((map (make-sparse-keymap)))
+		  ;;              (define-key map [mode-line mouse-1] 'mode-line-change-eol)
+		  ;;              map)
+          ))
+
+       ))))
+
+  (doom-modeline-def-modeline 'main
+    ;; '(bar workspace-number window-number evil-state god-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
+    ;; '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
+    '(evil-state matches buffer-info remote-host parrot)
+    '(misc-info persp-name lsp github debug buffer-encoding linum-colnum minor-modes major-mode vcs))
+
+  (defun my-minor-modes-toggle ()
+    (interactive)
+    (setq doom-modeline-minor-modes (if doom-modeline-minor-modes nil t)))
+  ;; (remove-text-properties )
+
+  )
+
+;; ----------------------------------------------------------------------
+(use-package hide-mode-line
+  :if window-system
+  :hook ((neotree-mode) . hide-mode-line-mode)
+  )
+
+
+;; ----------------------------------------------------------------------
 (use-package undo-tree
   :config
   (define-key undo-tree-map (kbd "C-?") 'nil)
@@ -697,16 +1194,16 @@
 
   ;; modeline
   (delq 'w32-ime-mode-line-state-indicator mode-line-format)
-  (add-hook 'emacs-startup-hook (lambda ()
+  ;; (add-hook 'emacs-startup-hook (lambda ()
      (setq evil-mode-line-format '(before . mode-line-front-space))
 
-     (let ((bg (face-background 'mode-line)))
-       (setq evil-normal-state-tag   (propertize " N " 'face `((:background ,(mycolor 'blue)    :foreground ,bg :weight bold)))
-             evil-emacs-state-tag    (propertize " E " 'face `((:background ,(mycolor 'orange)  :foreground ,bg :weight bold)))
-             evil-insert-state-tag   (propertize " I " 'face `((:background ,(mycolor 'red)     :foreground ,bg :weight bold)))
-             evil-motion-state-tag   (propertize " M " 'face `((:background ,(mycolor 'purple)  :foreground ,bg :weight bold)))
-             evil-visual-state-tag   (propertize " V " 'face `((:background ,(mycolor 'green)   :foreground ,bg :weight bold)))
-             evil-operator-state-tag (propertize " O " 'face `((:background ,(mycolor 'pink)    :foreground ,bg :weight bold)))))))
+     (setq evil-normal-state-tag   (propertize " N " 'face 'my-evil-normal-tag-face)
+           evil-emacs-state-tag    (propertize " E " 'face 'my-evil-emacs-tag-face)
+           evil-insert-state-tag   (propertize " I " 'face 'my-evil-insert-tag-face)
+           evil-motion-state-tag   (propertize " M " 'face 'my-evil-motion-tag-face)
+           evil-visual-state-tag   (propertize " V " 'face 'my-evil-visual-tag-face)
+           ;; evil-operator-state-tag (propertize " O " 'face 'my-evil-operator-tag-face))))
+           evil-operator-state-tag (propertize " O " 'face 'my-evil-operator-tag-face))
 
   ;; ----------
   ;; currently not use
@@ -1240,492 +1737,6 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (common-mode-line-mode 1)
   (common-header-line-mode 1)
   ;; (setq common-header-mode-line-update-delay 0.5)
-  )
-
-;; ----------------------------------------------------------------------
-;; (use-package my-zerodark-theme
-;;   :load-path "~/.emacs.d/themes"
-;;   :config
-;;   (load-theme 'my-zerodark t)
-
-;;   ;; (global-tab-line-mode 1) ; for emacs27
-;;   )
-
-;; ----------------------------------------------------------------------
-(use-package my-doom-material-theme
-  :if window-system
-  :load-path "~/.emacs.d/themes"
-  :config
-  (load-theme 'my-doom-material t)
-
-  ;; (global-tab-line-mode 1) ; for emacs27
-  )
-
-;; ----------------------------------------------------------------------
-(use-package tabbar
-  :if window-system
-  ;; :disabled
-  :hook ((after-save   . tabbar-on-saving-buffer)
-         (first-change . tabbar-on-modifying-buffer))
-  :config
-  (tabbar-mode)
-
-; (defun my-adv-load-theme--tabbar-reset-appearance (&rest _)
-  (set-face-attribute 'tabbar-default nil
-                      :height 1.1
-                      :family (myfont 'ui)
-;                       :background (face-background 'mode-line)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline (face-background 'mode-line)
-                      )
-; 
-;   (set-face-attribute 'tabbar-selected nil
-;                       ;; :inherit 'tabbar-default
-;                       :foreground (face-background 'mode-line)
-;                       :background (face-foreground 'line-number-current-line)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline (face-foreground 'line-number-current-line)
-;                       )
-; 
-;   (set-face-attribute 'tabbar-unselected nil
-;                       ;; :inherit 'tabbar-default
-;                       :background (face-foreground 'tabbar-selected)
-;                       :foreground (face-background 'tabbar-selected)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline (face-foreground 'tabbar-selected)
-;                       )
-; 
-;   (set-face-attribute 'tabbar-selected-modified nil
-;                       ;; :inherit 'tabbar-default
-;                       :background (face-background 'tabbar-selected)
-;                       :foreground (face-foreground 'tabbar-selected)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline "orange"
-;                       )
-; 
-;   (set-face-attribute 'tabbar-modified nil
-;                       ;; :inherit 'tabbar-default
-;                       :background (face-attribute 'tabbar-unselected :background)
-;                       :foreground (face-attribute 'tabbar-unselected :foreground)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline "orange"
-;                       )
-; 
-  (set-face-attribute 'tabbar-separator nil
-                      ;; :inherit 'tabbar-default
-                      :background (face-attribute 'tabbar-selected :background))
-
-    (setq tabbar-separator '(0.2))
-;  )
-
-; (my-adv-load-theme--tabbar-reset-appearance)
-; (advice-add 'load-theme :after #'my-adv-load-theme--tabbar-reset-appearance)
-
-  (global-set-key (kbd "M-j") 'tabbar-backward-tab)
-  (global-set-key (kbd "M-k") 'tabbar-forward-tab)
-
-  (tabbar-mwheel-mode nil)                  ;; マウスホイール無効
-  (setq tabbar-buffer-groups-function nil)  ;; グループ無効             ;; モードラインがちらつく原因
-  (setq tabbar-buffer-groups-function '(lambda () (list "")))
-  (setq tabbar-use-images nil)              ;; 画像を使わない
-
-  ;;----- 左側のボタンを消す
-  (dolist (btn '(tabbar-buffer-home-button
-                 tabbar-scroll-left-button
-                 tabbar-scroll-right-button))
-    (set btn (cons (cons "" nil)
-                   (cons "" nil))))
-
-  (defun my-tabbar-buffer-list ()
-    (delq nil
-          (mapcar #'(lambda (b)
-                      (cond
-                       ;; Always include the current buffer.
-                       ((eq (current-buffer) b) b)
-                       ((string= (buffer-name b) (file-name-nondirectory org-default-notes-file)) nil)  ; hide "notes.org"
-                       ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
-                       ((buffer-file-name b) b)
-                       ((char-equal ?\  (aref (buffer-name b) 0)) nil)
-                       ((equal "*scratch*" (buffer-name b)) b)              ; *scratch*バッファは表示する
-                       ((char-equal ?* (aref (buffer-name b) 0)) nil)       ; それ以外の * で始まるバッファは表示しない
-                       ((string-match "^magit" (buffer-name b)) nil)        ; magit が開くバッファは表示しない
-                       ((buffer-live-p b) b)))
-                  (buffer-list))))
-
-  (setq tabbar-buffer-list-function 'my-tabbar-buffer-list)
-
-  ;; mod
-  (defun tabbar-buffer-tab-label (tab)
-    "Return a label for TAB.
-That is, a string used to represent it on the tab bar."
-    (let ((label  (if tabbar--buffer-show-groups
-                      (format " [%s] " (tabbar-tab-tabset tab))
-                    (format " %s " (tabbar-tab-value tab)))))
-      ;; Unless the tab bar auto scrolls to keep the selected tab
-      ;; visible, shorten the tab label to keep as many tabs as possible
-      ;; in the visible area of the tab bar.
-      (if tabbar-auto-scroll-flag
-          label
-        (tabbar-shorten
-         label (max 1 (/ (window-width)
-                         (length (tabbar-view
-                                  (tabbar-current-tabset)))))))))
-
-  (defun tabbar-on-saving-buffer ()
-    (tabbar-set-template tabbar-current-tabset nil)
-    (tabbar-display-update))
-
-  (defun tabbar-on-modifying-buffer ()
-    (set-buffer-modified-p (buffer-modified-p))
-    (tabbar-set-template tabbar-current-tabset nil)
-    (tabbar-display-update))
-
-  (defun tabbar-after-modifying-buffer (begin end length)
-    (set-buffer-modified-p (buffer-modified-p))
-    (tabbar-set-template tabbar-current-tabset nil)
-    (tabbar-display-update))
-
-  )
-
-;; ----------------------------------------------------------------------
-(use-package centaur-tabs
-  :disabled
-  :demand
-  :config
-  (setq centaur-tabs-set-close-button nil
-        centaur-tabs-set-icons nil
-        centaur-tabs-set-modified-marker nil
-        centaur-tabs-left-edge-margin nil
-        centaur-tabs-right-edge-margin nil)
-
-  (set-face-attribute 'centaur-tabs-default nil
-                      :height 0.8
-                      :family (myfont 'ui)
-                      :foreground (face-background 'mode-line)
-                      :background (face-background 'mode-line)
-                      :slant 'normal
-                      :weight 'normal
-                      :box nil
-                      :overline (face-background 'mode-line)
-                      )
-  (set-face-attribute 'centaur-tabs-selected nil
-                      :foreground (face-background 'mode-line)
-                      :background (face-foreground 'line-number-current-line)
-                      :slant 'normal
-                      :weight 'normal
-                      :box nil
-                      :overline (face-foreground 'line-number-current-line)
-                      )
-  (set-face-attribute 'centaur-tabs-unselected nil
-                      :background (face-foreground 'centaur-tabs-selected)
-                      :foreground (face-background 'centaur-tabs-selected)
-                      :slant 'normal
-                      :weight 'normal
-                      :box nil
-                      :overline (face-foreground 'centaur-tabs-selected)
-                      )
-  (set-face-attribute 'centaur-tabs-selected-modified nil
-                      ;; :inherit 'tabbar-default
-                      :background (face-background 'centaur-tabs-selected)
-                      :foreground (face-foreground 'centaur-tabs-selected)
-                      :slant 'normal
-                      :weight 'normal
-                      :box nil
-                      :overline '(:color "orange" :style 'wave)
-                      ;; :overline "orange"
-                      )
-  (set-face-attribute 'centaur-tabs-unselected-modified nil
-                      ;; :inherit 'tabbar-default
-                      :background (face-background 'centaur-tabs-unselected)
-                      :foreground (face-foreground 'centaur-tabs-unselected)
-                      :slant 'normal
-                      :weight 'normal
-                      :box nil
-                      :overline '(:color "orange" :style 'wave)
-                      ;; :overline "orange"
-                      )
-  (set-face-attribute 'centaur-tabs-modified-marker-selected nil
-                      :background (face-foreground 'centaur-tabs-selected)
-                      :foreground (face-background 'centaur-tabs-selected)
-                      :slant 'normal
-                      :weight 'normal
-                      :box nil
-                      :overline '(:color "orange" :style 'wave)
-                      )
-
-  (setq centaur-tabs-buffer-groups-function '(lambda () (list "-")))
-  ;; (setq centaur-tabs-buffer-groups-function nil)
-
-  (defun my-centaur-tabs-hide-func (b)
-    (not (cond
-          ;; Always include the current buffer.
-          ((eq (current-buffer) b) b)
-          ((string= (buffer-name b) (file-name-nondirectory org-default-notes-file)) nil)  ; hide "notes.org"
-          ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
-          ((buffer-file-name b) b)
-          ((char-equal ?\  (aref (buffer-name b) 0)) nil)
-          ((equal "*scratch*" (buffer-name b)) b)              ; *scratch*バッファは表示する
-          ((char-equal ?* (aref (buffer-name b) 0)) nil)       ; それ以外の * で始まるバッファは表示しない
-          ((string-match "^magit" (buffer-name b)) nil)        ; magit が開くバッファは表示しない
-          ((buffer-live-p b) b)
-          (t b))))
-
-  (setq centaur-tabs-hide-tab-function 'my-centaur-tabs-hide-func)
-
-  ;; from tabbar
-  (defun centaur-shorten (str width)
-    "Return a shortened string from STR that fits in the given display WIDTH.
-WIDTH is specified in terms of character display width in the current
-buffer; see also `char-width'.  If STR display width is greater than
-WIDTH, STR is truncated and an ellipsis string \"...\" is inserted at
-end or in the middle of the returned string, depending on available
-room."
-    (let* ((n  (length str))
-           (sw (string-width str))
-           (el "...")
-           (ew (string-width el))
-           (w  0)
-           (i  0))
-      (cond
-       ;; STR fit in WIDTH, return it.
-       ((<= sw width)
-        str)
-       ;; There isn't enough room for the ellipsis, STR is just
-       ;; truncated to fit in WIDTH.
-       ((<= width ew)
-        (while (< w width)
-          (setq w (+ w (char-width (aref str i)))
-                i (1+ i)))
-        (substring str 0 i))
-       ;; There isn't enough room to insert the ellipsis in the middle
-       ;; of the truncated string, so put the ellipsis at end.
-       ((zerop (setq sw (/ (- width ew) 2)))
-        (setq width (- width ew))
-        (while (< w width)
-          (setq w (+ w (char-width (aref str i)))
-                i (1+ i)))
-        (concat (substring str 0 i) el))
-       ;; Put the ellipsis in the middle of the truncated string.
-       (t
-        (while (< w sw)
-          (setq w (+ w (char-width (aref str i)))
-                i (1+ i)))
-        (setq w (+ w ew))
-        (while (< w width)
-          (setq n (1- n)
-                w (+ w (char-width (aref str n)))))
-        (concat (substring str 0 i) el (substring str n)))
-       )))
-
-  ;; mod
-  (defun centaur-tabs-buffer-tab-label (tab)
-    "Return a label for TAB.
-That is, a string used to represent it on the tab bar."
-    (let ((label  (if centaur-tabs--buffer-show-groups
-                      (format " [%s] " (centaur-tabs-tab-tabset tab))
-                    (format " %s " (centaur-tabs-tab-value tab)))))
-      ;; Unless the tab bar auto scrolls to keep the selected tab
-      ;; visible, shorten the tab label to keep as many tabs as possible
-      ;; in the visible area of the tab bar.
-      (if centaur-tabs-auto-scroll-flag
-          label
-        (centaur-shorten
-         label (max 1 (/ (window-width)
-                         (length (centaur-tabs-view
-                                  (centaur-tabs-current-tabset)))))))))
-
-  ;; (defun tabbar-on-saving-buffer () centaur-tabs-line-tab)
-
-  (centaur-tabs-headline-match)
-  (centaur-tabs-mode t)
-
-  :bind
-  ("M-j" . centaur-tabs-backward)
-  ("M-k" . centaur-tabs-forward)
-  )
-
-;; ----------------------------------------------------------------------
-(use-package doom-modeline
-  :disabled
-  :ensure t
-  :after evil
-  :hook (after-init . doom-modeline-mode)
-
-  :custom
-  (doom-modeline-buffer-file-name-style 'truncate-with-project)
-  (doom-modeline-icon t)
-  (doom-modeline-major-mode-icon t)
-  (doom-modeline-minor-modes nil)
-  (doom-modeline-height 18)
-
-  :config
-  (set-face-attribute 'doom-modeline-project-dir nil :foreground (mycolor 'blue) :weight 'light)
-  (set-face-attribute 'doom-modeline-buffer-file nil :foreground (mycolor 'blue) :weight 'bold)
-
-  (let ((bg (face-background 'mode-line)))
-    (setq evil-normal-state-tag   (propertize " NORMAL " 'face `((:background ,(mycolor 'blue)    :foreground ,bg :weight bold)))
-          evil-emacs-state-tag    (propertize " EMACS  " 'face `((:background ,(mycolor 'orange)  :foreground ,bg :weight bold)))
-          evil-insert-state-tag   (propertize " INSERT " 'face `((:background ,(mycolor 'red)     :foreground ,bg :weight bold)))
-          evil-motion-state-tag   (propertize " MOTION " 'face `((:background ,(mycolor 'purple)  :foreground ,bg :weight bold)))
-          evil-visual-state-tag   (propertize " VISUAL " 'face `((:background ,(mycolor 'green)   :foreground ,bg :weight bold)))
-          evil-operator-state-tag (propertize " OPERATOR " 'face `((:background ,(mycolor 'pink)    :foreground ,bg :weight bold)))))
-
-  (doom-modeline-def-segment evil-state
-    "The current evil state.  Requires `evil-mode' to be enabled."
-    (when (bound-and-true-p evil-local-mode)
-      ;; (s-trim-right (evil-state-property evil-state :tag t))))
-      (when (doom-modeline--active)
-          (evil-state-property evil-state :tag t))))
-
-  (doom-modeline-def-segment linum-colnum
-    "Display current linum/colnum"
-    (propertize (format " %4s/%d,%-3s"
-                        (format-mode-line "%l")
-                        (line-number-at-pos (point-max))
-                        (format-mode-line "%c"))))
-
-  ;; ;; fixme, doesn't work
-  ;; (doom-modeline-def-segment linum-colnum
-  ;;   "Display current linum/colnum"
-  ;;   (if (and (bound-and-true-p evil-local-mode) (eq 'visual evil-state))
-  ;;       (prog1
-  ;;         (cond ((eq (evil-visual-type) 'block)
-  ;;                (format " [H%4d, W%3d]" (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))
-  ;;                        (1+ (abs (- (save-excursion (goto-char (region-beginning)) (current-column))
-  ;;                                    (save-excursion (goto-char (region-end)) (current-column)))))))
-  ;;               ((eq (evil-visual-type) 'line)
-  ;;                (format " [LINE %-4d]  " (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))))
-  ;;               (t
-  ;;                (format " [CHAR %-4d]  "
-  ;;                        (1+ (abs (- (region-beginning) (region-end)))))))
-  ;;         (force-mode-line-update t))
-  ;;     (format " %4s/%d,%-3s"
-  ;;                         (format-mode-line "%l")
-  ;;                         (line-number-at-pos (point-max))
-  ;;                         (format-mode-line "%c"))))
-
-  ;; mod
-  (defun doom-modeline-update-buffer-file-state-icon (&rest _)
-  "Update the buffer or file state in mode-line."
-  (setq doom-modeline--buffer-file-state-icon
-        (when doom-modeline-buffer-state-icon
-          (ignore-errors
-            (concat
-             (cond (buffer-read-only
-                    (doom-modeline-buffer-file-state-icon
-                  ;; "lock" "🔒" "%1*" `(:inherit doom-modeline-warning
-                     "lock" "🔒" "%1*" `(:inherit doom-modeline-buffer-modified
-                                         :weight ,(if doom-modeline-icon
-                                                      'normal
-                                                    'bold))))
-                   ((and buffer-file-name (buffer-modified-p)
-                         doom-modeline-buffer-modification-icon)
-                    (doom-modeline-buffer-file-state-icon
-                     "save" "💾" "%1*" `(:inherit doom-modeline-buffer-modified
-                                         :weight ,(if doom-modeline-icon
-                                                      'normal
-                                                    'bold))))
-                   ((and buffer-file-name
-                         (not (file-exists-p buffer-file-name)))
-                    (doom-modeline-buffer-file-state-icon
-                     "do_not_disturb_alt" "🚫" "!" 'doom-modeline-urgent))
-                   (t ""))
-             ;; add
-             (when (eq major-mode 'org-mode)
-               (doom-modeline-icon 'material
-                (cond ((eq my-org-global-fold-cycle-state 'hide-all) "more_horiz")
-                      ((eq my-org-global-fold-cycle-state 'show-all) "format_align_left")
-                      (t "person"))
-                   "↕" "><" :face 'doom-modeline-warning :height  1.1 :v-adjust -0.3))
-             (when (or (buffer-narrowed-p)
-                       (and (bound-and-true-p fancy-narrow-mode)
-                            (fancy-narrow-active-p))
-                       (bound-and-true-p dired-narrow-mode))
-               (doom-modeline-buffer-file-state-icon
-                "unfold_less" "↕" "><" 'doom-modeline-warning)))))))
-
-  ;; mod
-  (doom-modeline-def-segment buffer-info
-  "Combined information about the current buffer, including the current working
-directory, the file name, and its state (modified, read-only or non-existent)."
-  (concat
-   (doom-modeline-spc)
-   (doom-modeline--buffer-mode-icon)
-   (doom-modeline--buffer-name)
-   (doom-modeline--buffer-state-icon)))
-
-  ;; mod
-  (doom-modeline-def-segment buffer-encoding
-  "Displays the eol and the encoding style of the buffer the same way Atom does."
-  (when doom-modeline-buffer-encoding
-    (let ((face (if (doom-modeline--active) 'mode-line 'mode-line-inactive))
-          (eouse-face 'mode-line-highlight))
-      (concat
-       (doom-modeline-spc)
-
-       ;; coding system
-       (propertize
-        (let ((sys (coding-system-plist buffer-file-coding-system)))
-          (cond ((memq (plist-get sys :category)
-                       '(coding-category-undecided coding-category-utf-8))
-                 "UTF-8")
-                (t (upcase (symbol-name (plist-get sys :name))))))
-        'face face
-        ;; 'mouse-face mouse-face
-        ;; 'help-echo 'mode-line-mule-info-help-echo
-        ;; 'local-map mode-line-coding-system-map
-        )
-
-       ;; eol type
-       (let ((eol (coding-system-eol-type buffer-file-coding-system)))
-         (propertize
-          (pcase eol
-            (0 "/LF")
-            (1 "/CRLF")
-            (2 "/CR")
-            (_ ""))
-          'face face
-          ;; 'mouse-face mouse-face
-          ;; 'help-echo (format "End-of-line style: %s\nmouse-1: Cycle"
-          ;;                    (pcase eol
-          ;;                      (0 "Unix-style LF")
-          ;;                      (1 "DOS-style CRLF")
-          ;;                      (2 "Mac-style CR")
-          ;;                      (_ "Undecided")))
-          ;; 'local-map (let ((map (make-sparse-keymap)))
-		  ;;              (define-key map [mode-line mouse-1] 'mode-line-change-eol)
-		  ;;              map)
-          ))
-
-       ))))
-
-  (doom-modeline-def-modeline 'main
-    ;; '(bar workspace-number window-number evil-state god-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
-    ;; '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
-    '(evil-state matches buffer-info remote-host parrot)
-    '(misc-info persp-name lsp github debug buffer-encoding linum-colnum minor-modes major-mode vcs))
-
-  (defun my-minor-modes-toggle ()
-    (interactive)
-    (setq doom-modeline-minor-modes (if doom-modeline-minor-modes nil t)))
-  ;; (remove-text-properties )
-
-  )
-
-;; ----------------------------------------------------------------------
-(use-package hide-mode-line
-  :if window-system
-  :hook ((neotree-mode) . hide-mode-line-mode)
   )
 
 ;; ----------------------------------------------------------------------
