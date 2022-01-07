@@ -6,5 +6,5 @@ C_DEFINES = -Dvterm_module_EXPORTS
 
 C_INCLUDES = -isystem /usr/local/include
 
-C_FLAGS = -O2 -g -DNDEBUG -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk -mmacosx-version-min=11.6 -fPIC -std=gnu99
+C_FLAGS = -O2 -g -DNDEBUG -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk -mmacosx-version-min=11.6 -fPIC -fvisibility=hidden -std=gnu99
 

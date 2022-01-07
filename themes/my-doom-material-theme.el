@@ -71,7 +71,7 @@ Can be an integer to determine the exact padding."
 
    ;; face categories -- required for all themes
    (highlight      teal)
-   (highlight-dark (doom-darken highlight 0.4))
+   (highlight-dark (doom-darken highlight 0.3))
    (vertical-bar   base2)
 ;; (selection      base4)
    (selection      nil)
@@ -138,7 +138,7 @@ Can be an integer to determine the exact padding."
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg-alt)))
 
    (line-number :foreground base7 :background base3)
-   (line-number-current-line      :background base3)
+   (line-number-current-line :foreground teal :background base3)
 
 ;; (fringe :background base2)
    (fringe :background base3)

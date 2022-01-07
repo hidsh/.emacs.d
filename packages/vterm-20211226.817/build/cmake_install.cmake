@@ -1,4 +1,4 @@
-# Install script for directory: /Users/g/.emacs.d/packages/vterm-20210908.640
+# Install script for directory: /Users/g/.emacs.d/packages/vterm-20211226.817
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/g/.emacs.d/packages/vterm-20210908.640/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/g/.emacs.d/packages/vterm-20211226.817/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

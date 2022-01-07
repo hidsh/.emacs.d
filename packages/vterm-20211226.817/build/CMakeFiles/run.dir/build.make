@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/Cellar/cmake/3.22.0/bin/cmake
+CMAKE_COMMAND = /usr/local/Cellar/cmake/3.22.1/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/Cellar/cmake/3.22.0/bin/cmake -E rm -f
+RM = /usr/local/Cellar/cmake/3.22.1/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/g/.emacs.d/packages/vterm-20210908.640
+CMAKE_SOURCE_DIR = /Users/g/.emacs.d/packages/vterm-20211226.817
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/g/.emacs.d/packages/vterm-20210908.640/build
+CMAKE_BINARY_DIR = /Users/g/.emacs.d/packages/vterm-20211226.817/build
 
 # Utility rule file for run.
 
@@ -67,7 +67,7 @@ include CMakeFiles/run.dir/compiler_depend.make
 include CMakeFiles/run.dir/progress.make
 
 CMakeFiles/run: ../vterm-module.so
-	emacs -Q -L /Users/g/.emacs.d/packages/vterm-20210908.640 -L /Users/g/.emacs.d/packages/vterm-20210908.640/build --eval \(require\ \'vterm\) --eval \(vterm\)
+	emacs -Q -L /Users/g/.emacs.d/packages/vterm-20211226.817 -L /Users/g/.emacs.d/packages/vterm-20211226.817/build --eval \(require\ \'vterm\) --eval \(vterm\)
 
 run: CMakeFiles/run
 run: CMakeFiles/run.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/run.dir/clean:
 .PHONY : CMakeFiles/run.dir/clean
 
 CMakeFiles/run.dir/depend:
-	cd /Users/g/.emacs.d/packages/vterm-20210908.640/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/g/.emacs.d/packages/vterm-20210908.640 /Users/g/.emacs.d/packages/vterm-20210908.640 /Users/g/.emacs.d/packages/vterm-20210908.640/build /Users/g/.emacs.d/packages/vterm-20210908.640/build /Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles/run.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/g/.emacs.d/packages/vterm-20211226.817/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/g/.emacs.d/packages/vterm-20211226.817 /Users/g/.emacs.d/packages/vterm-20211226.817 /Users/g/.emacs.d/packages/vterm-20211226.817/build /Users/g/.emacs.d/packages/vterm-20211226.817/build /Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles/run.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/run.dir/depend
 

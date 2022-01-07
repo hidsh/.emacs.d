@@ -45,19 +45,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/Cellar/cmake/3.22.0/bin/cmake
+CMAKE_COMMAND = /usr/local/Cellar/cmake/3.22.1/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/Cellar/cmake/3.22.0/bin/cmake -E rm -f
+RM = /usr/local/Cellar/cmake/3.22.1/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/g/.emacs.d/packages/vterm-20210908.640
+CMAKE_SOURCE_DIR = /Users/g/.emacs.d/packages/vterm-20211226.817
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/g/.emacs.d/packages/vterm-20210908.640/build
+CMAKE_BINARY_DIR = /Users/g/.emacs.d/packages/vterm-20211226.817/build
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -82,14 +82,14 @@ clean: CMakeFiles/run.dir/clean
 CMakeFiles/vterm-module.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/vterm-module.dir/build.make CMakeFiles/vterm-module.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/vterm-module.dir/build.make CMakeFiles/vterm-module.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles --progress-num=1,2,3,4 "Built target vterm-module"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles --progress-num=1,2,3,4 "Built target vterm-module"
 .PHONY : CMakeFiles/vterm-module.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/vterm-module.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/vterm-module.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles 0
 .PHONY : CMakeFiles/vterm-module.dir/rule
 
 # Convenience name for target.
@@ -108,14 +108,14 @@ CMakeFiles/vterm-module.dir/clean:
 CMakeFiles/run.dir/all: CMakeFiles/vterm-module.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles --progress-num= "Built target run"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles --progress-num= "Built target run"
 .PHONY : CMakeFiles/run.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/run.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/run.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/g/.emacs.d/packages/vterm-20210908.640/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles 0
 .PHONY : CMakeFiles/run.dir/rule
 
 # Convenience name for target.

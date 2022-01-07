@@ -1,6 +1,6 @@
 CMakeFiles/vterm-module.dir/utf8.c.o: \
-  /Users/g/.emacs.d/packages/vterm-20210908.640/utf8.c \
-  /Users/g/.emacs.d/packages/vterm-20210908.640/utf8.h \
+  /Users/g/.emacs.d/packages/vterm-20211226.817/utf8.c \
+  /Users/g/.emacs.d/packages/vterm-20211226.817/utf8.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include/stdbool.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include/stdint.h \

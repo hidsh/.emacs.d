@@ -10,9 +10,7 @@
 ;;; Generated autoloads from vterm.el
 
 (autoload 'vterm-module-compile "vterm" "\
-Compile vterm-module.
-
-\(fn)" t nil)
+Compile vterm-module." t nil)
 
 (autoload 'vterm--bookmark-handler "vterm" "\
 Handler to restore a vterm bookmark BMK.

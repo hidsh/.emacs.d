@@ -1,7 +1,7 @@
 CMakeFiles/vterm-module.dir/vterm-module.c.o: \
-  /Users/g/.emacs.d/packages/vterm-20210908.640/vterm-module.c \
-  /Users/g/.emacs.d/packages/vterm-20210908.640/vterm-module.h \
-  /Users/g/.emacs.d/packages/vterm-20210908.640/emacs-module.h \
+  /Users/g/.emacs.d/packages/vterm-20211226.817/vterm-module.c \
+  /Users/g/.emacs.d/packages/vterm-20211226.817/vterm-module.h \
+  /Users/g/.emacs.d/packages/vterm-20211226.817/emacs-module.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include/stdint.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk/usr/include/stdint.h \
@@ -72,8 +72,8 @@ CMakeFiles/vterm-module.dir/vterm-module.c.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk/usr/include/sys/_types/_dev_t.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk/usr/include/sys/_types/_mode_t.h \
   /usr/local/include/vterm_keycodes.h \
-  /Users/g/.emacs.d/packages/vterm-20210908.640/elisp.h \
-  /Users/g/.emacs.d/packages/vterm-20210908.640/utf8.h \
+  /Users/g/.emacs.d/packages/vterm-20211226.817/elisp.h \
+  /Users/g/.emacs.d/packages/vterm-20211226.817/utf8.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk/usr/include/assert.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk/usr/include/fcntl.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk/usr/include/sys/fcntl.h \
