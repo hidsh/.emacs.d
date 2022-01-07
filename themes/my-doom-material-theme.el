@@ -29,7 +29,11 @@ Can be an integer to determine the exact padding."
    (base6      '("#556369" "#626262" "brightblack"))
    (base7      '("#737E84" "#767676" "brightblack"))
    (base8      '("#9BA3A7" "#a8a8a8" "white"))
-   (fg         '("#EEFFFF" "#e4e4e4" "brightwhite"))
+   ;; (fg         '("#EEFFFF" "#e4e4e4" "brightwhite"))
+   ;; (fg         '("#FFFBEB" "#e4e4e4" "brightwhite"))
+   ;; (fg         '("#FFFEFA" "#e4e4e4" "brightwhite"))
+   ;; (fg         '("#FEFFFA" "#e4e4e4" "brightwhite"))
+   (fg         '("#F0F9F8" "#e4e4e4" "brightwhite"))
    (fg-alt     '("#BFC7D5" "#bcbcbc" "white"))
 
    (grey base5)
