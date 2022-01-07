@@ -386,13 +386,18 @@
 
  (defun my-mode-line-vc-string ()
    (if vc-mode
-       (concat (propertize "\ue725" 'face `(:family ,(myfont 'default3))) (second (split-string vc-mode ":")))   ;; nf-dev-git_branch
+       (concat (propertize "\ue725" 'face `(:family ,(myfont 'default3)))
+               (let ((branch (substring-no-properties (second (split-string vc-mode ":")))))
+                 (if (or (string= branch "master") (string= branch "main"))
+                     (propertize branch 'face `(:foreground ,(face-background 'my-evil-normal-tag-face)))
+                   (propertize branch 'face `(:foreground ,(face-foreground 'warning))))))
      ""))
 
  (defun my-mode-line-num ()
    (format "%3s:%-s/%d"
            (format-mode-line "%c")
-           (format-mode-line "%l")
+           (propertize (format-mode-line "%l")
+                       'face `(:foreground ,(face-background 'my-evil-normal-tag-face)))
            (line-number-at-pos (point-max))))
 
 (defun moon-flymake-mode-line ()
@@ -470,11 +475,12 @@
    (let* ((left-part (concat
                       evil-mode-line-tag
                       " "
-                      (if (buffer-modified-p)
-                          (propertize (format-mode-line "%b") 'face `(:foreground ,(mycolor 'red)))
-                        (format-mode-line "%b"))
+                      (propertize (format-mode-line "%b")
+                                  'face (if (buffer-modified-p)
+                                            `(:foreground ,(face-foreground 'error))
+                                          `(:foreground ,(face-background 'my-evil-normal-tag-face))))
                       " "
-                      (propertize (if buffer-read-only "\uf023" " ") 'face `(:family ,(myfont 'default3) :foreground ,(mycolor 'red))) ;; nf-fa-lock
+                      (propertize (if buffer-read-only "\uf023" " ") 'face `(:family ,(myfont 'default3) :foreground ,(face-foreground 'error))) ;; nf-fa-lock
                       " "))
           (right-part (concat
                        (my-coding-system-name-mnemonic)
@@ -488,7 +494,7 @@
                        (cond
                         (flycheck-mode (my-flycheck-mode-line))     ; todo sum count flymake + flycheck
                         (flymake-mode (moon-flymake-mode-line))
-                        (t " / / "))
+                        (t "     "))
                        " "
                        (propertize mode-name 'face '(:weight bold))
                        " "
