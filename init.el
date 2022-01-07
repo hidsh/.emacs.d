@@ -181,7 +181,7 @@
  (set-window-buffer nil (current-buffer))                ; Use them now.
 
  (add-hook 'prog-mode-hook #'(lambda () (setq-local show-trailing-whitespace t)))
- (set-face-background 'trailing-whitespace (face-background 'error))
+ (set-face-background 'trailing-whitespace (face-foreground 'error))
 
  ;; save-place
  (setq save-place-file "~/.emacs.d/.emacs-places")
