@@ -976,9 +976,10 @@
 
   ;; ----------
   (defvar my-evil-visual-surround-paired '((?\" . ?\") (?\' . ?\') (?\( . ?\)) (?\{ . ?\}) (?\[ . ?\]) (?\< . ?>)))
-  (defun my-evil-visual-surround-add (beg end)
+  (defun my-evil-visual-surround-add (beg end s)
     "Surround selected string with specified character."
-    (let* ((c (read-char "Surround with:"))
+    (let* ((prompt (format "Surround '%s' with:" s))
+           (c (read-char prompt))
            (pair (my-evil-visual-surround-get-pair c))
            head tail)
       (if pair
@@ -990,9 +991,10 @@
         (goto-char beg)
         (insert (char-to-string head)))))
 
-  (defun my-evil-visual-surround-change (beg end)
+  (defun my-evil-visual-surround-change (beg end s)
     "Change surrounded character. Delete surround if you input RET."
-    (let* ((c (read-char "Re-surround with:"))
+    (let* ((prompt (format "Re-surround '%s' with:" s))
+           (c (read-char prompt))
            (pair (my-evil-visual-surround-get-pair c))
            head tail)
       (if pair
@@ -1006,23 +1008,24 @@
       (delete-char 1)
       (unless (eq head #xd) (insert (char-to-string head))))))
 
-  (defun my-evil-visual-surround-get-tail (head)
-    (cdr (assoc head my-evil-visual-surround-paired)))
+(defun my-evil-visual-surround-get-tail (head)
+  (or (cdr (assoc head my-evil-visual-surround-paired))
+      0))
 
   (defun my-evil-visual-surround-get-pair (head-or-tail)
     (or (assoc head-or-tail my-evil-visual-surround-paired)
         (rassoc head-or-tail my-evil-visual-surround-paired)))
 
-  (defun my-evil-visual-surround (beg end)
+(defun my-evil-visual-surround (beg end)
     (interactive "r")
     (let* ((s (buffer-substring-no-properties beg end))
            (head (aref s 0))
            (tail (aref s (1- (length s)))))
       (cond ((= (- end beg) 1)
-             (my-evil-visual-surround-add beg end))
+             (my-evil-visual-surround-add beg end s))
             ((or (= head tail) (= tail (my-evil-visual-surround-get-tail head)))
-             (my-evil-visual-surround-change beg end))
-            (t (my-evil-visual-surround-add beg end)))))
+             (my-evil-visual-surround-change beg end s))
+            (t (my-evil-visual-surround-add beg end s)))))
 
   (define-key evil-visual-state-map "s" 'my-evil-visual-surround)
 
