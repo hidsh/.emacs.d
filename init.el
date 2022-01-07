@@ -2374,10 +2374,15 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
       "........")
 
     (set-face-attribute 'git-gutter:separator nil :background (face-attribute 'fringe :background))
-    (set-face-attribute 'git-gutter:modified  nil :background (face-attribute 'fringe :background))
+    (set-face-attribute 'git-gutter:modified  nil :background (face-attribute 'fringe :background)
+                                                  :foreground (face-foreground 'warning))
     (set-face-attribute 'git-gutter:added     nil :background (face-attribute 'fringe :background))
     (set-face-attribute 'git-gutter:deleted   nil :background (face-attribute 'fringe :background))
-    (set-face-attribute 'git-gutter:unchanged nil :background (face-attribute 'fringe :background)))
+    (set-face-attribute 'git-gutter:unchanged nil :background (face-attribute 'fringe :background))
+
+    (set-face-attribute 'git-gutter-fr:modified  nil :background (face-attribute 'fringe :background)
+                                                  :foreground (face-foreground 'warning))
+    )
 
   :config
   (global-git-gutter-mode)
