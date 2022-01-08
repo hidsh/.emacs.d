@@ -1481,7 +1481,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (define-key evil-visual-state-map (kbd "N") #'my-evil-search-from-region-prev)
 
   ;; ----------
-  (defvar my-evil-visual-surround-paired '((?\" . ?\") (?\' . ?\') (?\( . ?\)) (?\{ . ?\}) (?\[ . ?\]) (?\< . ?>)))
+  (defvar my-evil-visual-surround-pairs '((?\" . ?\") (?\' . ?\') (?\( . ?\)) (?\{ . ?\}) (?\[ . ?\]) (?\< . ?>) (?\` . ?`)))
   (defun my-evil-visual-surround-add (beg end s)
     "Surround selected string with specified character."
     (let* ((prompt (format "Surround '%s' with:" s))
@@ -1515,12 +1515,12 @@ directory, the file name, and its state (modified, read-only or non-existent)."
       (unless (eq head #xd) (insert (char-to-string head))))))
 
 (defun my-evil-visual-surround-get-tail (head)
-  (or (cdr (assoc head my-evil-visual-surround-paired))
+  (or (cdr (assoc head my-evil-visual-surround-pairs))
       0))
 
   (defun my-evil-visual-surround-get-pair (head-or-tail)
-    (or (assoc head-or-tail my-evil-visual-surround-paired)
-        (rassoc head-or-tail my-evil-visual-surround-paired)))
+    (or (assoc head-or-tail my-evil-visual-surround-pairs)
+        (rassoc head-or-tail my-evil-visual-surround-pairs)))
 
 (defun my-evil-visual-surround (beg end)
     (interactive "r")
