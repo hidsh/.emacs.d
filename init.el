@@ -127,7 +127,7 @@
   ;; display-line-numbers-grow-only t
   ;; display-line-numbers-width-start 10
   ;; line-number-display-width 10
-  display-line-numbers-width 4
+  ;; display-line-numbers-width 4
 
   ;; 1行スクロール
   ;; (setq scroll-conservatively most-positive-fixnum)
@@ -2355,37 +2355,44 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package git-gutter
-  :if window-system
+(use-package git-gutter-fringe
+;; (use-package git-gutter
   :ensure t
-  :hook ((focus-in . git-gutter))
-  :init
-  (use-package git-gutter-fringe
-    :ensure t
-    :config
-    (fringe-helper-define 'git-gutter-fr:modified nil
-      "........"
-      ".XXXXXX."
-      ".XXXXXX."
-      ".XXXXXX."
-      ".XXXXXX."
-      ".XXXXXX."
-      ".XXXXXX."
-      "........")
-
-    (set-face-attribute 'git-gutter:separator nil :background (face-attribute 'fringe :background))
-    (set-face-attribute 'git-gutter:modified  nil :background (face-attribute 'fringe :background)
-                                                  :foreground (face-foreground 'warning))
-    (set-face-attribute 'git-gutter:added     nil :background (face-attribute 'fringe :background))
-    (set-face-attribute 'git-gutter:deleted   nil :background (face-attribute 'fringe :background))
-    (set-face-attribute 'git-gutter:unchanged nil :background (face-attribute 'fringe :background))
-
-    (set-face-attribute 'git-gutter-fr:modified  nil :background (face-attribute 'fringe :background)
-                                                  :foreground (face-foreground 'warning))
-    )
-
+  :hook ((focus-in . git-gutter-frin))
+  ;; :hook ((focus-in . git-gutter))
   :config
-  (global-git-gutter-mode)
+  (global-git-gutter-mode +1)
+  ;; (setq git-gutter:added-sign " ")
+  ;; (setq git-gutter:deleted-sign " ")
+  ;; (setq git-gutter:modified-sign " ")
+  ;; (setq git-gutter-fr:side 'right-fringe)
+  (fringe-helper-define 'git-gutter-fr:modified nil
+    ".."
+    ".."
+    ".."
+    ".."
+    ".."
+    ".."
+    ".."
+    "..")
+  (fringe-helper-define 'git-gutter-fr:added nil
+    ".."
+    ".."
+    ".."
+    ".."
+    ".."
+    ".."
+    ".."
+    "..")
+  (fringe-helper-define 'git-gutter-fr:deleted nil
+    ".."
+    ".."
+    ".."
+    ".."
+    ".."
+    ".."
+    ".."
+    "..")
 
   :bind (([M-down] . git-gutter:next-hunk)
          ([M-up]   . git-gutter:previous-hunk))
@@ -2530,6 +2537,41 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
   (define-key evil-motion-state-map (kbd "g j") 'flycheck-next-error)
   (define-key evil-motion-state-map (kbd "g k") 'flycheck-previous-error)
+
+  (setq flycheck-indication-mode 'right-fringe)
+
+(define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
+  (vector #b00011011
+          #b00110110
+          #b01101100
+          #b11011000
+          #b01101100
+          #b00110110
+          #b00011011))
+
+(flycheck-define-error-level 'error
+  :severity 100
+  :compilation-level 2
+  :overlay-category 'flycheck-error-overlay
+  :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
+  :fringe-face 'flycheck-fringe-error
+  :error-list-face 'flycheck-error-list-error)
+
+  (flycheck-define-error-level 'warning
+    :severity 10
+    :compilation-level 1
+    :overlay-category 'flycheck-warning-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
+    :fringe-face 'flycheck-fringe-warning
+    :error-list-face 'flycheck-error-list-warning)
+
+  (flycheck-define-error-level 'info
+    :severity -10
+    :compilation-level 0
+    :overlay-category 'flycheck-info-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+    :fringe-face 'flycheck-fringe-info
+    :error-list-face 'flycheck-error-list-info)
 
 ;;   (load "~/.emacs.d/packages/flycheck-tip-20171020.1048/error-tip.el")
 ;;   (defun flycheck-tip-cycle (&optional reverse)

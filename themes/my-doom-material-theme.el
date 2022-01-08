@@ -171,6 +171,20 @@ Can be an integer to determine the exact padding."
    (my-evil-visual-tag-face :inherit 'my-evil-normal-tag-face :background green)
    (my-evil-operator-tag-face :inherit 'my-evil-normal-tag-face :background violet)
 
+   ;; git-gutter
+   (git-gutter:modified :background yellow :foregorund nil)
+   (git-gutter:added    :background teal   :foregorund nil)
+   (git-gutter:deleted  :background red    :foreground nil)
+
+   (git-gutter-fr:modified :background yellow :foregorund nil)
+   (git-gutter-fr:added    :background teal :foregorund: nil)
+   (git-gutter-fr:deleted  :background red :foreground nil)
+
+   ;; flycheck (fringe)
+   (flycheck-fringe-info    :background nil :foreground teal)
+   (flycheck-fringe-warning :background nil :foreground yellow)
+   (flycheck-fringe-error   :background nil :foreground red)
+
    ;; css-mode / scss-mode
    (css-proprietary-property :foreground orange)
    (css-property             :foreground green)
