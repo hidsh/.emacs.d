@@ -3362,6 +3362,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
 ;; ----------------------------------------------------------------------
 (use-package web-mode
   :mode (("\\.html$" . web-mode))
+  :after html-mode
   ;; :hook ((web-mode . lsp))
   ;; :commands lsp
 
