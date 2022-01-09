@@ -2355,44 +2355,43 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package git-gutter-fringe
-;; (use-package git-gutter
-  :ensure t
-  :hook ((focus-in . git-gutter-frin))
-  ;; :hook ((focus-in . git-gutter))
+(use-package git-gutter
+  :hook ((focus-in . git-gutter))
   :config
-  (global-git-gutter-mode +1)
-  ;; (setq git-gutter:added-sign " ")
-  ;; (setq git-gutter:deleted-sign " ")
-  ;; (setq git-gutter:modified-sign " ")
-  ;; (setq git-gutter-fr:side 'right-fringe)
-  (fringe-helper-define 'git-gutter-fr:modified nil
-    ".."
-    ".."
-    ".."
-    ".."
-    ".."
-    ".."
-    ".."
-    "..")
-  (fringe-helper-define 'git-gutter-fr:added nil
-    ".."
-    ".."
-    ".."
-    ".."
-    ".."
-    ".."
-    ".."
-    "..")
-  (fringe-helper-define 'git-gutter-fr:deleted nil
-    ".."
-    ".."
-    ".."
-    ".."
-    ".."
-    ".."
-    ".."
-    "..")
+  ;; (setq git-gutter:modified-sign " "
+  ;;       git-gutter:added-sign " "
+  ;;       git-gutter:deleted-sign " ")
+  (global-git-gutter-mode t)
+
+  (use-package git-gutter-fringe
+    :config
+    (fringe-helper-define 'git-gutter-fr:modified nil
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........")
+    (fringe-helper-define 'git-gutter-fr:added nil
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........")
+    (fringe-helper-define 'git-gutter-fr:deleted nil
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"
+                          "........"))
 
   :bind (([M-down] . git-gutter:next-hunk)
          ([M-up]   . git-gutter:previous-hunk))
