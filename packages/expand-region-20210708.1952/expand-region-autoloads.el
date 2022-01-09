@@ -143,7 +143,14 @@ If set to nil, always place the cursor at the beginning of the region.")
 
 (custom-autoload 'expand-region-smart-cursor "expand-region-custom" t)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "expand-region-custom" '("expand-region-guess-python-mode")))
+(define-obsolete-variable-alias 'er/enable-subword-mode\? 'expand-region-subword-enabled "2019-03-23")
+
+(defvar expand-region-subword-enabled nil "\
+Whether expand-region should use subword expansions.")
+
+(custom-autoload 'expand-region-subword-enabled "expand-region-custom" t)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "expand-region-custom" '("expand-region-")))
 
 ;;;***
 
@@ -280,6 +287,14 @@ If set to nil, always place the cursor at the beginning of the region.")
 ;;; Generated autoloads from web-mode-expansions.el
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "web-mode-expansions" '("er/add-web-mode-expansions")))
+
+;;;***
+
+;;;### (autoloads nil "yaml-mode-expansions" "yaml-mode-expansions.el"
+;;;;;;  (0 0 0 0))
+;;; Generated autoloads from yaml-mode-expansions.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "yaml-mode-expansions" '("er--" "er/" "yaml-indent")))
 
 ;;;***
 
