@@ -4,8 +4,8 @@
 ;; Copyright 2011-2021 François-Xavier Bois
 
 ;; Version: 17.0.4
-;; Package-Version: 20210902.1615
-;; Package-Commit: 61f057a6baeba6b3595e412ba79b3080dca17dcc
+;; Package-Version: 20220104.1504
+;; Package-Commit: 4f1c96381a96000358b6621782d79c79b05ca5da
 ;; Author: François-Xavier Bois <fxbois AT Google Mail Service>
 ;; Maintainer: François-Xavier Bois
 ;; Package-Requires: ((emacs "23.1"))
@@ -13,7 +13,7 @@
 ;; Repository: http://github.com/fxbois/web-mode
 ;; Created: July 2011
 ;; Keywords: languages
-;; License: GNU General Public License >= 2
+;; License: GNU General Public License >= 3
 ;; Distribution: This file is not part of Emacs
 
 ;;; Commentary:
