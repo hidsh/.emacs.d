@@ -138,6 +138,7 @@
   next-line-add-newlines nil                  ; バッファ末尾に余計な改行コードを防ぐための設定
   idle-update-delay 0.3
 
+  indicate-unused-lines t                     ; 左フランジにEOFがわかるように
   electric-pair-mode nil
 
   ;;
