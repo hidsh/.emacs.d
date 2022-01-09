@@ -5,8 +5,8 @@
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; Maintainer: Neil Okamoto <neil.okamoto+melpa@gmail.com>
 ;; URL: https://github.com/emacsorphanage/git-gutter-fringe
-;; Package-Version: 20200323.2249
-;; Package-Commit: da19a474137876b29b5658ee7e9ae366f2b65c1d
+;; Package-Version: 20211003.2228
+;; Package-Commit: 648cb5b57faec55711803cdc9434e55a733c3eba
 ;; Version: 0.23
 ;; Package-Requires: ((git-gutter "0.88") (fringe-helper "0.1.1") (cl-lib "0.5") (emacs "24"))
 
@@ -48,17 +48,17 @@
 
 (defface git-gutter-fr:modified
   '((t (:inherit (git-gutter:modified fringe))))
-  "Face of modified"
+  "Face of modified fringe."
   :group 'git-gutter)
 
 (defface git-gutter-fr:added
   '((t (:inherit (git-gutter:added fringe))))
-  "Face of added"
+  "Face of added fringe."
   :group 'git-gutter)
 
 (defface git-gutter-fr:deleted
   '((t (:inherit (git-gutter:deleted fringe))))
-  "Face of deleted"
+  "Face of deleted fringe."
   :group 'git-gutter)
 
 (defcustom git-gutter-fr:side 'left-fringe
@@ -68,34 +68,34 @@
   :group 'git-gutter)
 
 (fringe-helper-define 'git-gutter-fr:added nil
-  "...XX..."
-  "...XX..."
-  "...XX..."
-  "XXXXXXXX"
-  "XXXXXXXX"
-  "...XX..."
-  "...XX..."
-  "...XX...")
+                      "...XX..."
+                      "...XX..."
+                      "...XX..."
+                      "XXXXXXXX"
+                      "XXXXXXXX"
+                      "...XX..."
+                      "...XX..."
+                      "...XX...")
 
 (fringe-helper-define 'git-gutter-fr:deleted nil
-  "........"
-  "........"
-  "........"
-  "XXXXXXXX"
-  "XXXXXXXX"
-  "........"
-  "........"
-  "........")
+                      "........"
+                      "........"
+                      "........"
+                      "XXXXXXXX"
+                      "XXXXXXXX"
+                      "........"
+                      "........"
+                      "........")
 
 (fringe-helper-define 'git-gutter-fr:modified nil
-  "........"
-  "..XXXX.."
-  "..XXXX.."
-  "..XXXX.."
-  "..XXXX.."
-  "..XXXX.."
-  "..XXXX.."
-  "........")
+                      "........"
+                      "..XXXX.."
+                      "..XXXX.."
+                      "..XXXX.."
+                      "..XXXX.."
+                      "..XXXX.."
+                      "..XXXX.."
+                      "........")
 
 (defvar git-gutter-fr:bitmap-references nil)
 
