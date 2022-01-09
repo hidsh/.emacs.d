@@ -172,12 +172,12 @@ Can be an integer to determine the exact padding."
    (my-evil-operator-tag-face :inherit 'my-evil-normal-tag-face :background violet)
 
    ;; git-gutter
-   (git-gutter:modified :background yellow :foregorund nil)
-   (git-gutter:added    :background teal   :foregorund nil)
+   (git-gutter:modified :background yellow :foreground nil)
+   (git-gutter:added    :background teal   :foreground nil)
    (git-gutter:deleted  :background red    :foreground nil)
 
-   (git-gutter-fr:modified :background yellow :foregorund nil)
-   (git-gutter-fr:added    :background teal :foregorund: nil)
+   (git-gutter-fr:modified :background yellow :foreground nil)
+   (git-gutter-fr:added    :background teal :foreground nil)
    (git-gutter-fr:deleted  :background red :foreground nil)
 
    ;; flycheck (fringe)
