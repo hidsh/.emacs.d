@@ -74,481 +74,224 @@
 ;; e.g. (myfont 'default) => "Source Han Code JP N"
 
 ;; ----------------------------------------------------------------------
-;; host independent
-(require
- (cond ((eq system-type 'windows-nt) '_windows)
-       ((eq system-type 'gnu/linux)  '_linux)
-       ((eq system-type 'darwin)     '_mac)
-       (t (error "Unknown system-type: %s" system-type))))
-
-(defun my-adv-load-theme--font-change (&rest _)
- (let ((font (myfont 'ui)))
-   (when font
-     (set-face-attribute 'mode-line          nil :family font)
-     (set-face-attribute 'mode-line-inactive nil :family font)
-     (set-face-attribute 'minibuffer-prompt  nil :family font)
-
-     (set-face-attribute 'line-number              nil :family font :height my-face-adj-line-number-height)
-     (set-face-attribute 'line-number-current-line nil :family font :height my-face-adj-line-number-height))))
-
-(advice-add 'load-theme :after #'my-adv-load-theme--font-change)
-
-;; ----------------------------------------------------------------------
 ;; defaults
-(setq-default inhibit-startup-screen t)           ; Disable start-up screen
+(setq-default
+ inhibit-startup-screen t                         ; Disable start-up screen
+ auto-window-vscroll nil                          ; Lighten vertical scroll
+ ;; confirm-kill-emacs 'yes-or-no-p                  ; Confirm before exiting Emacs
+ delete-by-moving-to-trash t                      ; Delete files to trash
+ display-time-default-load-average nil            ; Don't display load average
+ display-time-format "%H:%M"                      ; Format the time string
+ fill-column 80                                   ; Set width for automatic line breaks
+ indent-tabs-mode nil                             ; Stop using tabs to indent
+ initial-scratch-message ""                       ; Empty the initial *scratch* buffer
+ left-margin-width 1 right-margin-width 1         ; Add left and right margins
+ select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
+ sentence-end-double-space nil                    ; End a sentence after a dot and a space
+ uniquify-buffer-name-style 'forward              ; Uniquify buffer names
+ window-combination-resize t                      ; Resize windows proportionally
 
-(add-hook 'emacs-startup-hook (lambda ()
- (message "--> startup-hook")
+ bidi-display-reordering nil                      ; 右から左に読む言語に対応させないことで描画を高速化
+ vc-follow-symlinks t
+ ring-bell-function 'ignore
+ parens-require-spaces nil
+ transient-mark-mode nil
+ tab-width 4
+ tab-stop-list nil
+ comment-column 60
 
- (setq-default
-  auto-window-vscroll nil                          ; Lighten vertical scroll
-  ;; confirm-kill-emacs 'yes-or-no-p                  ; Confirm before exiting Emacs
-  delete-by-moving-to-trash t                      ; Delete files to trash
-  display-time-default-load-average nil            ; Don't display load average
-  display-time-format "%H:%M"                      ; Format the time string
-  fill-column 80                                   ; Set width for automatic line breaks
-  indent-tabs-mode nil                             ; Stop using tabs to indent
-  initial-scratch-message ""                       ; Empty the initial *scratch* buffer
-  left-margin-width 1 right-margin-width 1         ; Add left and right margins
-  select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
-  sentence-end-double-space nil                    ; End a sentence after a dot and a space
-  uniquify-buffer-name-style 'forward              ; Uniquify buffer names
-  window-combination-resize t                      ; Resize windows proportionally
+ ;; display-line-numbers-grow-only t
+ ;; display-line-numbers-width-start 10
+ ;; line-number-display-width 10
+ ;; display-line-numbers-width 4
 
-  bidi-display-reordering nil                      ; 右から左に読む言語に対応させないことで描画を高速化
-  vc-follow-symlinks t
-  ring-bell-function 'ignore
-  parens-require-spaces nil
-  transient-mark-mode nil
-  tab-width 4
-  tab-stop-list nil
-  comment-column 60
+ ;; 1行スクロール
+ ;; (setq scroll-conservatively most-positive-fixnum)
+ scroll-margin 3
+ next-screen-context-lines 3
+ scroll-preserve-screen-position t
 
-  ;; display-line-numbers-grow-only t
-  ;; display-line-numbers-width-start 10
-  ;; line-number-display-width 10
-  ;; display-line-numbers-width 4
+ next-line-add-newlines nil                  ; バッファ末尾に余計な改行コードを防ぐための設定
+ idle-update-delay 0.3
 
-  ;; 1行スクロール
-  ;; (setq scroll-conservatively most-positive-fixnum)
-  scroll-margin 3
-  next-screen-context-lines 3
-  scroll-preserve-screen-position t
+ indicate-unused-lines t                     ; 左フランジにEOFがわかるように
+ electric-pair-mode nil
 
-  next-line-add-newlines nil                  ; バッファ末尾に余計な改行コードを防ぐための設定
-  idle-update-delay 0.3
+ ;;
+ ;; backup files
+ ;; https://masutaka.net/chalow/2014-05-11-1.html
+ ;; http://yohshiy.blog.fc2.com/blog-entry-319.html
+ ;;
+ ;; backup to `hoge.txt~'
+ backup-directory-alist '((".*" . "~/.Trash"))
+ version-control     t  ;; 番号付けによる複数保存 存実行の有無
+ kept-new-versions   5  ;;                   最新の保持数
+ kept-old-versions   1  ;;                   最古の保持数
+ delete-old-versions t  ;;                   範囲外を削除
 
-  indicate-unused-lines t                     ; 左フランジにEOFがわかるように
-  electric-pair-mode nil
-
-  ;;
-  ;; backup files
-  ;; https://masutaka.net/chalow/2014-05-11-1.html
-  ;; http://yohshiy.blog.fc2.com/blog-entry-319.html
-  ;;
-  ;; backup to `hoge.txt~'
-  backup-directory-alist '((".*" . "~/.Trash"))
-  version-control     t  ;; 番号付けによる複数保存 存実行の有無
-  kept-new-versions   5  ;;                   最新の保持数
-  kept-old-versions   1  ;;                   最古の保持数
-  delete-old-versions t  ;;                   範囲外を削除
-
-  ;; backup to `#hoge.txt#'
-  auto-save-file-name-transforms '(("~/\\([^/]*/\\)*\\([^/]*\\)$" "~/.Trash/\\2" t))
+ ;; backup to `#hoge.txt#'
+ auto-save-file-name-transforms '(("~/\\([^/]*/\\)*\\([^/]*\\)$" "~/.Trash/\\2" t))
                                         ;             '((".*" "~/.Trash" t))
 
-  auto-save-default nil                  ; disabled
+ auto-save-default nil                  ; disabled
 
-  ;; backup to `~/.emacs.d/auto-save-list/.saves-xxxx'
-  auto-save-list-file-prefix nil         ; disabled
+ ;; backup to `~/.emacs.d/auto-save-list/.saves-xxxx'
+ auto-save-list-file-prefix nil         ; disabled
 
-  ;; lock file to `.#hoge'
-  create-lockfiles nil                   ; disabled
+ ;; lock file to `.#hoge'
+ create-lockfiles nil                   ; disabled
 
-  ) ;; setq-default
-
-;; ----------------------------------------------------------------------
- (fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
- (tool-bar-mode -1)
- (menu-bar-mode 0)                                 ; Disable the menu bar
- (add-hook 'focus-out-hook #'garbage-collect)
- (electric-indent-mode)
-
- (setq cursor-type 'box)
- (blink-cursor-mode 0)
-
- ;; margin
- (setq-default left-margin-width 0 right-margin-width 0) ; Define new widths.
- (set-window-buffer nil (current-buffer))                ; Use them now.
-
- (add-hook 'prog-mode-hook #'(lambda () (setq-local show-trailing-whitespace t)))
- (set-face-background 'trailing-whitespace (face-foreground 'error))
-
- ;; save-place
- (setq save-place-file "~/.emacs.d/.emacs-places")
- (save-place-mode 1)                                     ; Enable save-place
-
- ;; ミニバッファの履歴を保存する
- (savehist-mode 1)
- (setq history-length 1000)
-
- (global-auto-revert-mode -1)                            ; disable auto-revert-mode
- (setq indent-line-function 'indent-relative-maybe)
-
- ;; mode-line
- (column-number-mode t)
- (set-face-attribute 'mode-line          nil :box nil :height 1.1)   ; モードラインを非3D化
- (set-face-attribute 'mode-line-inactive nil :inherit 'mode-line)
-
- ;; モードラインの割合表示を総行数表示に
- (setq mode-line-position '(:eval (format "%%3c:%%l/%d"
-                                          (count-lines (point-max) (point-min)))))
-
- ;; タイトルバーにファイルのフルパス表示
- (defmacro replace-home-directory-string (file-name)
-   `(if ,file-name
-        (let ((regexp (cond ((eq system-type 'windows-nt) "^C:\\Users\\[^\\]\\+")
-                            ((eq system-type 'gnu/linux)  "^/home/[^/]+/")
-                            (t                            "^/Users/[^/]+/"))))
-          (replace-regexp-in-string regexp "~/" ,file-name))
-      nil))
-
- ;; (defun emacs-version-briefly ()
- ;;   (let ((lst (split-string (emacs-version))))
- ;;     (concat (nth 1 lst) (nth 2 lst))))
-
- (setq frame-title-format '(format "%s"
-                                   (:eval (or (replace-home-directory-string (buffer-file-name))
-                                              (buffer-name)))))
-
- (set-face-background 'region (mycolor 'dark-blue3))
-
- ;; =====================================================================
- ;; key unbinding / binding
- (keyboard-translate ?\C-h ?\C-?)                        ; c-h
-
- (global-unset-key (kbd "M-,"))                          ; xref
- (global-unset-key (kbd "M-."))                          ; xref
- (global-unset-key (kbd "C-z"))                          ; suspend-frame
- (global-unset-key (kbd "C-x C-z"))                      ; suspend-frame
- (global-unset-key (kbd "C-x o"))                        ; other-window
- (global-unset-key (kbd "M-t"))                          ; transpose-word
- (global-unset-key (kbd "M-'"))                          ; abbrev-prefix-mark
- (global-unset-key (kbd "M-c"))                          ; capitalize-word     why also assigned to M-RET ??
- (global-unset-key (kbd "M-i"))                          ; tab-to-tab-stop
- (global-unset-key [f11])                                ; toggle-frame-fullscreen
- (global-unset-key [f12])                                ; "M-c"
-
- (global-set-key (kbd "C-x C-x") #'nop)                  ; exchange-point-and-mark
-
- ;; (global-set-key "(" 'my-insert-paren)                   ; ()
- ;; (global-set-key "{" 'my-insert-brace)                   ; {}
- ;; (global-set-key "[" 'my-insert-bracket)                 ; []
- ;; (global-set-key "<" 'my-insert-angle)                   ; <>
- (global-set-key "'" 'my-insert-squote)                  ; ''
- (global-set-key "\"" 'my-insert-dquote)                 ; ""
-
- (global-set-key (kbd "C-m") 'newline-and-indent)             ; Returnキーで改行＋オートインデント
- (global-set-key (kbd "C-0") 'delete-window)
- (global-set-key (kbd "C-1") 'delete-other-windows)
- (global-set-key (kbd "C-2") 'split-window-below)
- (global-set-key (kbd "C-3") 'split-window-right)
- (global-set-key (kbd "C-o") 'other-window)
-
- (global-set-key (kbd "M-9") 'insert-parentheses)
- (global-set-key (kbd "M-[") 'my-insert-brace2)
- (global-set-key (kbd "M-g") 'goto-line)
- (global-set-key (kbd "M-P") 'beginning-of-buffer)
- (global-set-key (kbd "M-N") 'end-of-buffer)
-
- (global-set-key (kbd "C-x t") 'revert-buffer)
- (global-set-key (kbd "C-x C-t") 'toggle-truncate-lines)
- (global-set-key (kbd "C-x n f") 'narrow-to-defun)
-
- (define-key isearch-mode-map (kbd "C-b") 'isearch-delete-char)
+ ) ;; setq-default
 
 ;; ----------------------------------------------------------------------
- (defun my-func ()
-   "called \'my-func\'")
+(fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
+(tool-bar-mode -1)
+(menu-bar-mode 0)                                 ; Disable the menu bar
+(add-hook 'focus-out-hook #'garbage-collect)
+(electric-indent-mode)
 
- (global-set-key [f2] '(lambda () (interactive) (message "%S" (funcall 'my-func))))
+(setq cursor-type 'box)
+(blink-cursor-mode 0)
+
+;; margin
+(setq-default left-margin-width 0 right-margin-width 0) ; Define new widths.
+(set-window-buffer nil (current-buffer))                ; Use them now.
+
+(add-hook 'prog-mode-hook #'(lambda () (setq-local show-trailing-whitespace t)))
+(set-face-background 'trailing-whitespace (face-foreground 'error))
+
+;; save-place
+(setq save-place-file "~/.emacs.d/.emacs-places")
+(save-place-mode 1)                                     ; Enable save-place
+
+;; ミニバッファの履歴を保存する
+(savehist-mode 1)
+(setq history-length 1000)
+
+(global-auto-revert-mode -1)                            ; disable auto-revert-mode
+(setq indent-line-function 'indent-relative-maybe)
+
+;; mode-line
+(column-number-mode t)
+(set-face-attribute 'mode-line          nil :box nil :height 1.1)   ; モードラインを非3D化
+(set-face-attribute 'mode-line-inactive nil :inherit 'mode-line)
+
+;; ;; モードラインの割合表示を総行数表示に
+;; (setq mode-line-position '(:eval (format "%%3c:%%l/%d"
+;;                                          (count-lines (point-max) (point-min)))))
+
+;; タイトルバーにファイルのフルパス表示
+(defmacro replace-home-directory-string (file-name)
+  `(if ,file-name
+       (let ((regexp (cond ((eq system-type 'windows-nt) "^C:\\Users\\[^\\]\\+")
+                           ((eq system-type 'gnu/linux)  "^/home/[^/]+/")
+                           (t                            "^/Users/[^/]+/"))))
+         (replace-regexp-in-string regexp "~/" ,file-name))
+     nil))
+
+;; (defun emacs-version-briefly ()
+;;   (let ((lst (split-string (emacs-version))))
+;;     (concat (nth 1 lst) (nth 2 lst))))
+
+(setq frame-title-format '(format "%s"
+                                  (:eval (or (replace-home-directory-string (buffer-file-name))
+                                             (buffer-name)))))
+
+(set-face-background 'region "#0F5895")
+
+;; =====================================================================
+;; key unbinding / binding
+(keyboard-translate ?\C-h ?\C-?)                        ; c-h
+
+(global-unset-key (kbd "M-,"))                          ; xref
+(global-unset-key (kbd "M-."))                          ; xref
+(global-unset-key (kbd "C-z"))                          ; suspend-frame
+(global-unset-key (kbd "C-x C-z"))                      ; suspend-frame
+(global-unset-key (kbd "C-x o"))                        ; other-window
+(global-unset-key (kbd "M-t"))                          ; transpose-word
+(global-unset-key (kbd "M-'"))                          ; abbrev-prefix-mark
+(global-unset-key (kbd "M-c"))                          ; capitalize-word     why also assigned to M-RET ??
+(global-unset-key (kbd "M-i"))                          ; tab-to-tab-stop
+(global-unset-key [f11])                                ; toggle-frame-fullscreen
+(global-unset-key [f12])                                ; "M-c"
+
+(global-set-key (kbd "C-x C-x") #'nop)                  ; exchange-point-and-mark
+
+;; (global-set-key "(" 'my-insert-paren)                   ; ()
+;; (global-set-key "{" 'my-insert-brace)                   ; {}
+;; (global-set-key "[" 'my-insert-bracket)                 ; []
+;; (global-set-key "<" 'my-insert-angle)                   ; <>
+(global-set-key "'" 'my-insert-squote)                  ; ''
+(global-set-key "\"" 'my-insert-dquote)                 ; ""
+
+(global-set-key (kbd "C-m") 'newline-and-indent)             ; Returnキーで改行＋オートインデント
+(global-set-key (kbd "C-0") 'delete-window)
+(global-set-key (kbd "C-1") 'delete-other-windows)
+(global-set-key (kbd "C-2") 'split-window-below)
+(global-set-key (kbd "C-3") 'split-window-right)
+(global-set-key (kbd "C-o") 'other-window)
+
+(global-set-key (kbd "M-9") 'insert-parentheses)
+(global-set-key (kbd "M-[") 'my-insert-brace2)
+(global-set-key (kbd "M-g") 'goto-line)
+(global-set-key (kbd "M-P") 'beginning-of-buffer)
+(global-set-key (kbd "M-N") 'end-of-buffer)
+
+(global-set-key (kbd "C-x t") 'revert-buffer)
+(global-set-key (kbd "C-x C-t") 'toggle-truncate-lines)
+(global-set-key (kbd "C-x n f") 'narrow-to-defun)
+
+(define-key isearch-mode-map (kbd "C-b") 'isearch-delete-char)
+
+(setq truncate-partial-width-windows nil)
+(setq-default truncate-lines t)
+
+;; kill-ringに同じ内容を重複して入れない
+(defadvice kill-new (before ys:no-kill-new-duplication activate)
+  (setq kill-ring (delete (ad-get-arg 0) kill-ring)))
+
+;; prevent annoying message "Text is read only" at mimibuffer
+(plist-put minibuffer-prompt-properties
+           'point-entered 'minibuffer-avoid-prompt)
+
+;; enable completion in `eval-expression' (M-:)
+(define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol)
+
+(defun indent-or-insert-tab ()
+  (interactive)
+  (let ((pos (point)))
+    (funcall indent-line-function)
+    (when (= pos (point))
+      (insert "\t"))))
+
+(global-set-key "\C-i" 'indent-or-insert-tab)
+
+(defun my-func ()
+  "called \'my-func\'")
+
+(global-set-key [f2] '(lambda () (interactive) (message "%S" (funcall 'my-func))))
+
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom. If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance. If there is more than one, they won't work right.
+;;  '(hl-line ((t (:background "#141619")))))
+
+;; ;; (global-hl-line-mode 1)
 
 ;; ----------------------------------------------------------------------
-;; which-func-mode
- (setq which-func-unknown "-"
-       which-func-modes '(emacs-lisp-mode lisp-interaction-mode c-mode python-mode ruby-mode)
-       which-func-format '(:propertize which-func-current face which-func))
+;; command aliases
+(defalias 'reb 're-builder)
+(defalias 'a 'counsel-apropos)
 
- (which-function-mode 0)        ;; global
+(defalias 'dv 'describe-variable)
+(defalias 'dfun 'describe-function)
+(defalias 'dface 'describe-face)
+(defalias 'dk 'describe-key)
 
- ;; ----------------------------------------------------------------------
- (setq truncate-partial-width-windows nil)
- (setq-default truncate-lines t)
-
- ;; kill-ringに同じ内容を重複して入れない
- (defadvice kill-new (before ys:no-kill-new-duplication activate)
-   (setq kill-ring (delete (ad-get-arg 0) kill-ring)))
-
- ;; prevent annoying message "Text is read only" at mimibuffer
- (plist-put minibuffer-prompt-properties
-            'point-entered 'minibuffer-avoid-prompt)
-
- ;; enable completion in `eval-expression' (M-:)
- (define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol)
-
- (defun indent-or-insert-tab ()
-   (interactive)
-   (let ((pos (point)))
-     (funcall indent-line-function)
-     (when (= pos (point))
-       (insert "\t"))))
-
- (global-set-key "\C-i" 'indent-or-insert-tab)
-
- (custom-set-faces
-  ;; custom-set-faces was added by Custom. If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance. If there is more than one, they won't work right.
-  '(hl-line ((t (:background "#141619")))))
-
- ;; (global-hl-line-mode 1)
-
- ;; ----------------------------------------------------------------------
- ;; command aliases
- (defalias 'reb 're-builder)
- (defalias 'a 'counsel-apropos)
-
- (defalias 'dv 'describe-variable)
- (defalias 'dfun 'describe-function)
- (defalias 'dface 'describe-face)
- (defalias 'dk 'describe-key)
-
- (defalias 'l 'display-line-numbers-mode)
- (defalias 'hl 'hl-line-mode)
- (defalias 'calc 'quick-calc)
- (defalias 'package-uninstall 'package-delete)
-
- ;; ----------------------------------------------------------------------
- (defvar exclude-face-list '(rainbow-delimiters-base-face
-                             rainbow-delimiters-depth-1-face
-                             rainbow-delimiters-depth-2-face
-                             rainbow-delimiters-depth-3-face
-                             rainbow-delimiters-depth-4-face
-                             rainbow-delimiters-depth-5-face
-                             rainbow-delimiters-depth-6-face
-                             rainbow-delimiters-depth-7-face
-                             rainbow-delimiters-depth-8-face
-                             rainbow-delimiters-depth-9-face
-                             rainbow-delimiters-mismatched-face
-                             rainbow-delimiters-unmatched-face
-                             sp-show-pair-match-face
-                             mode-line-buffer-id
-                             mode-line-emphasis
-                             mode-line-highlight
-                             mode-line-inactive
-                             mode-line))
-
- ;; (my-font-lighter (remove-if (lambda (x) (member x exclude-face-list)) (face-list)))
-
- ;; (zerodark-setup-modeline-format)
- (my-load-frame)
-
- (defun my-font-lock-add-keywords-elisp ()
-   (font-lock-add-keywords nil
-     '(("(\\(lambda\\|cons\\|car\\|cdr\\|nth\\|eq\\|equal\\|null\\|remove\\|delete
-\\|mapc\\|mapcar\\|fset\\|set
-\\|memq\\|member\\|delq\\|funcall\\|fboundp\\|list\\|add-to-list\\|concat\\|call-interactively
-\\|assoc\\|rassoc\\|add-hook\\|remove-hook\\|define-key\\|global-set-key\\|local-set-key\\|define-key
-\\|ad-activate\\|ad-enable-advice\\|ad-disable-advice\\|propertize\\|run-hooks\\)[ \t\n]" . font-lock-keyword-face))))
-
- (add-hook 'emacs-lisp-mode-hook #'my-font-lock-add-keywords-elisp)
- (add-hook 'emacs-lisp-mode-hook #'flymake-mode)
- (add-hook 'lisp-interaction-mode-hook #'my-font-lock-add-keywords-elisp)
- (add-hook 'lisp-interaction-mode-hook #'flymake-mode)
-
- (lisp-interaction-mode)                            ;; workaround for scratch-log
-
- ;; ここからモードライン設定
- ;; https://tsuu32.hatenablog.com/entry/2019/08/04/160316
- (set 'eol-mnemonic-dos (propertize "\u24d3" 'face `(:family ,(myfont 'default3))))  ;; d
- (set 'eol-mnemonic-unix (propertize "\u24e4" 'face `(:family ,(myfont 'default3)))) ;; u
- (set 'eol-mnemonic-mac (propertize "\u24dc" 'face `(:family ,(myfont 'default3))))  ;; m
- (set 'eol-mnemonic-undecided (propertize "?" 'face `(:family ,(myfont 'default3)))) ;; ?
- (defun my-coding-system-name-mnemonic ()
-   (let* ((base (coding-system-base buffer-file-coding-system))
-          (name (symbol-name base)))
-     (cond ((string-prefix-p "utf-8" name) "U8")
-           ((string-prefix-p "utf-16" name) "U16")
-           ((string-prefix-p "utf-7" name) "U7")
-           ((string-prefix-p "japanese-shift-jis" name) "SJIS")
-           ((string-match "cp\\([0-9]+\\)" name) (match-string 1 name))
-           ((string-match "japanese-iso-8bit" name) "EUC")
-           (t "???")
-           )))
-
- (defun my-mode-line-vc-string ()
-   (if vc-mode
-       (concat (propertize "\ue725" 'face `(:family ,(myfont 'default3)))
-               (let ((branch (substring-no-properties (second (split-string vc-mode ":")))))
-                 (if (or (string= branch "master") (string= branch "main"))
-                     (propertize branch 'face `(:foreground ,(face-background 'my-evil-normal-tag-face)))
-                   (propertize branch 'face `(:foreground ,(face-foreground 'warning))))))
-     ""))
-
- (defun my-mode-line-num ()
-   (format "%3s:%-s/%d"
-           (format-mode-line "%c")
-           (propertize (format-mode-line "%l")
-                       'face `(:foreground ,(face-background 'my-evil-normal-tag-face)))
-           (line-number-at-pos (point-max))))
-
-(defun moon-flymake-mode-line ()
-  "https://emacs-china.org/t/flymake-mode-line/7878"
-  (let* ((known (hash-table-keys flymake--backend-state))
-         (running (flymake-running-backends))
-         (disabled (flymake-disabled-backends))
-         (reported (flymake-reporting-backends))
-         (diags-by-type (make-hash-table))
-         (all-disabled (and disabled (null running)))
-         (some-waiting (cl-set-difference running reported)))
-    (maphash (lambda (_b state)
-               (mapc (lambda (diag)
-                       (push diag
-                             (gethash (flymake--diag-type diag)
-                                      diags-by-type)))
-                     (flymake--backend-state-diags state)))
-             flymake--backend-state)
-    (apply #'concat
-           (mapcar (lambda (args)
-                     (apply (lambda (num str face)
-                              (propertize
-                               (format str num) 'face face))
-                               ;; (format str num) 'face `(:family `(myfont 'default3))))
-                            args))
-                   ;; `((,(length (gethash :error diags-by-type)) "\uf79f%d " error)    ;; nf-mdi-ghost
-                     ;; (,(length (gethash :warning diags-by-type)) "\uf071%d " warning)    ;; nf-fa-warning
-                     ;; (,(length (gethash :note diags-by-type)) "\uf05a%d" success))))))   ;; nf-fa-info_circle
-                   `((,(length (gethash :error diags-by-type)) "%d " error)
-                     (,(length (gethash :warning diags-by-type)) "%d " warning)
-                     (,(length (gethash :note diags-by-type)) "%d" success))))))
-
-(defun my-flycheck-mode-line ()
-  (let-alist (flycheck-count-errors flycheck-current-errors)
-    (let* ((status flycheck-last-status-change)
-           (info (or .info 0))
-           (warnings (or .warning 0))
-           (errors (or .error 0)))
-      (when status
-        (concat
-         (propertize (int-to-string errors)   'face 'flycheck-error-list-error) " "
-         (propertize (int-to-string warnings) 'face 'flycheck-error-list-warning) " "
-         (propertize (int-to-string info)     'face 'flycheck-error-list-info))))))
-
- ;; -----------
-;;  (defun simple-mode-line-render (left right)
-;;    "Return a string of `window-width' length.
-;; Containing LEFT, and RIGHT aligned respectively."
-;;    (let ((available-width
-;;           (- (window-total-width)
-;;              (+ (string-width (format-mode-line left))
-;;                 (string-width (format-mode-line right))))))
-;;      (append left
-;;              (list (format (format "%%%ds" available-width) ""))
-;;              right)))
-
-;;  (setq-default
-;;   mode-line-format
-;;   '((:eval
-;;      (simple-mode-line-render
-;;       ;; Left.
-;;       (quote ("%e "
-;;               mode-line-buffer-identification
-;;               " %l : %c"
-;;               evil-mode-line-tag
-;;               "[%*]"))
-;;       ;; Right.
-;;       (quote ("%p "
-;;               mode-line-frame-identification
-;;               mode-line-modes
-;;               mode-line-misc-info))))))
-
- ;;---------
- (defun my-mode-line--form ()
-   (let* ((left-part (concat
-                      evil-mode-line-tag
-                      " "
-                      (propertize (format-mode-line "%b")
-                                  'face (if (buffer-modified-p)
-                                            `(:foreground ,(face-foreground 'error))
-                                          `(:foreground ,(face-background 'my-evil-normal-tag-face))))
-                      " "
-                      (propertize (if buffer-read-only "\uf023" " ") 'face `(:family ,(myfont 'default3) :foreground ,(face-foreground 'error))) ;; nf-fa-lock
-                      " "))
-          (right-part (concat
-                       (my-coding-system-name-mnemonic)
-                       (mode-line-eol-desc)
-                       " "
-                       (my-mode-line-num)
-                       " "
-                       (my-mode-line-vc-string)
-                       ;; (format-mode-line "%l:%c")
-                       " "
-                       (cond
-                        (flycheck-mode (my-flycheck-mode-line))     ; todo sum count flymake + flycheck
-                        (flymake-mode (moon-flymake-mode-line))
-                        (t "     "))
-                       " "
-                       (propertize mode-name 'face '(:weight bold))
-                       " "
-                       ;; mode-line-misc-info
-                       ;; " "
-                       ;; (vc-mode vc-mode)
-                       ;; mode-line-modes))
-                       ))
-          (margin-env (case system-type
-                        (darwin 1)
-                        (windows-nt 8)
-                        (t 0)))
-          (margin
-           (propertize " "
-                       'display `(space :align-to (- (+ scroll-bar scroll-bar) ,(string-width right-part) ,margin-env)))))
-     (concat left-part margin right-part)))
- (setq-default mode-line-format '(:eval (my-mode-line--form)))
-
- ;; (kill-local-variable 'mode-line-format)
-
- ;; ;; modeline の右端が切れる問題 East Asian Ambiguous Width
- ;; ;; https://note.com/5mingame2/n/nc8010be0c32e
- ;; (set-language-environment "English") ;; call this explicity
- ;; (prefer-coding-system 'utf-8)
- ;; (set-default-coding-systems 'utf-8)
- ;; (set-terminal-coding-system 'utf-8)
- ;; (set-keyboard-coding-system 'utf-8)
- ;; (set-buffer-file-coding-system 'utf-8-unix)
- ;; (setq locale-coding-system 'utf-8)
- ;; (setq file-name-coding-system 'utf-8)
- ;; (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
- ;; (require 'my-utf-8-eaw-fullwidth)
-
- ;; disable mhtml-mode so avoiding conflict with web-mode
- (delete-if #'(lambda (elm) (eq (cdr elm) 'mhtml-mode)) auto-mode-alist)
-
- (setq enable-local-variables nil)  ;; disable "emacs the local variables list in..." when find-file
-
- (message "<-- startup-hook")
-
- ;; show emacs version and startup time in mini-buffer
- (message "%s / %.3f sec"
-          (substring (version) 0 14)
-          (float-time (time-subtract after-init-time before-init-time)))
-)) ;; emacs-startup-hook function ends here
-
-;; ======================================================================
-;; auto-insert
-(add-hook 'find-file-hook 'auto-insert)
-(setq auto-insert-directory "~/.emacs.d/templates")
-(defvar auto-insert-alist nil)
-(setq auto-insert-alist (cons '("\\.mq4" . "mq4")
-                                auto-insert-alist))
+(defalias 'l 'display-line-numbers-mode)
+(defalias 'hl 'hl-line-mode)
+(defalias 'calc 'quick-calc)
+(defalias 'package-uninstall 'package-delete)
 
 ;; ----------------------------------------------------------------------
 ;; im-ctl
@@ -576,24 +319,23 @@
 )
 
 ;; ----------------------------------------------------------------------
-;; Stop "Active processes exist; kill them and exit anyway?"
-(require 'cl-lib)
-(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
-  (cl-letf (((symbol-function #'process-list) (lambda ())))
-    ad-do-it))
+(defvar my-face-adj-line-number-height 1.0)     ;; set by _mac.el or _windows.el or ...
 
-;; fixme need this?
-;; ----------------------------------------------------------------------
-;; utility for use-package
-(defun my-font-exists-p ($font-name)
-  (if (null (x-list-fonts $font-name))
-      nil t))
+(defun my-adv-load-theme--font-change (&rest _)
+ (let ((font (myfont 'ui)))
+   (when font
+     (set-face-attribute 'mode-line          nil :family font)
+     (set-face-attribute 'mode-line-inactive nil :family font)
+     (set-face-attribute 'minibuffer-prompt  nil :family font)
+
+     (set-face-attribute 'line-number              nil :family font :height my-face-adj-line-number-height)
+     (set-face-attribute 'line-number-current-line nil :family font :height my-face-adj-line-number-height))))
+
+(advice-add 'load-theme :after #'my-adv-load-theme--font-change)
 
 ;; ----------------------------------------------------------------------
-;;
 ;; package setting
-;;
+;; ----------------------------------------------------------------------
 (require 'package)
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -603,6 +345,8 @@
 (unless (require 'use-package nil t)
   (defmacro use-package (&rest args)))
 
+;; ----------------------------------------------------------------------
+;; ここから use-package
 ;; ----------------------------------------------------------------------
 (use-package cl-lib
   :init
@@ -616,56 +360,6 @@
       (lambda (x)
         (funcall f (funcall g x)))))
 )
-
-;; ----------------------------------------------------------------------
-(use-package diminish
-  :config
-  (defmacro diminish-minor-mode (file mode &optional new-name)
-    "https://github.com/larstvei/dot-emacs/blob/master/init.org"
-    `(with-eval-after-load ,file
-       (diminish ,mode ,new-name)))
-
-  (defmacro diminish-major-mode (hook new-name)
-    `(add-hook ,hook #'(lambda ()
-                         (setq mode-name ,new-name))))
-
-  ;; minor mode
-  (diminish-minor-mode "undo-tree" 'undo-tree-mode)
-  (diminish-minor-mode "eldoc" 'eldoc-mode)
-  (diminish-minor-mode "abbrev" 'abbrev-mode)
-  (diminish-minor-mode "cwarn" 'cwarn-mode)
-  (diminish-minor-mode "company" 'company-mode)
-  (diminish-minor-mode "super-save" 'super-save-mode)
-  (diminish-minor-mode "git-gutter" 'git-gutter-mode)
-  (diminish-minor-mode "ivy" 'ivy-mode)
-  (diminish-minor-mode "yasnippet" 'yas-minor-mode)
-  (diminish-minor-mode "symbol-overlay" 'symbol-overlay-mode)
-  (diminish-minor-mode "hideif" 'hide-ifdef-mode)
-
-
-  ;; major mode
-  (diminish-major-mode 'emacs-lisp-mode-hook "Elisp")
-  (diminish-major-mode 'lisp-interaction-mode-hook "LispInt")
-  (diminish-major-mode 'js-mode-hook "JS")
-
-  (defun flymake--transform-mode-line-format (ret)
-    "Change the output of `flymake--mode-line-format'."
-    (setf (seq-elt (car ret) 1) " ")
-    (setf (seq-elt (second ret) 1) "")
-    (setf (seq-elt (sixth ret) 1) "")
-    ret)
-  (advice-add #'flymake--mode-line-format
-              :filter-return #'flymake--transform-mode-line-format)
-)
-
-;; ----------------------------------------------------------------------
-;; (use-package my-zerodark-theme
-;;   :load-path "~/.emacs.d/themes"
-;;   :config
-;;   (load-theme 'my-zerodark t)
-
-;;   ;; (global-tab-line-mode 1) ; for emacs27
-;;   )
 
 ;; ----------------------------------------------------------------------
 (use-package my-doom-material-theme
@@ -685,8 +379,215 @@
   ;; (defface my-evil-operator-tag-face `((t (:inherit my-evil-normal-tag-face))) "")
 
   (load-theme 'my-doom-material t)
-  ;; (global-tab-line-mode 1) ; for emacs27
   )
+
+;; ----------------------------------------------------------------------
+; host independent
+(require
+ (cond ((eq system-type 'windows-nt) '_windows)
+       ((eq system-type 'gnu/linux)  '_linux)
+       ((eq system-type 'darwin)     '_mac)
+       (t (error "Unknown system-type: %s" system-type))))
+
+(my-load-frame)
+
+;; ----------------------------------------------------------------------
+;; (defvar exclude-face-list '(rainbow-delimiters-base-face
+;;                             rainbow-delimiters-depth-1-face
+;;                             rainbow-delimiters-depth-2-face
+;;                             rainbow-delimiters-depth-3-face
+;;                             rainbow-delimiters-depth-4-face
+;;                             rainbow-delimiters-depth-5-face
+;;                             rainbow-delimiters-depth-6-face
+;;                             rainbow-delimiters-depth-7-face
+;;                             rainbow-delimiters-depth-8-face
+;;                             rainbow-delimiters-depth-9-face
+;;                             rainbow-delimiters-mismatched-face
+;;                             rainbow-delimiters-unmatched-face
+;;                             sp-show-pair-match-face
+;;                             mode-line-buffer-id
+;;                             mode-line-emphasis
+;;                             mode-line-highlight
+;;                             mode-line-inactive
+;;                             mode-line))
+;;
+;; (my-font-lighter (remove-if (lambda (x) (member x exclude-face-list)) (face-list)))
+
+;; (zerodark-setup-modeline-format)
+
+;; ----------------------------------------------------------------------
+;; ここからモードライン設定
+;; https://tsuu32.hatenablog.com/entry/2019/08/04/160316
+(set 'eol-mnemonic-dos (propertize "\u24d3" 'face `(:family ,(myfont 'default3))))  ;; d
+(set 'eol-mnemonic-unix (propertize "\u24e4" 'face `(:family ,(myfont 'default3)))) ;; u
+(set 'eol-mnemonic-mac (propertize "\u24dc" 'face `(:family ,(myfont 'default3))))  ;; m
+(set 'eol-mnemonic-undecided (propertize "?" 'face `(:family ,(myfont 'default3)))) ;; ?
+(defun my-coding-system-name-mnemonic ()
+  (let* ((base (coding-system-base buffer-file-coding-system))
+         (name (symbol-name base)))
+    (cond ((string-prefix-p "utf-8" name) "U8")
+          ((string-prefix-p "utf-16" name) "U16")
+          ((string-prefix-p "utf-7" name) "U7")
+          ((string-prefix-p "japanese-shift-jis" name) "SJIS")
+          ((string-match "cp\\([0-9]+\\)" name) (match-string 1 name))
+          ((string-match "japanese-iso-8bit" name) "EUC")
+          (t "???")
+          )))
+
+(defun split-vc-mode-string (s)
+  "Returns cons (\"Git\" . \"master\") for example \" Git-master\", otherwise (\"\" . \"\")."
+  (let ((pos (string-match "[-:]" s)))
+    (if pos
+        (cons (string-trim-left (substring s 0 pos)) (substring s (1+ pos)))
+      '("" . ""))))
+
+(defun my-mode-line-vc-string ()
+  (if vc-mode
+      (let* ((l (split-vc-mode-string vc-mode))
+             (type (car l))
+             (branch (cdr l)))
+        (concat (pcase type
+                  ("Git" "\ue725")
+                  (_ "?"))
+                (cond ((string= branch "") "")
+                      ((or (string= branch "master") (string= branch "main"))
+                       (propertize branch 'face `(:foreground ,(face-background 'my-evil-normal-tag-face))))
+                      (t (propertize branch 'face `(:foreground ,(face-foreground 'warning)))))))
+    ""))
+
+(defun my-mode-line-num ()
+  (format "%3s:%-s/%d"
+          (format-mode-line "%c")
+          (propertize (format-mode-line "%l")
+                      'face `(:foreground ,(face-background 'my-evil-normal-tag-face)))
+          (line-number-at-pos (point-max))))
+
+(defun moon-flymake-mode-line ()
+  "https://emacs-china.org/t/flymake-mode-line/7878"
+  (let* ((known (hash-table-keys flymake--backend-state))
+         (running (flymake-running-backends))
+         (disabled (flymake-disabled-backends))
+         (reported (flymake-reporting-backends))
+         (diags-by-type (make-hash-table))
+         (all-disabled (and disabled (null running)))
+         (some-waiting (cl-set-difference running reported)))
+    (maphash (lambda (_b state)
+               (mapc (lambda (diag)
+                       (push diag
+                             (gethash (flymake--diag-type diag)
+                                      diags-by-type)))
+                     (flymake--backend-state-diags state)))
+             flymake--backend-state)
+    (apply #'concat
+           (mapcar (lambda (args)
+                     (apply (lambda (num str face)
+                              (propertize
+                               (format str num) 'face face))
+                            ;; (format str num) 'face `(:family `(myfont 'default3))))
+                            args))
+                   ;; `((,(length (gethash :error diags-by-type)) "\uf79f%d " error)    ;; nf-mdi-ghost
+                   ;; (,(length (gethash :warning diags-by-type)) "\uf071%d " warning)    ;; nf-fa-warning
+                   ;; (,(length (gethash :note diags-by-type)) "\uf05a%d" success))))))   ;; nf-fa-info_circle
+                   `((,(length (gethash :error diags-by-type)) "%d " error)
+                     (,(length (gethash :warning diags-by-type)) "%d " warning)
+                     (,(length (gethash :note diags-by-type)) "%d" success))))))
+
+(defun my-flycheck-mode-line ()
+  (let-alist (flycheck-count-errors flycheck-current-errors)
+    (let* ((status flycheck-last-status-change)
+           (info (or .info 0))
+           (warnings (or .warning 0))
+           (errors (or .error 0)))
+      (when status
+        (concat
+         (propertize (int-to-string errors)   'face 'flycheck-error-list-error) " "
+         (propertize (int-to-string warnings) 'face 'flycheck-error-list-warning) " "
+         (propertize (int-to-string info)     'face 'flycheck-error-list-info))))))
+
+;; -----------
+;;  (defun simple-mode-line-render (left right)
+;;    "Return a string of `window-width' length.
+;; Containing LEFT, and RIGHT aligned respectively."
+;;    (let ((available-width
+;;           (- (window-total-width)
+;;              (+ (string-width (format-mode-line left))
+;;                 (string-width (format-mode-line right))))))
+;;      (append left
+;;              (list (format (format "%%%ds" available-width) ""))
+;;              right)))
+
+;;  (setq-default
+;;   mode-line-format
+;;   '((:eval
+;;      (simple-mode-line-render
+;;       ;; Left.
+;;       (quote ("%e "
+;;               mode-line-buffer-identification
+;;               " %l : %c"
+;;               evil-mode-line-tag
+;;               "[%*]"))
+;;       ;; Right.
+;;       (quote ("%p "
+;;               mode-line-frame-identification
+;;               mode-line-modes
+;;               mode-line-misc-info))))))
+
+;;---------
+(defun my-mode-line--form ()
+  (let* ((left-part (concat
+                     evil-mode-line-tag
+                     " "
+                     (propertize (format-mode-line "%b")
+                                 'face (if (buffer-modified-p)
+                                           `(:foreground ,(face-foreground 'error))
+                                         `(:foreground ,(face-background 'my-evil-normal-tag-face))))
+                     " "
+                     (propertize (if buffer-read-only "\uf023" " ") 'face `(:family ,(myfont 'default3) :foreground ,(face-foreground 'error))) ;; nf-fa-lock
+                     " "))
+         (right-part (concat
+                      (my-coding-system-name-mnemonic)
+                      (mode-line-eol-desc)
+                      " "
+                      (my-mode-line-num)
+                      " "
+                      (my-mode-line-vc-string)                       ;; NG
+                      " "
+                      (cond
+                       (flycheck-mode (my-flycheck-mode-line))
+                       ;; (flymake-mode (moon-flymake-mode-line))       ;; NG todo fixme
+                       (t "     "))
+                      " "
+                      mode-name
+                      " "
+                      ;; mode-line-misc-info
+                      ;; " "
+                      ;; (vc-mode vc-mode)
+                      ;; mode-line-modes))
+                      ))
+         (margin-env (case system-type
+                       (darwin 1)
+                       (windows-nt 8)
+                       (t 0)))
+         (margin
+          (propertize " "
+                      'display `(space :align-to (- (+ scroll-bar scroll-bar) ,(string-width right-part) ,margin-env)))))
+    (concat left-part margin right-part)))
+(setq-default mode-line-format '(:eval (my-mode-line--form)))
+
+;; (kill-local-variable 'mode-line-format)
+
+;; ;; modeline の右端が切れる問題 East Asian Ambiguous Width
+;; ;; https://note.com/5mingame2/n/nc8010be0c32e
+;; (set-language-environment "English") ;; call this explicity
+;; (prefer-coding-system 'utf-8)
+;; (set-default-coding-systems 'utf-8)
+;; (set-terminal-coding-system 'utf-8)
+;; (set-keyboard-coding-system 'utf-8)
+;; (set-buffer-file-coding-system 'utf-8-unix)
+;; (setq locale-coding-system 'utf-8)
+;; (setq file-name-coding-system 'utf-8)
+;; (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+;; (require 'my-utf-8-eaw-fullwidth)
 
 ;; ----------------------------------------------------------------------
 (use-package tabbar
@@ -979,188 +880,6 @@ That is, a string used to represent it on the tab bar."
   :bind
   ("M-j" . centaur-tabs-backward)
   ("M-k" . centaur-tabs-forward)
-  )
-
-;; ----------------------------------------------------------------------
-(use-package doom-modeline
-  :disabled
-  :ensure t
-  :after evil
-  :hook (after-init . doom-modeline-mode)
-
-  :custom
-  (doom-modeline-buffer-file-name-style 'truncate-with-project)
-  (doom-modeline-icon t)
-  (doom-modeline-major-mode-icon t)
-  (doom-modeline-minor-modes nil)
-  (doom-modeline-height 18)
-
-  :config
-  (set-face-attribute 'doom-modeline-project-dir nil :foreground (mycolor 'blue) :weight 'light)
-  (set-face-attribute 'doom-modeline-buffer-file nil :foreground (mycolor 'blue) :weight 'bold)
-
-  (let ((bg (face-background 'mode-line)))
-    (setq evil-normal-state-tag   (propertize " NORMAL " 'face `((:background ,(mycolor 'blue)    :foreground ,bg :weight bold)))
-          evil-emacs-state-tag    (propertize " EMACS  " 'face `((:background ,(mycolor 'orange)  :foreground ,bg :weight bold)))
-          evil-insert-state-tag   (propertize " INSERT " 'face `((:background ,(mycolor 'red)     :foreground ,bg :weight bold)))
-          evil-motion-state-tag   (propertize " MOTION " 'face `((:background ,(mycolor 'purple)  :foreground ,bg :weight bold)))
-          evil-visual-state-tag   (propertize " VISUAL " 'face `((:background ,(mycolor 'green)   :foreground ,bg :weight bold)))
-          evil-operator-state-tag (propertize " OPERATOR " 'face `((:background ,(mycolor 'pink)    :foreground ,bg :weight bold)))))
-
-  (doom-modeline-def-segment evil-state
-    "The current evil state.  Requires `evil-mode' to be enabled."
-    (when (bound-and-true-p evil-local-mode)
-      ;; (s-trim-right (evil-state-property evil-state :tag t))))
-      (when (doom-modeline--active)
-          (evil-state-property evil-state :tag t))))
-
-  (doom-modeline-def-segment linum-colnum
-    "Display current linum/colnum"
-    (propertize (format " %4s/%d,%-3s"
-                        (format-mode-line "%l")
-                        (line-number-at-pos (point-max))
-                        (format-mode-line "%c"))))
-
-  ;; ;; fixme, doesn't work
-  ;; (doom-modeline-def-segment linum-colnum
-  ;;   "Display current linum/colnum"
-  ;;   (if (and (bound-and-true-p evil-local-mode) (eq 'visual evil-state))
-  ;;       (prog1
-  ;;         (cond ((eq (evil-visual-type) 'block)
-  ;;                (format " [H%4d, W%3d]" (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))
-  ;;                        (1+ (abs (- (save-excursion (goto-char (region-beginning)) (current-column))
-  ;;                                    (save-excursion (goto-char (region-end)) (current-column)))))))
-  ;;               ((eq (evil-visual-type) 'line)
-  ;;                (format " [LINE %-4d]  " (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))))
-  ;;               (t
-  ;;                (format " [CHAR %-4d]  "
-  ;;                        (1+ (abs (- (region-beginning) (region-end)))))))
-  ;;         (force-mode-line-update t))
-  ;;     (format " %4s/%d,%-3s"
-  ;;                         (format-mode-line "%l")
-  ;;                         (line-number-at-pos (point-max))
-  ;;                         (format-mode-line "%c"))))
-
-  ;; mod
-  (defun doom-modeline-update-buffer-file-state-icon (&rest _)
-  "Update the buffer or file state in mode-line."
-  (setq doom-modeline--buffer-file-state-icon
-        (when doom-modeline-buffer-state-icon
-          (ignore-errors
-            (concat
-             (cond (buffer-read-only
-                    (doom-modeline-buffer-file-state-icon
-                  ;; "lock" "🔒" "%1*" `(:inherit doom-modeline-warning
-                     "lock" "🔒" "%1*" `(:inherit doom-modeline-buffer-modified
-                                         :weight ,(if doom-modeline-icon
-                                                      'normal
-                                                    'bold))))
-                   ((and buffer-file-name (buffer-modified-p)
-                         doom-modeline-buffer-modification-icon)
-                    (doom-modeline-buffer-file-state-icon
-                     "save" "💾" "%1*" `(:inherit doom-modeline-buffer-modified
-                                         :weight ,(if doom-modeline-icon
-                                                      'normal
-                                                    'bold))))
-                   ((and buffer-file-name
-                         (not (file-exists-p buffer-file-name)))
-                    (doom-modeline-buffer-file-state-icon
-                     "do_not_disturb_alt" "🚫" "!" 'doom-modeline-urgent))
-                   (t ""))
-             ;; add
-             (when (eq major-mode 'org-mode)
-               (doom-modeline-icon 'material
-                (cond ((eq my-org-global-fold-cycle-state 'hide-all) "more_horiz")
-                      ((eq my-org-global-fold-cycle-state 'show-all) "format_align_left")
-                      (t "person"))
-                   "↕" "><" :face 'doom-modeline-warning :height  1.1 :v-adjust -0.3))
-             (when (or (buffer-narrowed-p)
-                       (and (bound-and-true-p fancy-narrow-mode)
-                            (fancy-narrow-active-p))
-                       (bound-and-true-p dired-narrow-mode))
-               (doom-modeline-buffer-file-state-icon
-                "unfold_less" "↕" "><" 'doom-modeline-warning)))))))
-
-  ;; mod
-  (doom-modeline-def-segment buffer-info
-  "Combined information about the current buffer, including the current working
-directory, the file name, and its state (modified, read-only or non-existent)."
-  (concat
-   (doom-modeline-spc)
-   (doom-modeline--buffer-mode-icon)
-   (doom-modeline--buffer-name)
-   (doom-modeline--buffer-state-icon)))
-
-  ;; mod
-  (doom-modeline-def-segment buffer-encoding
-  "Displays the eol and the encoding style of the buffer the same way Atom does."
-  (when doom-modeline-buffer-encoding
-    (let ((face (if (doom-modeline--active) 'mode-line 'mode-line-inactive))
-          (eouse-face 'mode-line-highlight))
-      (concat
-       (doom-modeline-spc)
-
-       ;; coding system
-       (propertize
-        (let ((sys (coding-system-plist buffer-file-coding-system)))
-          (cond ((memq (plist-get sys :category)
-                       '(coding-category-undecided coding-category-utf-8))
-                 "UTF-8")
-                (t (upcase (symbol-name (plist-get sys :name))))))
-        'face face
-        ;; 'mouse-face mouse-face
-        ;; 'help-echo 'mode-line-mule-info-help-echo
-        ;; 'local-map mode-line-coding-system-map
-        )
-
-       ;; eol type
-       (let ((eol (coding-system-eol-type buffer-file-coding-system)))
-         (propertize
-          (pcase eol
-            (0 "/LF")
-            (1 "/CRLF")
-            (2 "/CR")
-            (_ ""))
-          'face face
-          ;; 'mouse-face mouse-face
-          ;; 'help-echo (format "End-of-line style: %s\nmouse-1: Cycle"
-          ;;                    (pcase eol
-          ;;                      (0 "Unix-style LF")
-          ;;                      (1 "DOS-style CRLF")
-          ;;                      (2 "Mac-style CR")
-          ;;                      (_ "Undecided")))
-          ;; 'local-map (let ((map (make-sparse-keymap)))
-		  ;;              (define-key map [mode-line mouse-1] 'mode-line-change-eol)
-		  ;;              map)
-          ))
-
-       ))))
-
-  (doom-modeline-def-modeline 'main
-    ;; '(bar workspace-number window-number evil-state god-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
-    ;; '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
-    '(evil-state matches buffer-info remote-host parrot)
-    '(misc-info persp-name lsp github debug buffer-encoding linum-colnum minor-modes major-mode vcs))
-
-  (defun my-minor-modes-toggle ()
-    (interactive)
-    (setq doom-modeline-minor-modes (if doom-modeline-minor-modes nil t)))
-  ;; (remove-text-properties )
-
-  )
-
-;; ----------------------------------------------------------------------
-(use-package hide-mode-line
-  :if window-system
-  :hook ((neotree-mode) . hide-mode-line-mode)
-  )
-
-
-;; ----------------------------------------------------------------------
-(use-package undo-tree
-  :config
-  (define-key undo-tree-map (kbd "C-?") 'nil)
-  (define-key undo-tree-map (kbd "C-r") 'nil)    ;; undo-tree-redo      FIXME: not work
   )
 
 ;; ----------------------------------------------------------------------
@@ -1738,65 +1457,6 @@ If COUNT is given, move COUNT - 1 lines downward first."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package common-header-mode-line
-  :disabled
-  :config
-  (common-mode-line-mode 1)
-  (common-header-line-mode 1)
-  ;; (setq common-header-mode-line-update-delay 0.5)
-  )
-
-;; ----------------------------------------------------------------------
-(use-package dashboard
-  :disabled
-  ;; :defer t
-  :config
-  (setq inhibit-startup-message t)
-  (setq dashboard-banner-logo-title "Life with Evil")
-  (setq dashboard-startup-banner "~/.emacs.d/img/e_splash.svg")
-  (dashboard-setup-startup-hook)
-  (setq dashboard-items '((recents  . 10)))
-  ;; (widget-forward 1)
-  )
-
-;; ----------------------------------------------------------------------
-(use-package all-the-icons
-  :if window-system
-  :config
-  (setq inhibit-compacting-font-caches t)
-  (setq all-the-icons-color-icons nil)
-  )
-
-;; ----------------------------------------------------------------------
-(use-package neotree
-  :if window-system
-  ;; :disabled
-  :after evil all-the-icons
-  :config
-  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-  (setq neo-show-hidden-files t)
-  (setq neo-create-file-auto-open t)
-  (setq neo-smart-open nil)
-  (setq neo-persist-show t)
-  (setq neo-keymap-style 'concise)
-
-  (global-set-key (kbd "M-q") 'neotree-toggle)
-  (evil-define-key 'normal neotree-mode-map (kbd "M-q") 'neotree-hide)
-  (evil-define-key 'normal neotree-mode-map (kbd "q")   'neotree-hide)
-  (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
-  (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
-  (evil-define-key 'normal neotree-mode-map (kbd "l")   'neotree-enter)
-  (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
-
-  (defun text-scale-twice ()
-    (interactive)
-    (text-scale-adjust 0)
-    (text-scale-decrease 1))
-  (add-hook 'neo-after-create-hook (lambda (_)(call-interactively 'text-scale-twice)))
-
-  )
-
-;; ----------------------------------------------------------------------
 (use-package ivy
   :diminish counsel-mode
   :init
@@ -2161,8 +1821,358 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
          ("g r" . gtags-find-reference)
          ("g s" . gtags-find-symbol)
          ("g h" . counsel-gtags-go-backward))
-
 )
+
+
+
+
+
+
+;; ----------------------------------------------------------------------
+;; which-func-mode
+ (setq which-func-unknown "-"
+       which-func-modes '(emacs-lisp-mode lisp-interaction-mode c-mode python-mode ruby-mode)
+       which-func-format '(:propertize which-func-current face which-func))
+
+ (which-function-mode 0)        ;; global
+
+ ;; ----------------------------------------------------------------------
+
+ (lisp-interaction-mode)                            ;; workaround for scratch-log
+
+
+ ;; disable mhtml-mode so avoiding conflict with web-mode
+ (delete-if #'(lambda (elm) (eq (cdr elm) 'mhtml-mode)) auto-mode-alist)
+
+ (setq enable-local-variables nil)  ;; disable "emacs the local variables list in..." when find-file
+
+
+;; ======================================================================
+;; auto-insert
+(add-hook 'find-file-hook 'auto-insert)
+(setq auto-insert-directory "~/.emacs.d/templates")
+(defvar auto-insert-alist nil)
+(setq auto-insert-alist (cons '("\\.mq4" . "mq4")
+                                auto-insert-alist))
+
+;; ----------------------------------------------------------------------
+;; Stop "Active processes exist; kill them and exit anyway?"
+(require 'cl-lib)
+(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+  (cl-letf (((symbol-function #'process-list) (lambda ())))
+    ad-do-it))
+
+;; fixme need this?
+;; ----------------------------------------------------------------------
+;; utility for use-package
+(defun my-font-exists-p ($font-name)
+  (if (null (x-list-fonts $font-name))
+      nil t))
+
+;; ----------------------------------------------------------------------
+(use-package diminish
+  :config
+  (defmacro diminish-minor-mode (file mode &optional new-name)
+    "https://github.com/larstvei/dot-emacs/blob/master/init.org"
+    `(with-eval-after-load ,file
+       (diminish ,mode ,new-name)))
+
+  (defmacro diminish-major-mode (hook new-name)
+    `(add-hook ,hook #'(lambda ()
+                         (setq mode-name ,new-name))))
+
+  ;; minor mode
+  (diminish-minor-mode "undo-tree" 'undo-tree-mode)
+  (diminish-minor-mode "eldoc" 'eldoc-mode)
+  (diminish-minor-mode "abbrev" 'abbrev-mode)
+  (diminish-minor-mode "cwarn" 'cwarn-mode)
+  (diminish-minor-mode "company" 'company-mode)
+  (diminish-minor-mode "super-save" 'super-save-mode)
+  (diminish-minor-mode "git-gutter" 'git-gutter-mode)
+  (diminish-minor-mode "ivy" 'ivy-mode)
+  (diminish-minor-mode "yasnippet" 'yas-minor-mode)
+  (diminish-minor-mode "symbol-overlay" 'symbol-overlay-mode)
+  (diminish-minor-mode "hideif" 'hide-ifdef-mode)
+
+
+  ;; major mode
+  (diminish-major-mode 'emacs-lisp-mode-hook "Elisp")
+  (diminish-major-mode 'lisp-interaction-mode-hook "LispInt")
+  (diminish-major-mode 'js-mode-hook "JS")
+
+  (defun flymake--transform-mode-line-format (ret)
+    "Change the output of `flymake--mode-line-format'."
+    (setf (seq-elt (car ret) 1) " ")
+    (setf (seq-elt (second ret) 1) "")
+    (setf (seq-elt (sixth ret) 1) "")
+    ret)
+  (advice-add #'flymake--mode-line-format
+              :filter-return #'flymake--transform-mode-line-format)
+)
+
+;; ----------------------------------------------------------------------
+;; (use-package my-zerodark-theme
+;;   :load-path "~/.emacs.d/themes"
+;;   :config
+;;   (load-theme 'my-zerodark t)
+
+;;   ;; (global-tab-line-mode 1) ; for emacs27
+;;   )
+
+;; ----------------------------------------------------------------------
+(use-package doom-modeline
+  :disabled
+  :ensure t
+  :after evil
+  :hook (after-init . doom-modeline-mode)
+
+  :custom
+  (doom-modeline-buffer-file-name-style 'truncate-with-project)
+  (doom-modeline-icon t)
+  (doom-modeline-major-mode-icon t)
+  (doom-modeline-minor-modes nil)
+  (doom-modeline-height 18)
+
+  :config
+  (set-face-attribute 'doom-modeline-project-dir nil :foreground (mycolor 'blue) :weight 'light)
+  (set-face-attribute 'doom-modeline-buffer-file nil :foreground (mycolor 'blue) :weight 'bold)
+
+  (let ((bg (face-background 'mode-line)))
+    (setq evil-normal-state-tag   (propertize " NORMAL " 'face `((:background ,(mycolor 'blue)    :foreground ,bg :weight bold)))
+          evil-emacs-state-tag    (propertize " EMACS  " 'face `((:background ,(mycolor 'orange)  :foreground ,bg :weight bold)))
+          evil-insert-state-tag   (propertize " INSERT " 'face `((:background ,(mycolor 'red)     :foreground ,bg :weight bold)))
+          evil-motion-state-tag   (propertize " MOTION " 'face `((:background ,(mycolor 'purple)  :foreground ,bg :weight bold)))
+          evil-visual-state-tag   (propertize " VISUAL " 'face `((:background ,(mycolor 'green)   :foreground ,bg :weight bold)))
+          evil-operator-state-tag (propertize " OPERATOR " 'face `((:background ,(mycolor 'pink)    :foreground ,bg :weight bold)))))
+
+  (doom-modeline-def-segment evil-state
+    "The current evil state.  Requires `evil-mode' to be enabled."
+    (when (bound-and-true-p evil-local-mode)
+      ;; (s-trim-right (evil-state-property evil-state :tag t))))
+      (when (doom-modeline--active)
+          (evil-state-property evil-state :tag t))))
+
+  (doom-modeline-def-segment linum-colnum
+    "Display current linum/colnum"
+    (propertize (format " %4s/%d,%-3s"
+                        (format-mode-line "%l")
+                        (line-number-at-pos (point-max))
+                        (format-mode-line "%c"))))
+
+  ;; ;; fixme, doesn't work
+  ;; (doom-modeline-def-segment linum-colnum
+  ;;   "Display current linum/colnum"
+  ;;   (if (and (bound-and-true-p evil-local-mode) (eq 'visual evil-state))
+  ;;       (prog1
+  ;;         (cond ((eq (evil-visual-type) 'block)
+  ;;                (format " [H%4d, W%3d]" (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))
+  ;;                        (1+ (abs (- (save-excursion (goto-char (region-beginning)) (current-column))
+  ;;                                    (save-excursion (goto-char (region-end)) (current-column)))))))
+  ;;               ((eq (evil-visual-type) 'line)
+  ;;                (format " [LINE %-4d]  " (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))))
+  ;;               (t
+  ;;                (format " [CHAR %-4d]  "
+  ;;                        (1+ (abs (- (region-beginning) (region-end)))))))
+  ;;         (force-mode-line-update t))
+  ;;     (format " %4s/%d,%-3s"
+  ;;                         (format-mode-line "%l")
+  ;;                         (line-number-at-pos (point-max))
+  ;;                         (format-mode-line "%c"))))
+
+  ;; mod
+  (defun doom-modeline-update-buffer-file-state-icon (&rest _)
+  "Update the buffer or file state in mode-line."
+  (setq doom-modeline--buffer-file-state-icon
+        (when doom-modeline-buffer-state-icon
+          (ignore-errors
+            (concat
+             (cond (buffer-read-only
+                    (doom-modeline-buffer-file-state-icon
+                  ;; "lock" "🔒" "%1*" `(:inherit doom-modeline-warning
+                     "lock" "🔒" "%1*" `(:inherit doom-modeline-buffer-modified
+                                         :weight ,(if doom-modeline-icon
+                                                      'normal
+                                                    'bold))))
+                   ((and buffer-file-name (buffer-modified-p)
+                         doom-modeline-buffer-modification-icon)
+                    (doom-modeline-buffer-file-state-icon
+                     "save" "💾" "%1*" `(:inherit doom-modeline-buffer-modified
+                                         :weight ,(if doom-modeline-icon
+                                                      'normal
+                                                    'bold))))
+                   ((and buffer-file-name
+                         (not (file-exists-p buffer-file-name)))
+                    (doom-modeline-buffer-file-state-icon
+                     "do_not_disturb_alt" "🚫" "!" 'doom-modeline-urgent))
+                   (t ""))
+             ;; add
+             (when (eq major-mode 'org-mode)
+               (doom-modeline-icon 'material
+                (cond ((eq my-org-global-fold-cycle-state 'hide-all) "more_horiz")
+                      ((eq my-org-global-fold-cycle-state 'show-all) "format_align_left")
+                      (t "person"))
+                   "↕" "><" :face 'doom-modeline-warning :height  1.1 :v-adjust -0.3))
+             (when (or (buffer-narrowed-p)
+                       (and (bound-and-true-p fancy-narrow-mode)
+                            (fancy-narrow-active-p))
+                       (bound-and-true-p dired-narrow-mode))
+               (doom-modeline-buffer-file-state-icon
+                "unfold_less" "↕" "><" 'doom-modeline-warning)))))))
+
+  ;; mod
+  (doom-modeline-def-segment buffer-info
+  "Combined information about the current buffer, including the current working
+directory, the file name, and its state (modified, read-only or non-existent)."
+  (concat
+   (doom-modeline-spc)
+   (doom-modeline--buffer-mode-icon)
+   (doom-modeline--buffer-name)
+   (doom-modeline--buffer-state-icon)))
+
+  ;; mod
+  (doom-modeline-def-segment buffer-encoding
+  "Displays the eol and the encoding style of the buffer the same way Atom does."
+  (when doom-modeline-buffer-encoding
+    (let ((face (if (doom-modeline--active) 'mode-line 'mode-line-inactive))
+          (eouse-face 'mode-line-highlight))
+      (concat
+       (doom-modeline-spc)
+
+       ;; coding system
+       (propertize
+        (let ((sys (coding-system-plist buffer-file-coding-system)))
+          (cond ((memq (plist-get sys :category)
+                       '(coding-category-undecided coding-category-utf-8))
+                 "UTF-8")
+                (t (upcase (symbol-name (plist-get sys :name))))))
+        'face face
+        ;; 'mouse-face mouse-face
+        ;; 'help-echo 'mode-line-mule-info-help-echo
+        ;; 'local-map mode-line-coding-system-map
+        )
+
+       ;; eol type
+       (let ((eol (coding-system-eol-type buffer-file-coding-system)))
+         (propertize
+          (pcase eol
+            (0 "/LF")
+            (1 "/CRLF")
+            (2 "/CR")
+            (_ ""))
+          'face face
+          ;; 'mouse-face mouse-face
+          ;; 'help-echo (format "End-of-line style: %s\nmouse-1: Cycle"
+          ;;                    (pcase eol
+          ;;                      (0 "Unix-style LF")
+          ;;                      (1 "DOS-style CRLF")
+          ;;                      (2 "Mac-style CR")
+          ;;                      (_ "Undecided")))
+          ;; 'local-map (let ((map (make-sparse-keymap)))
+		  ;;              (define-key map [mode-line mouse-1] 'mode-line-change-eol)
+		  ;;              map)
+          ))
+
+       ))))
+
+  (doom-modeline-def-modeline 'main
+    ;; '(bar workspace-number window-number evil-state god-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
+    ;; '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
+    '(evil-state matches buffer-info remote-host parrot)
+    '(misc-info persp-name lsp github debug buffer-encoding linum-colnum minor-modes major-mode vcs))
+
+  (defun my-minor-modes-toggle ()
+    (interactive)
+    (setq doom-modeline-minor-modes (if doom-modeline-minor-modes nil t)))
+  ;; (remove-text-properties )
+
+  )
+
+;; ----------------------------------------------------------------------
+(use-package hide-mode-line
+  :if window-system
+  :hook ((neotree-mode) . hide-mode-line-mode)
+  )
+
+;; ----------------------------------------------------------------------
+(use-package common-header-mode-line
+  :disabled
+  :config
+  (common-mode-line-mode 1)
+  (common-header-line-mode 1)
+  ;; (setq common-header-mode-line-update-delay 0.5)
+  )
+
+;; ----------------------------------------------------------------------
+(use-package all-the-icons
+  :if window-system
+  :config
+  (setq inhibit-compacting-font-caches t)
+  (setq all-the-icons-color-icons nil)
+  )
+
+;; ----------------------------------------------------------------------
+(defun my-font-lock-add-keywords-elisp ()
+  (font-lock-add-keywords nil
+                          '(("(\\(lambda\\|cons\\|car\\|cdr\\|nth\\|eq\\|equal\\|null\\|remove\\|delete
+\\|mapc\\|mapcar\\|fset\\|set
+\\|memq\\|member\\|delq\\|funcall\\|fboundp\\|list\\|add-to-list\\|concat\\|call-interactively
+\\|assoc\\|rassoc\\|add-hook\\|remove-hook\\|define-key\\|global-set-key\\|local-set-key\\|define-key
+\\|ad-activate\\|ad-enable-advice\\|ad-disable-advice\\|propertize\\|run-hooks\\)[ \t\n]" . font-lock-keyword-face))))
+
+(add-hook 'emacs-lisp-mode-hook #'my-font-lock-add-keywords-elisp)
+(add-hook 'emacs-lisp-mode-hook #'flymake-mode)
+(add-hook 'lisp-interaction-mode-hook #'my-font-lock-add-keywords-elisp)
+(add-hook 'lisp-interaction-mode-hook #'flymake-mode)
+
+;; ----------------------------------------------------------------------
+(use-package undo-tree
+  :config
+  (define-key undo-tree-map (kbd "C-?") 'nil)
+  (define-key undo-tree-map (kbd "C-r") 'nil)    ;; undo-tree-redo      FIXME: not work
+  )
+
+;; ----------------------------------------------------------------------
+(use-package dashboard
+  :disabled
+  ;; :defer t
+  :config
+  ;; (setq inhibit-startup-message t)
+  (setq dashboard-banner-logo-title "Life with Evil")
+  (setq dashboard-startup-banner "~/.emacs.d/img/e_splash.svg")
+  (dashboard-setup-startup-hook)
+  (setq dashboard-items '((recents  . 10)))
+  ;; (widget-forward 1)
+  )
+
+;; ----------------------------------------------------------------------
+(use-package neotree
+  :if window-system
+  ;; :disabled
+  :after evil all-the-icons
+  :config
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (setq neo-show-hidden-files t)
+  (setq neo-create-file-auto-open t)
+  (setq neo-smart-open nil)
+  (setq neo-persist-show t)
+  (setq neo-keymap-style 'concise)
+
+  (global-set-key (kbd "M-q") 'neotree-toggle)
+  (evil-define-key 'normal neotree-mode-map (kbd "M-q") 'neotree-hide)
+  (evil-define-key 'normal neotree-mode-map (kbd "q")   'neotree-hide)
+  (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
+  (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
+  (evil-define-key 'normal neotree-mode-map (kbd "l")   'neotree-enter)
+  (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
+
+  (defun text-scale-twice ()
+    (interactive)
+    (text-scale-adjust 0)
+    (text-scale-decrease 1))
+  (add-hook 'neo-after-create-hook (lambda (_)(call-interactively 'text-scale-twice)))
+
+  )
 
 ;; ----------------------------------------------------------------------
 (use-package projectile
@@ -3362,7 +3372,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
 ;; ----------------------------------------------------------------------
 (use-package web-mode
   :mode (("\\.html$" . web-mode))
-  :after html-mode
+  ;; :requires html-mode
   ;; :hook ((web-mode . lsp))
   ;; :commands lsp
 
@@ -4033,5 +4043,14 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
 (load custom-file nil t)
+
+;; disable start greeting message such as "for information about gnu emacs and the gnu system type c-h c-a"
+(setq inhibit-startup-echo-area-message (getenv "USER"))
+(setq inhibit-startup-message t)
+
+;; show emacs version and startup time in mini-buffer
+ (message "%s / %.3f sec"
+          (substring (version) 0 14)
+          (float-time (time-subtract after-init-time before-init-time)))
 
 ;;; init.el ends here
