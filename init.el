@@ -4049,7 +4049,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 (load custom-file nil t)
 
 ;; disable start greeting message such as "for information about gnu emacs and the gnu system type c-h c-a"
-(setq inhibit-startup-echo-area-message (getenv "USER"))
+(fset 'display-startup-echo-area-message 'ignore)
 (setq inhibit-startup-message t)
 
 ;; show emacs version and startup time in mini-buffer
