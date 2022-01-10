@@ -1838,7 +1838,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
  ;; ----------------------------------------------------------------------
 
- (lisp-interaction-mode)                            ;; workaround for scratch-log
+ ;; (lisp-interaction-mode)                            ;; workaround for scratch-log
 
 
  ;; disable mhtml-mode so avoiding conflict with web-mode
@@ -2337,6 +2337,10 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   :ensure t
   :config
   (add-to-list 'recentf-exclude "scratch-log-autoloads.el")
+
+  (defun my-adv--sl-restore-scratch--no-modified (&rest _)
+    (set-buffer-modified-p nil))
+  (advice-add 'sl-restore-scratch :after #'my-adv--sl-restore-scratch--no-modified)
   )
 
 ;; ----------------------------------------------------------------------
