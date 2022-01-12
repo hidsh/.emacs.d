@@ -389,7 +389,7 @@
        ((eq system-type 'darwin)     '_mac)
        (t (error "Unknown system-type: %s" system-type))))
 
-(my-load-frame)
+;; (my-load-frame)
 
 ;; ----------------------------------------------------------------------
 ;; (defvar exclude-face-list '(rainbow-delimiters-base-face
@@ -1476,8 +1476,8 @@ If COUNT is given, move COUNT - 1 lines downward first."
   )
 
   ;; color
-  (set-face-foreground 'ivy-action (mycolor 'red))
-  (set-face-background 'ivy-confirm-face "'green")
+  ;; (set-face-foreground 'ivy-action (mycolor 'red))
+  ;; (set-face-background 'ivy-confirm-face "'green")
   ;; (set-face-background 'ivy-current-match "#0a5770")
   ;; (set-face-attribute  'ivy-current-match nil
   ;;                   :foreground (mycolor 'black) :background (mycolor 'red))
@@ -1489,10 +1489,10 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; (set-face-background 'ivy-minibuffer-match-face-2 "#0a5770")
   ;; (set-face-background 'ivy-minibuffer-match-face-3 "'DarkGray")
   ;; (set-face-background 'ivy-minibuffer-match-face-4 "'DarkCyan")
-  (set-face-attribute 'ivy-minibuffer-match-face-1 nil :foreground nil :background nil :bold t :underline t)
-  (copy-face 'ivy-minibuffer-match-face-1 'ivy-minibuffer-match-face-2)
-  (copy-face 'ivy-minibuffer-match-face-1 'ivy-minibuffer-match-face-3)
-  (copy-face 'ivy-minibuffer-match-face-1 'ivy-minibuffer-match-face-4)
+  ;; (set-face-attribute 'ivy-minibuffer-match-face-1 nil :foreground nil :background nil :bold t :underline t)
+  ;; (copy-face 'ivy-minibuffer-match-face-1 'ivy-minibuffer-match-face-2)
+  ;; (copy-face 'ivy-minibuffer-match-face-1 'ivy-minibuffer-match-face-3)
+  ;; (copy-face 'ivy-minibuffer-match-face-1 'ivy-minibuffer-match-face-4)
 
   ;; disable mouse hover in minibuffer
   ;; mod

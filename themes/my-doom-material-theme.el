@@ -186,7 +186,7 @@ Can be an integer to determine the exact padding."
    (flycheck-fringe-error   :background nil :foreground red)
 
    ;; css-mode / scss-mode
-   (css-proprietary-property :foreground orange)
+   (css-proprietary-property :foreground yellow)
    (css-property             :foreground green)
    (css-selector             :foreground blue)
 
@@ -200,7 +200,28 @@ Can be an integer to determine the exact padding."
    (dired-k-added    :foreground vc-added)
 
    ;; ivy
+   ;; (set-face-foreground 'ivy-action (mycolor 'red))
+   ;; (set-face-background 'ivy-confirm-face "'green")
+   ;; (set-face-attribute 'ivy-minibuffer-match-face-1 nil :foreground nil :background nil :bold t :underline t)
+   ;; (copy-face 'ivy-minibuffer-match-face-1 'ivy-minibuffer-match-face-2)
+   ;; (copy-face 'ivy-minibuffer-match-face-1 'ivy-minibuffer-match-face-3)
+   ;; (copy-face 'ivy-minibuffer-match-face-1 'ivy-minibuffer-match-face-4)
+   (ivy-action :foreground red)
+   (ivy-confirm-face :foreground green)
    (ivy-current-match :background base5)
+   ;; (ivy-cursor )
+   ;; (ivy-highlight-face )
+   (ivy-match-required-face :foreground red)
+   (ivy-minibuffer-match-face-1 :background highlight :underline highlight)
+   (ivy-minibuffer-match-face-2 :underline highlight)
+   (ivy-minibuffer-match-face-3 :underline highlight)
+   (ivy-minibuffer-match-face-4 :underline highlight)
+   (ivy-minibuffer-match-highlight :underline highlight)
+   (ivy-modified-buffer :foreground red)
+   ;; (ivy-prompt-match )
+   (ivy-remote :foreground red)
+   (ivy-subdir :foreground highlight)
+   (ivy-virtual :foreground yellow)
 
    ;; js2-mode
    (js2-jsdoc-tag              :foreground magenta)
