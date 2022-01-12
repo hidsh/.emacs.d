@@ -3389,6 +3389,11 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   (web-mode-engines-alist '(("django" . "\\.html$")))     ;; django template (this is temporary)
 
   :config
+  (setq-default web-mode-comment-formats
+              '(("java"       . "/*")
+                ("javascript" . "//")
+                ("php"        . "/*")))
+
   (setq web-mode-extra-snippets
    '(("django" . (("{" . "{{ | }}")
                   ("c" . "{# -- | -- #}")
