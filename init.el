@@ -2241,6 +2241,7 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (define-key evil-visual-state-map (kbd "=") 'er/expand-region)
   (define-key evil-visual-state-map (kbd "-") 'er/contract-region)
 
+  (add-hook 'web-mode-hook #'(lambda () (er/enable-mode-expansions 'web-mode 'er/add-web-mode-expansions)))
   )
 
 ;; ----------------------------------------------------------------------
