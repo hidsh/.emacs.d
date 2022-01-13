@@ -1015,7 +1015,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd "k") #'evil-previous-visual-line)
   (define-key evil-motion-state-map (kbd "0") #'my-beginning-of-line)
   (define-key evil-motion-state-map (kbd "4") #'my-end-of-line)
-  (define-key evil-motion-state-map (kbd "6") #'evil-first-non-blank)
+  ;; (define-key evil-motion-state-map (kbd "6") #'evil-first-non-blank)
   ;; (define-key evil-motion-state-map (kbd "v") #'my-evil-visual-cycle)
   (define-key evil-motion-state-map (kbd "M-w") #'my-forward-word)
   ;; (define-key evil-motion-state-map (kbd "g g") #'my-evil-beginning-of-buffer)
