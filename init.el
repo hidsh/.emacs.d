@@ -2516,6 +2516,9 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   :bind (("C-x d"    . my-dired)
          ("C-x C-d"  . my-dired)
          :map dired-mode-map
+         ("C-o"   . nil)                     ;; other-window instead of dired-display-file
+         ("o"     . dired-display-file)
+         ("q"     . kill-this-buffer)        ;; kill-buffer instead to bury-buffer
          ("H"     . dired-up-directory)
          ("L"     . nop)
          ("a"     . dired-find-file)
