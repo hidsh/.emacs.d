@@ -3396,6 +3396,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   (setq-default web-mode-comment-formats
               '(("java"       . "/*")
                 ("javascript" . "//")
+                ("css"        . "//")
                 ("php"        . "/*")))
 
   (setq web-mode-extra-snippets
@@ -3466,57 +3467,63 @@ See URL `https://github.com/htacg/tidy-html5'."
   ;;        ([S-down] . flycheck-next-error)
   ;;        ([S-up]   . flycheck-previous-error))
 
-  ;; my-web-mode-replace-tag
-  (defface my-web-mode-replace-tag-highlight-face
-    `((t :foreground "black" :background "yellow"))
-    "Face to highlight tag name tempolary in my-web-mode-replace-tag")
 
-  (defun my-web-mode-replace-tag (&optional marker len from to)
-    (interactive)
-    (flet ((delete-word (n) (delete-region (point) (progn (forward-word n) (point))))
-           (delete-backward-word () (delete-word -1))
-           (add-overlay (beg end)
-                        (prog1
-                            (overlay-put (make-overlay beg end) 'face 'my-web-mode-replace-tag-highlight-face)
-                          (setq mark-active nil))))
-      (save-excursion
-        (cond ((and marker len from to)  ;; third call
-               (delete-backward-word)
-               (insert to))
-              ((and marker len)            ;; second call
-               (when (text-property-search-forward 'face 'web-mode-html-tag-face t)
-                 ;; highlighting
-                 (let* ((ol1-end (point))
-                        (ol1-beg (- (point) len))
-                        (ol2-end marker)
-                        (ol2-beg (- marker len)))
-                   (add-overlay ol1-beg ol1-end)
-                   (add-overlay ol2-beg ol2-end)
-                   (ignore-errors
-                     (unwind-protect
-                         (let* ((from (word-at-point t))
-                                (to (read-string (format "Rename tag \"%s\":" from))))
-                           (remove-overlays ol1-beg ol1-end 'face 'my-web-mode-replace-tag-highlight-face)
-                           (remove-overlays ol2-beg ol2-end 'face 'my-web-mode-replace-tag-highlight-face)
-                           (delete-backward-word)
-                           (insert to)
-                           (goto-char marker)
-                           (my-web-mode-replace-tag marker len from to))
-                         (remove-overlays ol1-beg ol1-end 'face 'my-web-mode-replace-tag-highlight-face)
-                         (remove-overlays ol2-beg ol2-end 'face 'my-web-mode-replace-tag-highlight-face)))
-                   )))
-              (t                  ;; first call
-               ;; (setq buffer-undo-list (cons (point) buffer-undo-list))
-               ;; (undo-boundary)
-               (when (text-property-search-forward 'face 'web-mode-html-tag-face t)
-                 (let* ((marker (point-marker))
-                        (len (- marker (progn (forward-word -1) (point)))))
-                   (web-mode-tag-match)
-                   (my-web-mode-replace-tag marker len))))))))
-
-  (set-face-background 'my-web-mode-replace-tag-highlight-face (face-foreground 'warning))
-  (evil-define-key 'normal web-mode-map (kbd "t") 'my-web-mode-replace-tag)
+  ;; ;; my-web-mode-replace-tag
+  ;; (defface my-web-mode-replace-tag-highlight-face
+  ;;   `((t :foreground "black" :background "yellow"))
+  ;;   "Face to highlight tag name tempolary in my-web-mode-replace-tag")
+  ;;
+  ;; (defun my-web-mode-replace-tag (&optional marker len from to)
+  ;;   "Replace html-tag at out side near the point in web-mode."
+  ;;   (interactive)
+  ;;   (flet ((delete-word (n) (delete-region (point) (progn (forward-word n) (point))))
+  ;;          (delete-backward-word () (delete-word -1))
+  ;;          (add-overlay (beg end)
+  ;;                       (prog1
+  ;;                           (overlay-put (make-overlay beg end) 'face 'my-web-mode-replace-tag-highlight-face)
+  ;;                         (setq mark-active nil))))
+  ;;     (save-excursion
+  ;;       (cond ((and marker len from to)  ;; third call
+  ;;              (delete-backward-word)
+  ;;              (insert to))
+  ;;             ((and marker len)            ;; second call
+  ;;              (when (text-property-search-forward 'face 'web-mode-html-tag-face t)
+  ;;                ;; highlighting
+  ;;                (let* ((ol1-end (point))
+  ;;                       (ol1-beg (- (point) len))
+  ;;                       (ol2-end marker)
+  ;;                       (ol2-beg (- marker len)))
+  ;;                  (add-overlay ol1-beg ol1-end)
+  ;;                  (add-overlay ol2-beg ol2-end)
+  ;;                  (ignore-errors
+  ;;                    (unwind-protect
+  ;;                        (let* ((from (word-at-point t))
+  ;;                               (to (read-string (format "Rename tag \"%s\":" from))))
+  ;;                          (remove-overlays ol1-beg ol1-end 'face 'my-web-mode-replace-tag-highlight-face)
+  ;;                          (remove-overlays ol2-beg ol2-end 'face 'my-web-mode-replace-tag-highlight-face)
+  ;;                          (delete-backward-word)
+  ;;                          (insert to)
+  ;;                          (goto-char marker)
+  ;;                          (my-web-mode-replace-tag marker len from to))
+  ;;                        (remove-overlays ol1-beg ol1-end 'face 'my-web-mode-replace-tag-highlight-face)
+  ;;                        (remove-overlays ol2-beg ol2-end 'face 'my-web-mode-replace-tag-highlight-face)))
+  ;;                  )))
+  ;;             (t                  ;; first call
+  ;;              ;; (setq buffer-undo-list (cons (point) buffer-undo-list))
+  ;;              ;; (undo-boundary)
+  ;;              (when (text-property-search-forward 'face 'web-mode-html-tag-face t)
+  ;;                (let* ((marker (point-marker))
+  ;;                       (len (- marker (progn (forward-word -1) (point)))))
+  ;;                  (web-mode-tag-match)
+  ;;                  (my-web-mode-replace-tag marker len))))))))
+  ;;
+  ;; (set-face-background 'my-web-mode-replace-tag-highlight-face (face-foreground 'warning))
+  ;; (evil-define-key 'normal web-mode-map (kbd "t") 'my-web-mode-replace-tag)
   )
+
+;; ----------------------------------------------------------------------
+(use-package auto-rename-tag
+  :hook (web-mode . auto-rename-tag-mode))
 
 ;; ----------------------------------------------------------------------
 (use-package posframe
