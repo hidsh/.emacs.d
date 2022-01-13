@@ -227,8 +227,8 @@
 (global-set-key (kbd "C-m") 'newline-and-indent)             ; Returnキーで改行＋オートインデント
 (global-set-key (kbd "C-0") 'delete-window)
 (global-set-key (kbd "C-1") 'delete-other-windows)
-(global-set-key (kbd "C-2") 'split-window-below)
-(global-set-key (kbd "C-3") 'split-window-right)
+(global-set-key (kbd "C-2") 'my-split-window-below)
+(global-set-key (kbd "C-6") 'my-split-window-right)
 (global-set-key (kbd "C-o") 'other-window)
 
 (global-set-key (kbd "M-9") 'insert-parentheses)
@@ -997,6 +997,7 @@ That is, a string used to represent it on the tab bar."
   ;; (define-key evil-motion-state-map (kbd "V")   #'nop)                          ; unmap
   ;; (define-key evil-motion-state-map (kbd "C-v") #'nop)                          ; unmap
   (define-key evil-motion-state-map (kbd "M-v") #'nop)                          ; unmap
+  (define-key evil-motion-state-map (kbd "C-6") nil)        ; evil-switch-to-windows-last-buffer
   (define-key evil-motion-state-map (kbd "C-f") nil)
   (define-key evil-motion-state-map (kbd "C-b") nil)
   (define-key evil-motion-state-map (kbd "C-o") nil)		; evil-jump-backward

@@ -1412,8 +1412,17 @@ not to prompt for input and return t."
 ;; 		(local-set-key "\C-a" 'beginning-of-minibuffer)))))
 
 
-(provide 'discrete)
+;; ----------------------------------------------------------------------
+(defun my-split-window-right ()
+  (interactive)
+  (split-window-right)
+  (other-window 1))
 
-;;
+(defun my-split-window-below ()
+  (interactive)
+  (split-window-below)
+  (other-window 1))
+
+
+(provide 'discrete)
 ;; discrete.el ends here
-;;
