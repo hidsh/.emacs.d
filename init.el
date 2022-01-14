@@ -418,6 +418,27 @@
 ;; ----------------------------------------------------------------------
 ;; ここからモードライン設定
 ;; https://tsuu32.hatenablog.com/entry/2019/08/04/160316
+
+(defface my-mode-line-accent-face  `((t (:foreground ,(face-background 'my-evil-normal-tag-face)))) "")
+
+(defvar mode-line-selected-window nil)
+
+(defun mode-line-record-selected-window ()
+  (unless (string-match-p " \*Minibuf" (buffer-name (window-buffer (car (window-list)))))
+    (setq mode-line-selected-window (selected-window))))
+
+(add-hook 'window-configuration-change-hook #'mode-line-record-selected-window)
+
+(defun mode-line-update-all ()
+  (force-mode-line-update t))
+
+(add-hook 'buffer-list-update-hook #'mode-line-update-all)
+
+(defun mode-line-choose-face (prior-face)
+  (if (eq mode-line-selected-window (selected-window))
+      prior-face
+    'mode-line-inactive))
+
 (set 'eol-mnemonic-dos (propertize "\u24d3" 'face `(:family ,(myfont 'default3))))  ;; d
 (set 'eol-mnemonic-unix (propertize "\u24e4" 'face `(:family ,(myfont 'default3)))) ;; u
 (set 'eol-mnemonic-mac (propertize "\u24dc" 'face `(:family ,(myfont 'default3))))  ;; m
@@ -434,8 +455,14 @@
           (t "???")
           )))
 
+(defun my-mode-line-evil-tag ()
+  (if (eq mode-line-selected-window (selected-window))
+      evil-mode-line-tag
+    (let ((color (face-foreground 'mode-line-inactive)))
+      (propertize evil-mode-line-tag 'face '(:background color :inverse-video t)))))
+
 (defun split-vc-mode-string (s)
-  "Returns cons (\"Git\" . \"master\") for example \" Git-master\", otherwise (\"\" . \"\")."
+  "Returns cons (\"Git\" . \"master\") from `s' for example \" Git-master\", otherwise (\"\" . \"\")."
   (let ((pos (string-match "[-:]" s)))
     (if pos
         (cons (string-trim-left (substring s 0 pos)) (substring s (1+ pos)))
@@ -451,15 +478,15 @@
                   (_ "?"))
                 (cond ((string= branch "") "")
                       ((or (string= branch "master") (string= branch "main"))
-                       (propertize branch 'face `(:foreground ,(face-background 'my-evil-normal-tag-face))))
-                      (t (propertize branch 'face `(:foreground ,(face-foreground 'warning)))))))
+                       (propertize branch 'face (mode-line-choose-face 'my-mode-line-accent-face)))
+                      (t (propertize branch 'face (mode-line-choose-face  'warning))))))
     ""))
 
 (defun my-mode-line-num ()
   (format "%3s:%-s/%d"
           (format-mode-line "%c")
           (propertize (format-mode-line "%l")
-                      'face `(:foreground ,(face-background 'my-evil-normal-tag-face)))
+                      'face (mode-line-choose-face 'my-mode-line-accent-face))
           (line-number-at-pos (point-max))))
 
 (defun moon-flymake-mode-line ()
@@ -500,9 +527,21 @@
            (errors (or .error 0)))
       (when status
         (concat
-         (propertize (int-to-string errors)   'face 'flycheck-error-list-error) " "
-         (propertize (int-to-string warnings) 'face 'flycheck-error-list-warning) " "
-         (propertize (int-to-string info)     'face 'flycheck-error-list-info))))))
+         (propertize (int-to-string errors)   'face (mode-line-choose-face 'error)) " "
+         (propertize (int-to-string warnings) 'face (mode-line-choose-face 'warning)) " "
+         (propertize (int-to-string info)     'face (mode-line-choose-face 'success)))))))
+
+(defun my-mode-line-buffer-name ()
+  (propertize (format-mode-line "%b")
+              'face (if (buffer-modified-p)
+                        (mode-line-choose-face 'error)
+                      (mode-line-choose-face 'my-mode-line-accent-face))))
+
+(defun my-mode-line-read-only ()
+  (if buffer-read-only
+      (propertize  "\uf023" ;; nf-fa-lock
+                   'face (mode-line-choose-face 'error))
+    " "))
 
 ;; -----------
 ;;  (defun simple-mode-line-render (left right)
@@ -535,14 +574,11 @@
 ;;---------
 (defun my-mode-line--form ()
   (let* ((left-part (concat
-                     evil-mode-line-tag
+                     (my-mode-line-evil-tag)
                      " "
-                     (propertize (format-mode-line "%b")
-                                 'face (if (buffer-modified-p)
-                                           `(:foreground ,(face-foreground 'error))
-                                         `(:foreground ,(face-background 'my-evil-normal-tag-face))))
+                     (my-mode-line-buffer-name)
                      " "
-                     (propertize (if buffer-read-only "\uf023" " ") 'face `(:family ,(myfont 'default3) :foreground ,(face-foreground 'error))) ;; nf-fa-lock
+                     (my-mode-line-read-only)
                      " "))
          (right-part (concat
                       (my-coding-system-name-mnemonic)
