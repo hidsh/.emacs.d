@@ -1094,8 +1094,8 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-visual-state-map (kbd "e") #'my-evil-visual-eval-region)
   (define-key evil-visual-state-map (kbd "w") #'my-evil-visual-write-region)
   (define-key evil-visual-state-map (kbd "a") #'my-evil-visual-align-region)
-  (define-key evil-visual-state-map (kbd "c c") #'my-evil-visual-comment-region)
-  (define-key evil-visual-state-map (kbd "i i") #'my-evil-visual-indent-region)
+  (define-key evil-visual-state-map (kbd ";") #'my-evil-visual-comment-region)
+  (define-key evil-visual-state-map (kbd "i") #'my-evil-visual-indent-region)
 
   ;; ;; not work, fixme
   ;; (add-hook 'macrostep-mode-hook #'(lambda ()
