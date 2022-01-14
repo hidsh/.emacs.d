@@ -586,7 +586,7 @@
                       " "
                       (my-mode-line-num)
                       " "
-                      (my-mode-line-vc-string)                       ;; NG
+                      (my-mode-line-vc-string)
                       " "
                       (cond
                        (flycheck-mode (my-flycheck-mode-line))
