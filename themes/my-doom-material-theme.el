@@ -131,8 +131,8 @@ Can be an integer to determine the exact padding."
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
 
    (mode-line-inactive
-    :background modeline-bg-alt :foreground modeline-fg-alt :overline nil
-    :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg-alt)))
+    :background modeline-bg :foreground modeline-fg-alt :overline nil
+    :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
 
    (solaire-mode-line-face
     :background modeline-bg :foreground modeline-fg
