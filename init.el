@@ -1256,7 +1256,7 @@ That is, a string used to represent it on the tab bar."
 
   (defun my-evil-visual-surround-change (beg end s)
     "Change surrounded character. Delete surround if you input RET."
-    (let* ((prompt (format "Re-surround '%s' with:" s))
+    (let* ((prompt (format "Re-surround '%s' with:" (substring s 1 (1- (length s)))))
            (c (read-char prompt))
            (pair (my-evil-visual-surround-get-pair c))
            head tail)
