@@ -276,3 +276,4 @@ Can be an integer to determine the exact padding."
    (tooltip              :background (doom-darken bg-alt 0.2) :foreground fg)))
 
 (provide 'doom-material-theme)
+;;; my-doom-material-theme.el ends here
