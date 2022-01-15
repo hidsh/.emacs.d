@@ -150,7 +150,8 @@ Can be an integer to determine the exact padding."
    (line-number-current-line :foreground teal :background base3)
 
 ;; (fringe :background base2)
-   (fringe :background base3)
+   ;; (fringe :background base3)
+   (fringe :background bg)
 
    ;; selection (region)
    (region :foreground nil :background nil :underline highlight)
