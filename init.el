@@ -4111,7 +4111,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   ;; :mode "\\.ino\\'"
   :config
   (push "D:/pgm/" exec-path)
-  
+
   :custom
   (arduino-cli-warnings 'all)
   (arduino-cli-verify t)
