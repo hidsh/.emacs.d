@@ -4105,6 +4105,14 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
           ))
   )
 ;; ----------------------------------------------------------------------
+(use-package bm
+  :config
+  (set-face-background 'bm-face (face-foreground 'warning))
+
+  (define-key evil-motion-state-map (kbd "g m") #'bm-toggle)
+  (define-key evil-motion-state-map (kbd "g b") #'bm-next)
+  )
+;; ----------------------------------------------------------------------
 (use-package arduino-cli-mode
   :ensure t
   ;; :hook arduino-mode
