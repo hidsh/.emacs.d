@@ -4088,7 +4088,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :ensure t
   :config
   (define-key evil-motion-state-map (kbd "g p") 'jumplist-previous)
-  (define-key evil-motion-state-map (kbd "g o") 'jumplist-next)
+  (define-key evil-motion-state-map (kbd "g n") 'jumplist-next)
   (global-set-key (kbd "C->") 'jumplist-next)
 
   (setq jumplist-hook-commands '(
@@ -4100,6 +4100,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
           evil-search-next evil-search-previous
           my-beginning-of-defun
           my-beginning-of-line my-end-of-line
+          symbol-overlay-jump-next
+          symbol-overlay-jump-prev
           ))
   )
 ;; ----------------------------------------------------------------------
