@@ -204,7 +204,7 @@
 (keyboard-translate ?\C-h ?\C-?)                        ; c-h
 
 (global-unset-key (kbd "M-,"))                          ; xref
-(global-unset-key (kbd "M-."))                          ; xref
+;; (global-unset-key (kbd "M-."))                          ; xref
 (global-unset-key (kbd "C-z"))                          ; suspend-frame
 (global-unset-key (kbd "C-x C-z"))                      ; suspend-frame
 (global-unset-key (kbd "C-x o"))                        ; other-window
@@ -929,6 +929,14 @@ That is, a string used to represent it on the tab bar."
   (evil-mode 1)
   (evil-set-initial-state 'help-mode 'emacs)
   (evil-set-initial-state 'slime-editing-mode 'emacs)
+
+  (setq evil-emacs-state-message nil)
+  (setq evil-insert-state-message nil)
+  (setq evil-motion-state-message nil)
+  (setq evil-normal-state-message nil)
+  (setq evil-operator-state-message nil)
+  (setq evil-replace-state-message nil)
+  (setq evil-visual-state-message nil)
 
   (defalias #'forward-evil-word #'forward-evil-symbol)
 
@@ -4080,7 +4088,9 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   ;; (setq dumb-jump-default-project "")
   ;; (setq dumb-jump-quiet t)
   (setq dumb-jump-force-searcher 'rg)
-  ;; (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  (define-key evil-motion-state-map (kbd "g d") #'dumb-jump-go)
+  (define-key evil-motion-state-map (kbd "g h") #'dumb-jump-back)
   (dumb-jump-mode)
   )
 ;; ----------------------------------------------------------------------
