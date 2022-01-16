@@ -3501,7 +3501,8 @@ See URL `https://github.com/htacg/tidy-html5'."
  ;; :modes (html-mode mhtml-mode nxhtml-mode))
     :modes (web-mode))
 
-  ;; :bind (:map web-mode-map
+  :bind (:map web-mode-map
+              ("M-;" . comment-line))
   ;;        ([S-down] . flycheck-next-error)
   ;;        ([S-up]   . flycheck-previous-error))
 
