@@ -433,6 +433,7 @@
   (force-mode-line-update t))
 
 (add-hook 'buffer-list-update-hook #'mode-line-update-all)
+(add-hook 'focus-in-hook #'mode-line-update-all)
 
 (defun mode-line-choose-face (prior-face)
   (if (eq mode-line-selected-window (selected-window))
