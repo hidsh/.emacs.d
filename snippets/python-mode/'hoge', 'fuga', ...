@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: 'hoge', 'fuga', ...
+# key: hoge
+# --
+'hoge', 'fuga', 'piyo',$0 'foo', 'bar', 'baz', 'spam', 'ham', 'eggs'

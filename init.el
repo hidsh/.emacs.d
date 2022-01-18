@@ -1098,8 +1098,8 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-insert-state-map (kbd "C-h") #'delete-backward-char)
   (define-key evil-insert-state-map (kbd "M-h") #'my-backward-kill-word)
   (define-key evil-insert-state-map (kbd "TAB") #'(lambda () (interactive) (insert-tab)))
-  (define-key evil-insert-state-map (kbd "'") #'my-insert-squote)
-  (define-key evil-insert-state-map (kbd "\"") #'my-insert-dquote)
+  ;; (define-key evil-insert-state-map (kbd "'") #'my-insert-squote)
+  ;; (define-key evil-insert-state-map (kbd "\"") #'my-insert-dquote)
 
   ;; visual-state-map
   (define-key evil-visual-state-map (kbd "e") #'my-evil-visual-eval-region)
@@ -3602,8 +3602,8 @@ See URL `https://github.com/htacg/tidy-html5'."
          (setq count 0)
          (my-insert-quote-python-1 count q))))
 
-  (evil-define-key 'insert python-mode-map (kbd "'") #'my-insert-quote-python)
-  (evil-define-key 'insert python-mode-map (kbd "\"") #'my-insert-double-quote-python)
+  ;; (evil-define-key 'insert python-mode-map (kbd "'") #'my-insert-quote-python)
+  ;; (evil-define-key 'insert python-mode-map (kbd "\"") #'my-insert-double-quote-python)
   )
 
 ;; ----------------------------------------------------------------------
@@ -4030,8 +4030,28 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 (use-package yasnippet
   ;; :disabled
   :ensure t
+  :hook
+  (snippet-mode . my-yas-keybindings)
   :config
   (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+
+  (defalias 'yas #'yas-new-snippet)
+
+  (defun my-adv--yas-load-snippet-buffer--kill-buffer (&rest _)
+    (kill-buffer (current-buffer)))
+  (advice-add 'yas-load-snippet-buffer :after #'my-adv--yas-load-snippet-buffer--kill-buffer)
+
+  (defun my-yas-keybindings ()
+    (define-key snippet-mode-map (kbd "C-x C-s") #'yas-load-snippet-buffer))
+
+  (setq yas-new-snippet-default  "\
+# -*- mode: snippet -*-
+# name: $1
+# key: ${2:${1:$(yas--key-from-desc yas-text)}}
+# --
+#$0`(yas-escape-text yas-selected-text)`
+
+# 例: \\$0 \\${1:hoge}")
 
   (yas-global-mode 1)
   )
