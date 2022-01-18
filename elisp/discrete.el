@@ -1038,7 +1038,7 @@ is already narrowed."
 
 
 ;; ----------------------------------------------------------------------
-;;@@ `my-insert-pair-*'  ;  (), {}, [], <>, "", '' 
+;;@@ `my-insert-pair-*'  ;  (), {}, [], <>, "", ''
 (defun my-insert-pair (lst)
   "args lst is formatted as '(flag open-char close-char)"
   (if (or (not (featurep 'evil))

@@ -221,8 +221,8 @@
 ;; (global-set-key "{" 'my-insert-brace)                   ; {}
 ;; (global-set-key "[" 'my-insert-bracket)                 ; []
 ;; (global-set-key "<" 'my-insert-angle)                   ; <>
-(global-set-key "'" 'my-insert-squote)                  ; ''
-(global-set-key "\"" 'my-insert-dquote)                 ; ""
+;; (global-set-key "'" 'my-insert-squote)                  ; ''
+;; (global-set-key "\"" 'my-insert-dquote)                 ; ""
 
 (global-set-key (kbd "C-m") 'newline-and-indent)             ; Returnキーで改行＋オートインデント
 (global-set-key (kbd "C-0") 'delete-window)
@@ -1098,6 +1098,8 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-insert-state-map (kbd "C-h") #'delete-backward-char)
   (define-key evil-insert-state-map (kbd "M-h") #'my-backward-kill-word)
   (define-key evil-insert-state-map (kbd "TAB") #'(lambda () (interactive) (insert-tab)))
+  (define-key evil-insert-state-map (kbd "'") #'my-insert-squote)
+  (define-key evil-insert-state-map (kbd "\"") #'my-insert-dquote)
 
   ;; visual-state-map
   (define-key evil-visual-state-map (kbd "e") #'my-evil-visual-eval-region)
@@ -3566,6 +3568,42 @@ See URL `https://github.com/htacg/tidy-html5'."
   ;;
   ;; (set-face-background 'my-web-mode-replace-tag-highlight-face (face-foreground 'warning))
   ;; (evil-define-key 'normal web-mode-map (kbd "t") 'my-web-mode-replace-tag)
+  )
+
+;; ----------------------------------------------------------------------
+(use-package python-mode
+  :mode "\\.py\\'"
+  :config
+  (let ((count 0))
+    (defun my-insert-quote-python ()
+      (interactive)
+      (setq count
+            (if (eq last-command this-command)
+                (mod (1+ count) 4)
+              0))
+      (my-insert-quote-python-1 count ?')))
+
+  (let ((count 0))
+    (defun my-insert-double-quote-python ()
+      (interactive)
+      (setq count
+            (if (eq last-command this-command)
+                (mod (1+ count) 4)
+              0))
+      (my-insert-quote-python-1 count ?\")))
+
+
+  (defun my-insert-quote-python-1 (count q)
+    (pcase count
+      (0 (insert q))
+      (1 (insert q) (backward-char))
+      (2 (insert q q q q) (backward-char 2))
+      (3 (backward-char 3) (delete-char 6) (backward-delete-char)
+         (setq count 0)
+         (my-insert-quote-python-1 count q))))
+
+  (evil-define-key 'insert python-mode-map (kbd "'") #'my-insert-quote-python)
+  (evil-define-key 'insert python-mode-map (kbd "\"") #'my-insert-double-quote-python)
   )
 
 ;; ----------------------------------------------------------------------
