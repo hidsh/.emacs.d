@@ -1451,6 +1451,10 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   (fset 'evil-backward-section-begin #'nop)     ;; disabled
 
+  (defun my-adv--evil-join--delete-space (&rest _)
+    (when (eq (char-after) ?\ )
+      (delete-char 1)))
+  (advice-add 'evil-join :after #'my-adv--evil-join--delete-space)
 )
 
 ;; ----------------------------------------------------------------------
