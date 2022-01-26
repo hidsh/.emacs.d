@@ -1066,6 +1066,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd "M-w") #'my-forward-word)
   ;; (define-key evil-motion-state-map (kbd "g g") #'my-evil-beginning-of-buffer)
   ;; (define-key evil-motion-state-map (kbd "g e") #'my-evil-end-of-buffer)
+  (define-key evil-motion-state-map (kbd "g j") 'evil-goto-line)
   (define-key evil-motion-state-map (kbd "g h") 'evil-jump-backward)
   ;; (define-key evil-motion-state-map (kbd "Y") #'my-evil-yank-whole-buffer)
   (define-key evil-motion-state-map (kbd "TAB") #'evil-indent-line)
