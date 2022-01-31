@@ -1602,6 +1602,8 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; refrect .ignore to the root of the project
   (setq counsel-git-cmd "rg --files")
 
+  (defvar my-counsel-rg-exclude-list '("node_modules/**"))
+
   (defun my-counsel-rg (&optional initial-input)
     "counsel-rg at point in the specified directory"
     (interactive)
@@ -1619,8 +1621,12 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (defvar my-counsel-rg-exe "")  ;; will be overridden by _windows.el or _mac.el
 
   (defun my-counsel-rg-1 (dir)
-    (let  ((counsel-ag-base-command (concat my-counsel-rg-exe
-                                            " -i --smart-case --no-heading --line-number --color never %s ."))
+    (let* ((ignores (mapconcat 'concat (mapcar '(lambda (e) (format "-g '!%s'" e)) my-counsel-rg-exclude-list)
+                               " "))
+           (rg-opts (format " -i --smart-case --no-heading --line-number %s " ignores))
+           (counsel-ag-base-command (concat my-counsel-rg-exe
+                                            ;; " -i --smart-case --no-heading --line-number --color never %s ."))
+                                            rg-opts "%s ."))
            (initial-input (if (symbol-at-point) (symbol-name (symbol-at-point)) ""))
            (initial-directory dir)
            (extra-rg-args nil)
