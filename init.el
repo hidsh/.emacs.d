@@ -146,6 +146,7 @@
 ;; ----------------------------------------------------------------------
 (fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
 (tool-bar-mode -1)
+(scroll-bar-mode -1)
 (menu-bar-mode 0)                                 ; Disable the menu bar
 (add-hook 'focus-out-hook #'garbage-collect)
 (electric-indent-mode)
@@ -1024,6 +1025,13 @@ That is, a string used to represent it on the tab bar."
     (message "Copied whole buffer to kill-ring"))
 
   ;; ----------
+(defun my-evil-beginning/end-of-buffer ()
+    (interactive)
+    (goto-char (cond ((bobp) (point-max))
+                     (t (point-min)))))
+  (define-key evil-motion-state-map (kbd "g g") #'my-evil-beginning/end-of-buffer)
+
+  ;; ----------
   ;; motion-state-map
   (define-key evil-motion-state-map (kbd "!") #'nop)                            ; unmap
   (define-key evil-motion-state-map (kbd "@") #'nop)                            ; unmap
@@ -1066,8 +1074,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd "M-w") #'my-forward-word)
   ;; (define-key evil-motion-state-map (kbd "g g") #'my-evil-beginning-of-buffer)
   ;; (define-key evil-motion-state-map (kbd "g e") #'my-evil-end-of-buffer)
-  (define-key evil-motion-state-map (kbd "g j") 'evil-goto-line)
-  (define-key evil-motion-state-map (kbd "g h") 'evil-jump-backward)
+  ;; (define-key evil-motion-state-map (kbd "g h") 'evil-jump-backward)
   ;; (define-key evil-motion-state-map (kbd "Y") #'my-evil-yank-whole-buffer)
   (define-key evil-motion-state-map (kbd "TAB") #'evil-indent-line)
   (define-key evil-motion-state-map "/" #'evil-search-forward)
@@ -1602,7 +1609,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; refrect .ignore to the root of the project
   (setq counsel-git-cmd "rg --files")
 
-  (defvar my-counsel-rg-exclude-list '("node_modules/**"))
+  (defvar my-counsel-rg-exclude-list '(".DS_Store" ".eslintrc.*" "node_modules/**" "__*__/**"))
 
   (defun my-counsel-rg (&optional initial-input)
     "counsel-rg at point in the specified directory"
@@ -1621,7 +1628,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (defvar my-counsel-rg-exe "")  ;; will be overridden by _windows.el or _mac.el
 
   (defun my-counsel-rg-1 (dir)
-    (let* ((ignores (mapconcat 'concat (mapcar '(lambda (e) (format "-g '!%s'" e)) my-counsel-rg-exclude-list)
+    (let* ((ignores (mapconcat 'concat (mapcar #'(lambda (e) (format "-g '!%s'" e)) my-counsel-rg-exclude-list)
                                " "))
            (rg-opts (format " -i --smart-case --no-heading --line-number %s " ignores))
            (counsel-ag-base-command (concat my-counsel-rg-exe
@@ -2599,9 +2606,14 @@ directory, the file name, and its state (modified, read-only or non-existent)."
     ;; (setq flycheck-check-syntax-automatically '(mode-enabled save)) ;; new-line also possible
     )
 
+  (defun flycheck-ruby-mode-hook-func ()
+    (setq flycheck-checker 'ruby-rubocop)
+    (flycheck-mode t))
+
   :hook ((c-mode   . flycheck-c-mode-hook-func)
          (js-mode  . flycheck-c-mode-hook-func)
-         (web-mode . flycheck-c-mode-hook-func))
+         (web-mode . flycheck-c-mode-hook-func)
+         (ruby-mode . flycheck-ruby-mode-hook-func))
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
   :config
@@ -3582,6 +3594,18 @@ See URL `https://github.com/htacg/tidy-html5'."
   )
 
 ;; ----------------------------------------------------------------------
+(use-package web-beautify
+
+  )
+
+
+;; ----------------------------------------------------------------------
+(use-package ruby-mode
+  :mode "\\.rb\\'"
+  :config
+  (setq flycheck)
+  )
+;; ----------------------------------------------------------------------
 (use-package python-mode
   :mode "\\.py\\'"
   :config
@@ -3643,6 +3667,7 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flymake-posframe
+  :disabled
   :if window-system
   :load-path "elisp/flymake-posframe"
   :hook (flymake-mode . flymake-posframe-mode)
@@ -3830,7 +3855,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
       (set-frame-height nil 100)
       (beacon-mode 1)
       (centaur-tabs-mode +1)
-      (scroll-bar-mode 1)
+      ;; (scroll-bar-mode 1)
       (set-fringe-mode nil)
       (set-window-margins (selected-window) (car margin) (cdr margin))
       (setq-local evil-normal-state-cursor 'box)
@@ -3966,7 +3991,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :ensure t
   :config
   (global-company-mode)
-  (setq company-idle-delay 0)
+  (setq company-idle-delay 0.1)
   (setq company-minimum-prefix-length 2)
   (setq company-selection-wrap-around t)
   (setq completion-ignore-case nil)
@@ -4190,6 +4215,19 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
   (define-key evil-motion-state-map (kbd "g m") #'bm-toggle)
   (define-key evil-motion-state-map (kbd "g b") #'bm-next)
+  )
+;; ----------------------------------------------------------------------
+(use-package nodejs-repl
+  :config
+  (add-hook 'js-mode-hook
+          (lambda ()
+            (company-mode nil)
+            (define-key js-mode-map (kbd "C-x C-e") 'nodejs-repl-send-last-expression)
+            (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
+            (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
+            (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
+            (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
+
   )
 ;; ----------------------------------------------------------------------
 (use-package arduino-cli-mode

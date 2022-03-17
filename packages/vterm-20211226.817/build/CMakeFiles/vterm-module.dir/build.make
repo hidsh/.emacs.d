@@ -44,10 +44,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/Cellar/cmake/3.22.1/bin/cmake
+CMAKE_COMMAND = /usr/local/Cellar/cmake/3.22.3/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/Cellar/cmake/3.22.1/bin/cmake -E rm -f
+RM = /usr/local/Cellar/cmake/3.22.3/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -73,43 +73,43 @@ CMakeFiles/vterm-module.dir/vterm-module.c.o: CMakeFiles/vterm-module.dir/flags.
 CMakeFiles/vterm-module.dir/vterm-module.c.o: ../vterm-module.c
 CMakeFiles/vterm-module.dir/vterm-module.c.o: CMakeFiles/vterm-module.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/vterm-module.dir/vterm-module.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/vterm-module.dir/vterm-module.c.o -MF CMakeFiles/vterm-module.dir/vterm-module.c.o.d -o CMakeFiles/vterm-module.dir/vterm-module.c.o -c /Users/g/.emacs.d/packages/vterm-20211226.817/vterm-module.c
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/vterm-module.dir/vterm-module.c.o -MF CMakeFiles/vterm-module.dir/vterm-module.c.o.d -o CMakeFiles/vterm-module.dir/vterm-module.c.o -c /Users/g/.emacs.d/packages/vterm-20211226.817/vterm-module.c
 
 CMakeFiles/vterm-module.dir/vterm-module.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/vterm-module.dir/vterm-module.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/g/.emacs.d/packages/vterm-20211226.817/vterm-module.c > CMakeFiles/vterm-module.dir/vterm-module.c.i
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/g/.emacs.d/packages/vterm-20211226.817/vterm-module.c > CMakeFiles/vterm-module.dir/vterm-module.c.i
 
 CMakeFiles/vterm-module.dir/vterm-module.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/vterm-module.dir/vterm-module.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/g/.emacs.d/packages/vterm-20211226.817/vterm-module.c -o CMakeFiles/vterm-module.dir/vterm-module.c.s
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/g/.emacs.d/packages/vterm-20211226.817/vterm-module.c -o CMakeFiles/vterm-module.dir/vterm-module.c.s
 
 CMakeFiles/vterm-module.dir/utf8.c.o: CMakeFiles/vterm-module.dir/flags.make
 CMakeFiles/vterm-module.dir/utf8.c.o: ../utf8.c
 CMakeFiles/vterm-module.dir/utf8.c.o: CMakeFiles/vterm-module.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/vterm-module.dir/utf8.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/vterm-module.dir/utf8.c.o -MF CMakeFiles/vterm-module.dir/utf8.c.o.d -o CMakeFiles/vterm-module.dir/utf8.c.o -c /Users/g/.emacs.d/packages/vterm-20211226.817/utf8.c
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/vterm-module.dir/utf8.c.o -MF CMakeFiles/vterm-module.dir/utf8.c.o.d -o CMakeFiles/vterm-module.dir/utf8.c.o -c /Users/g/.emacs.d/packages/vterm-20211226.817/utf8.c
 
 CMakeFiles/vterm-module.dir/utf8.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/vterm-module.dir/utf8.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/g/.emacs.d/packages/vterm-20211226.817/utf8.c > CMakeFiles/vterm-module.dir/utf8.c.i
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/g/.emacs.d/packages/vterm-20211226.817/utf8.c > CMakeFiles/vterm-module.dir/utf8.c.i
 
 CMakeFiles/vterm-module.dir/utf8.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/vterm-module.dir/utf8.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/g/.emacs.d/packages/vterm-20211226.817/utf8.c -o CMakeFiles/vterm-module.dir/utf8.c.s
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/g/.emacs.d/packages/vterm-20211226.817/utf8.c -o CMakeFiles/vterm-module.dir/utf8.c.s
 
 CMakeFiles/vterm-module.dir/elisp.c.o: CMakeFiles/vterm-module.dir/flags.make
 CMakeFiles/vterm-module.dir/elisp.c.o: ../elisp.c
 CMakeFiles/vterm-module.dir/elisp.c.o: CMakeFiles/vterm-module.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/vterm-module.dir/elisp.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/vterm-module.dir/elisp.c.o -MF CMakeFiles/vterm-module.dir/elisp.c.o.d -o CMakeFiles/vterm-module.dir/elisp.c.o -c /Users/g/.emacs.d/packages/vterm-20211226.817/elisp.c
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/vterm-module.dir/elisp.c.o -MF CMakeFiles/vterm-module.dir/elisp.c.o.d -o CMakeFiles/vterm-module.dir/elisp.c.o -c /Users/g/.emacs.d/packages/vterm-20211226.817/elisp.c
 
 CMakeFiles/vterm-module.dir/elisp.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/vterm-module.dir/elisp.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/g/.emacs.d/packages/vterm-20211226.817/elisp.c > CMakeFiles/vterm-module.dir/elisp.c.i
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/g/.emacs.d/packages/vterm-20211226.817/elisp.c > CMakeFiles/vterm-module.dir/elisp.c.i
 
 CMakeFiles/vterm-module.dir/elisp.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/vterm-module.dir/elisp.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/g/.emacs.d/packages/vterm-20211226.817/elisp.c -o CMakeFiles/vterm-module.dir/elisp.c.s
+	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/g/.emacs.d/packages/vterm-20211226.817/elisp.c -o CMakeFiles/vterm-module.dir/elisp.c.s
 
 # Object files for target vterm-module
 vterm__module_OBJECTS = \
@@ -124,7 +124,7 @@ vterm__module_EXTERNAL_OBJECTS =
 ../vterm-module.so: CMakeFiles/vterm-module.dir/utf8.c.o
 ../vterm-module.so: CMakeFiles/vterm-module.dir/elisp.c.o
 ../vterm-module.so: CMakeFiles/vterm-module.dir/build.make
-../vterm-module.so: /usr/local/lib/libvterm.dylib
+../vterm-module.so: libvterm-prefix/src/libvterm/.libs/libvterm.a
 ../vterm-module.so: CMakeFiles/vterm-module.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/g/.emacs.d/packages/vterm-20211226.817/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C shared module ../vterm-module.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/vterm-module.dir/link.txt --verbose=$(VERBOSE)
