@@ -1627,7 +1627,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   (defvar my-counsel-rg-exe "")  ;; will be overridden by _windows.el or _mac.el
 
-  (defun my-counsel-rg-1 (dir)
+  (defun my-counsel-rg-1 (input)
     (let* ((ignores (mapconcat 'concat (mapcar #'(lambda (e) (format "-g '!%s'" e)) my-counsel-rg-exclude-list)
                                " "))
            (rg-opts (format " -i --smart-case --no-heading --line-number %s " ignores))
@@ -1635,10 +1635,16 @@ If COUNT is given, move COUNT - 1 lines downward first."
                                             ;; " -i --smart-case --no-heading --line-number --color never %s ."))
                                             rg-opts "%s ."))
            (initial-input (if (symbol-at-point) (symbol-name (symbol-at-point)) ""))
-           (initial-directory dir)
-           (extra-rg-args nil)
-           (rg-prompt dir)
+           ;; (input-list (split-string input "\t"))
+           (input-list (split-string input " "))
+           (initial-directory (car input-list))
+           (extra-rg-args (mapconcat #'identity
+                                     (mapcar #'(lambda (x) (format "-g '*%s'" x))   ;; e.g.: /hoge-dir .h .c
+                                             (cdr input-list))
+                                     " "))
+           (rg-prompt (car input-list))
            (my-ivy-immediate-flag nil))
+      ;; (message "%s, %s" rg-prompt extra-rg-args)
       (counsel-ag initial-input initial-directory extra-rg-args rg-prompt)))
 
   (cl-pushnew 'my-counsel-rg-1 ivy-highlight-grep-commands)
