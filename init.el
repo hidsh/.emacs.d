@@ -2321,14 +2321,14 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   :after cl-lib color
   :hook ((prog-mode . rainbow-delimiters-mode))
   :config
-  (set-face-foreground 'rainbow-delimiters-depth-9-face "#CF8C8C")   ; swap 1 <--> 9
-  (set-face-foreground 'rainbow-delimiters-depth-2-face "#FF8585")
-  (set-face-foreground 'rainbow-delimiters-depth-3-face "#FFBE99")
-  (set-face-foreground 'rainbow-delimiters-depth-4-face "#FFFA5C")
-  (set-face-foreground 'rainbow-delimiters-depth-5-face "#80EE80")
-  (set-face-foreground 'rainbow-delimiters-depth-6-face "#66BBFF")
-  (set-face-foreground 'rainbow-delimiters-depth-7-face "#E28DE2")
-  (set-face-foreground 'rainbow-delimiters-depth-8-face "#AFAFAF")
+  (set-face-foreground 'rainbow-delimiters-depth-9-face "#C79579")   ; swap 1 <--> 9
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "#FF6D7F")
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "#FEB45B")
+  (set-face-foreground 'rainbow-delimiters-depth-4-face "#F8E740")
+  (set-face-foreground 'rainbow-delimiters-depth-5-face "#59E56D")
+  (set-face-foreground 'rainbow-delimiters-depth-6-face "#53A9FD")
+  (set-face-foreground 'rainbow-delimiters-depth-7-face "#AF92FB")
+  (set-face-foreground 'rainbow-delimiters-depth-8-face "#aaaaaa")
   (set-face-foreground 'rainbow-delimiters-depth-1-face "#f0f0f0")   ; swap 1 <--> 9
 
   (setq rainbow-delimiters-outermost-only-face-count 1)
