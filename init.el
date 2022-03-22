@@ -1480,7 +1480,9 @@ If COUNT is given, move COUNT - 1 lines downward first."
     [right]    'dired-open-in-accordance-with-situation
     "."        'dired-open-in-accordance-with-situation
     [left]     'kill-current-buffer-and-dired-up-directory
-    ","        'kill-current-buffer-and-dired-up-directory
+    "H"        'kill-current-buffer-and-dired-up-directory
+    "L"        'kill-current-buffer-and-dired-up-directory
+    "q"        'kill-current-buffer
     "r"        'revert-buffer)                                    ; reload
 )
 
@@ -1517,7 +1519,47 @@ If COUNT is given, move COUNT - 1 lines downward first."
   )
 
 ;; ----------------------------------------------------------------------
+(use-package orderless
+  :config
+  (setq completion-styles '(orderless))
+  )
+
+(use-package marginalia)
+
+(use-package embark)
+
+(use-package embark-consult)
+
+(use-package consult
+  ;; :disabled
+  :config
+  (defun my-consult-after-init-hook ()
+    (recentf-mode 1)
+    (vertico-mode)
+    (marginalia-mode)
+    ;; savehist-modeを使ってVerticoの順番を永続化する
+    (savehist-mode))
+
+  (add-hook 'after-init-hook #'my-consult-after-init-hook)
+
+  (global-set-key (kbd "M-r") #'consult-recent-file)
+ )
+
+(use-package vertico
+  ;; :disabled
+  :config
+  ;; (setq recentf-mode 1)
+  (setq vertico-count 20)
+  (define-key vertico-map "?" #'minibuffer-completion-help)
+  (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
+  (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
+  (define-key vertico-map (kbd "C-j") #'vertico-next)
+  (define-key vertico-map (kbd "C-k") #'vertico-previous)
+  )
+
+;; ----------------------------------------------------------------------
 (use-package ivy
+  :disabled
   :diminish counsel-mode
   :init
   (ivy-mode 1)
