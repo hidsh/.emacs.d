@@ -1081,6 +1081,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map "?" #'evil-search-backward)
   (define-key evil-motion-state-map (kbd ":") #'nop)        ; unmap :
   (define-key evil-motion-state-map (kbd ";") #'evil-ex)    ; works as :
+  (define-key evil-motion-state-map "f" #'avy-goto-char-timer)
 
   ;; normal-state-map
   (define-key evil-normal-state-map (kbd "!") #'shell-command)
@@ -1555,6 +1556,11 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
   (define-key vertico-map (kbd "C-j") #'vertico-next)
   (define-key vertico-map (kbd "C-k") #'vertico-previous)
+  )
+
+(use-package avy
+  :config
+  (setq avy-timeout-seconds 0.7)
   )
 
 ;; ----------------------------------------------------------------------
