@@ -295,31 +295,6 @@
 (defalias 'package-uninstall 'package-delete)
 
 ;; ----------------------------------------------------------------------
-;; im-ctl
-;; (defun im-ctl (on) (do-depends-on-each-os))
-
-(when window-system
-  (defun im-on ()
-    (interactive)
-    (if (fboundp 'im-ctl)
-        (im-ctl t)
-      (message "Error: void function \"im-ctl\"! System dependent")))
-
-  (defun im-off ()
-    (interactive)
-    (if (fboundp 'im-ctl)
-        (im-ctl nil)
-      (message "Error: void function \"im-ctl\"! System dependent")))
-
-  (add-hook 'minibuffer-setup-hook #'im-off)
-  (add-hook 'minibuffer-exit-hook #'im-off)
-  ;; (add-hook 'focus-out-hook #'im-off)
-  (add-hook 'evil-insert-state-exit-hook #'im-off)
-
-  (im-off)      ;; なぜか起動直後にim-onしているので追加
-)
-
-;; ----------------------------------------------------------------------
 (defvar my-face-adj-line-number-height 1.0)     ;; set by _mac.el or _windows.el or ...
 
 (defun my-adv-load-theme--font-change (&rest _)
@@ -391,6 +366,31 @@
        (t (error "Unknown system-type: %s" system-type))))
 
 ;; (my-load-frame)
+
+;; ----------------------------------------------------------------------
+;; im-ctl
+;; (defun im-ctl (on) (do-depends-on-each-os))
+
+(when window-system
+  (defun im-on ()
+    (interactive)
+    (if (fboundp 'im-ctl)
+        (im-ctl t)
+      (message "Error: void function \"im-ctl\"! System dependent")))
+
+  (defun im-off ()
+    (interactive)
+    (if (fboundp 'im-ctl)
+        (im-ctl nil)
+      (message "Error: void function \"im-ctl\"! System dependent")))
+
+  (add-hook 'minibuffer-setup-hook #'im-off)
+  (add-hook 'minibuffer-exit-hook #'im-off)
+  ;; (add-hook 'focus-out-hook #'im-off)
+  (add-hook 'evil-insert-state-exit-hook #'im-off)
+
+  (im-off)      ;; なぜか起動直後にim-onしているので追加
+)
 
 ;; ----------------------------------------------------------------------
 ;; (defvar exclude-face-list '(rainbow-delimiters-base-face
