@@ -461,7 +461,7 @@
   (if (eq mode-line-selected-window (selected-window))
       evil-mode-line-tag
     (let ((color (face-foreground 'mode-line-inactive)))
-      (propertize evil-mode-line-tag 'face '(:background color :inverse-video t)))))
+      (propertize evil-mode-line-tag 'face `(:background ,color :inverse-video t)))))
 
 (defun split-vc-mode-string (s)
   "Returns cons (\"Git\" . \"master\") from `s' for example \" Git-master\", otherwise (\"\" . \"\")."
