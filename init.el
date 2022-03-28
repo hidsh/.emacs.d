@@ -1543,6 +1543,26 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   (add-hook 'after-init-hook #'my-consult-after-init-hook)
 
+  (setq my-consult-ripgrep-exclude-list
+    '("#*#"
+      ".eslintrc.*" "node_modules/**"
+      "__*__/**"
+      ".DS_Store"))
+
+  (setq consult-ripgrep-args-orig
+    "--null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --line-number")
+
+  (setq consult-ripgrep-args
+        (concat "rg "
+                (mapconcat 'concat
+                           (mapcar #'(lambda (s) (format "-g !%s" s)) my-consult-ripgrep-exclude-list)
+                           " ")
+                " "
+                consult-ripgrep-args-orig
+                " ."))
+
+  ;; (setq consult-ripgrep-args (concat "rg " "-g !#*# " consult-ripgrep-args-orig " ."))
+
   :bind (("M-r" . consult-recent-file)
          ("M-o" . consult-ripgrep)
          ("M-e" . embark-act)
