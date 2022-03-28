@@ -1543,7 +1543,13 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   (add-hook 'after-init-hook #'my-consult-after-init-hook)
 
-  (global-set-key (kbd "M-r") #'consult-recent-file)
+  :bind (("M-r" . consult-recent-file)
+         ("M-o" . consult-ripgrep)
+         ("M-e" . embark-act)
+         :map evil-motion-state-map
+         ("C-x C-g" . consult-find)
+         ("C-x C-b" . consult-buffer)
+         )
  )
 
 (use-package vertico
