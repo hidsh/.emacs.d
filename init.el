@@ -2751,7 +2751,8 @@ directory, the file name, and its state (modified, read-only or non-existent)."
 (use-package cc-mode
   :after flymake
   :mode (("\\.c$" . c-mode)
-         ("\\.h$" . c-mode)
+         ;; ("\\.h$" . c-mode)
+         ("\\.h$"       . c++-mode)
          ("\\.cpp$"     . c++-mode)
          ("\\.c\\+\\+$" . c++-mode)
          ("\\.hpp$"     . c++-mode))
