@@ -205,6 +205,16 @@ Can be an integer to determine the exact padding."
    (dired-k-ignored :foreground cyan)
    (dired-k-added    :foreground vc-added)
 
+   ;; vertico
+   (vertico-group-separator :foreground red)
+   (vertico-group-title :foreground yellow)
+   (vertico-multiline :foreground base8)
+
+   ;; consult
+   (consult-separator :foreground base8 :background red)
+   (consult-grep-context :foreground base8 :background yellow)
+   (consult-help :foreground base8 :background green)
+
    ;; ivy
    ;; (set-face-foreground 'ivy-action (mycolor 'red))
    ;; (set-face-background 'ivy-confirm-face "'green")
