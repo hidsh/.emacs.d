@@ -207,7 +207,7 @@ Can be an integer to determine the exact padding."
 
    ;; vertico
    (vertico-group-separator :foreground red)
-   (vertico-group-title :foreground yellow)
+   (vertico-group-title :foreground orange)
    (vertico-multiline :foreground base8)
 
    ;; consult
