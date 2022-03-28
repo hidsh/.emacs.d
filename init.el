@@ -2847,6 +2847,38 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (add-hook 'c++-mode-hook '(lambda () (flymake-mode t)))
   (add-hook 'c-mode-hook   '(lambda () (flymake-mode t)))
 
+  ;; (defun my-cpp-eglot-enable ()
+  ;;   "enable variables and hooks for eglot cpp IDE"
+  ;;   (interactive)
+  ;;   (setq clangd-exe (pcase system-type
+  ;;                      ('darwin "/usr/local/opt/llvm/bin/clangd")
+  ;;                      (_ nil)))
+  ;;   (unless clangd-exe
+  ;;     (error "Not found 'clangd', quit."))
+
+  ;;   (defun my-projectile-proj-find-function (dir)
+  ;;     (let ((root (projectile-project-root dir)))
+  ;;       (and root (cons 'transient root))))
+
+  ;;   (setq company-backends
+  ;;         (cons 'company-capf
+  ;;               (remove 'company-capf company-backends)))
+  ;;   (with-eval-after-load 'projectile
+  ;;     (add-to-list 'project-find-functions
+  ;;                  'my-projectile-proj-find-function))
+  ;;   (add-to-list 'eglot-server-programs
+  ;;                `((c++-mode c-mode) . ,clangd-exe))
+  ;;   (add-hook 'c++-mode-hook 'eglot-ensure)
+  ;;   (add-hook 'c-mode-hook 'eglot-ensure)
+  ;;   )
+
+  ;; (defun my-cpp-eglot-disable ()
+  ;;   "disable hook for eglot"
+  ;;   (interactive)
+  ;;   (remove-hook 'c++-mode-hook 'eglot-ensure)
+  ;;   (remove-hook 'c-mode-hook 'eglot-ensure)
+  ;;   )
+
 
   ;; :after telephone-line
   ;; :config
@@ -3719,6 +3751,9 @@ See URL `https://github.com/htacg/tidy-html5'."
   :ensure t
   :after flycheck
   :config
+  (set-face-attribute 'flycheck-posframe-error-face nil :weight 'light)
+  (set-face-attribute 'flycheck-posframe-warning-face nil :weight 'light)
+  (set-face-attribute 'flycheck-posframe-info-face nil :weight 'light)
   (setq flycheck-posframe-error-prefix "")
   (setq flycheck-posframe-warning-prefix "")
   (setq flycheck-posframe-info-prefix "")
@@ -4154,21 +4189,30 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   )
 
 ;; ----------------------------------------------------------------------
-(use-package lsp-mode
+(use-package eglot
   :disabled
+  :ensure t
+  :config
+  )
+;; ----------------------------------------------------------------------
+(use-package lsp-mode
+  ;; :disabled
   :ensure t
   :commands lsp
   :custom
-  ((lsp-print-io t)                     ;; => *lsp-log*
+  (lsp-print-io t)                     ;; => *lsp-log*
    (lsp-enable-snippet t)
-   (lsp-enable-indentation nil)     ;; disable when using ccls
-   (lsp-prefer-flymake t)
+   ;; (lsp-enable-indentation nil)     ;; disable when using ccls
+   ;; (lsp-prefer-flymake t)
    (lsp-prefer-capf t)              ;; use capf instead of company
-   (lsp-headerline-breadcrumb-mode t)
+   (lsp-headerline-breadcrumb-enable nil)
    (lsp-document-sync-method 2)
    (lsp-inhibit-message t)
    (lsp-message-project-root-warning nil)
-   (create-lockfiles nil))
+   (lsp-idle-delay 0.1)
+   (create-lockfiles nil)
+   (lsp-ui-sideline-enable nil)
+
   :init
   (unbind-key "C-l")
   :bind
@@ -4180,6 +4224,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
    ("C-l l"    . lsp-lens-mode))
   :hook
   (prog-major-mode . lsp-prog-major-mode-enable)
+  (c++-mode . lsp)
   )
 ;; ----------------------------------------------------------------------
 ;; (use-package lsp-ui
@@ -4244,8 +4289,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   ;; (setq dumb-jump-quiet t)
   (setq dumb-jump-force-searcher 'rg)
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-  (define-key evil-motion-state-map (kbd "g d") #'dumb-jump-go)
-  (define-key evil-motion-state-map (kbd "g h") #'dumb-jump-back)
+  ;; (define-key evil-motion-state-map (kbd "g d") #'dumb-jump-go)      ; obsolete
+  ;; (define-key evil-motion-state-map (kbd "g h") #'dumb-jump-back)    ; obsolete
   (dumb-jump-mode)
   )
 ;; ----------------------------------------------------------------------

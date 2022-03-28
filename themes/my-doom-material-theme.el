@@ -186,6 +186,11 @@ Can be an integer to determine the exact padding."
    (git-gutter-fr:added    :background teal :foreground nil)
    (git-gutter-fr:deleted  :background red :foreground nil)
 
+   ;; lsp
+   (lsp-face-highlight-read :underline teal)
+   (lsp-face-highlight-textual :underline orange)
+   (lsp-face-highlight-write :underline red)
+
    ;; flycheck (fringe)
    (flycheck-fringe-info    :background nil :foreground teal)
    (flycheck-fringe-warning :background nil :foreground yellow)

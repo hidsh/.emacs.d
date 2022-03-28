@@ -33,3 +33,4 @@ tutorial
 \.check-emacs-setting/batch-script\.el
 *.elc
 projectile-bookmarks.eld
+.lsp-session-*
