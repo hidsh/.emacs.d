@@ -1970,11 +1970,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
          ("g h" . counsel-gtags-go-backward))
 )
 
-
-
-
-
-
 ;; ----------------------------------------------------------------------
 ;; which-func-mode
  (setq which-func-unknown "-"
@@ -2059,195 +2054,9 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 )
 
 ;; ----------------------------------------------------------------------
-;; (use-package my-zerodark-theme
-;;   :load-path "~/.emacs.d/themes"
-;;   :config
-;;   (load-theme 'my-zerodark t)
-
-;;   ;; (global-tab-line-mode 1) ; for emacs27
-;;   )
-
-;; ----------------------------------------------------------------------
-(use-package doom-modeline
-  :disabled
-  :ensure t
-  :after evil
-  :hook (after-init . doom-modeline-mode)
-
-  :custom
-  (doom-modeline-buffer-file-name-style 'truncate-with-project)
-  (doom-modeline-icon t)
-  (doom-modeline-major-mode-icon t)
-  (doom-modeline-minor-modes nil)
-  (doom-modeline-height 18)
-
-  :config
-  (set-face-attribute 'doom-modeline-project-dir nil :foreground (mycolor 'blue) :weight 'light)
-  (set-face-attribute 'doom-modeline-buffer-file nil :foreground (mycolor 'blue) :weight 'bold)
-
-  (let ((bg (face-background 'mode-line)))
-    (setq evil-normal-state-tag   (propertize " NORMAL " 'face `((:background ,(mycolor 'blue)    :foreground ,bg :weight bold)))
-          evil-emacs-state-tag    (propertize " EMACS  " 'face `((:background ,(mycolor 'orange)  :foreground ,bg :weight bold)))
-          evil-insert-state-tag   (propertize " INSERT " 'face `((:background ,(mycolor 'red)     :foreground ,bg :weight bold)))
-          evil-motion-state-tag   (propertize " MOTION " 'face `((:background ,(mycolor 'purple)  :foreground ,bg :weight bold)))
-          evil-visual-state-tag   (propertize " VISUAL " 'face `((:background ,(mycolor 'green)   :foreground ,bg :weight bold)))
-          evil-operator-state-tag (propertize " OPERATOR " 'face `((:background ,(mycolor 'pink)    :foreground ,bg :weight bold)))))
-
-  (doom-modeline-def-segment evil-state
-    "The current evil state.  Requires `evil-mode' to be enabled."
-    (when (bound-and-true-p evil-local-mode)
-      ;; (s-trim-right (evil-state-property evil-state :tag t))))
-      (when (doom-modeline--active)
-          (evil-state-property evil-state :tag t))))
-
-  (doom-modeline-def-segment linum-colnum
-    "Display current linum/colnum"
-    (propertize (format " %4s/%d,%-3s"
-                        (format-mode-line "%l")
-                        (line-number-at-pos (point-max))
-                        (format-mode-line "%c"))))
-
-  ;; ;; fixme, doesn't work
-  ;; (doom-modeline-def-segment linum-colnum
-  ;;   "Display current linum/colnum"
-  ;;   (if (and (bound-and-true-p evil-local-mode) (eq 'visual evil-state))
-  ;;       (prog1
-  ;;         (cond ((eq (evil-visual-type) 'block)
-  ;;                (format " [H%4d, W%3d]" (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))
-  ;;                        (1+ (abs (- (save-excursion (goto-char (region-beginning)) (current-column))
-  ;;                                    (save-excursion (goto-char (region-end)) (current-column)))))))
-  ;;               ((eq (evil-visual-type) 'line)
-  ;;                (format " [LINE %-4d]  " (count-lines (region-beginning) (min (1+ (region-end)) (point-max)))))
-  ;;               (t
-  ;;                (format " [CHAR %-4d]  "
-  ;;                        (1+ (abs (- (region-beginning) (region-end)))))))
-  ;;         (force-mode-line-update t))
-  ;;     (format " %4s/%d,%-3s"
-  ;;                         (format-mode-line "%l")
-  ;;                         (line-number-at-pos (point-max))
-  ;;                         (format-mode-line "%c"))))
-
-  ;; mod
-  (defun doom-modeline-update-buffer-file-state-icon (&rest _)
-  "Update the buffer or file state in mode-line."
-  (setq doom-modeline--buffer-file-state-icon
-        (when doom-modeline-buffer-state-icon
-          (ignore-errors
-            (concat
-             (cond (buffer-read-only
-                    (doom-modeline-buffer-file-state-icon
-                  ;; "lock" "🔒" "%1*" `(:inherit doom-modeline-warning
-                     "lock" "🔒" "%1*" `(:inherit doom-modeline-buffer-modified
-                                         :weight ,(if doom-modeline-icon
-                                                      'normal
-                                                    'bold))))
-                   ((and buffer-file-name (buffer-modified-p)
-                         doom-modeline-buffer-modification-icon)
-                    (doom-modeline-buffer-file-state-icon
-                     "save" "💾" "%1*" `(:inherit doom-modeline-buffer-modified
-                                         :weight ,(if doom-modeline-icon
-                                                      'normal
-                                                    'bold))))
-                   ((and buffer-file-name
-                         (not (file-exists-p buffer-file-name)))
-                    (doom-modeline-buffer-file-state-icon
-                     "do_not_disturb_alt" "🚫" "!" 'doom-modeline-urgent))
-                   (t ""))
-             ;; add
-             (when (eq major-mode 'org-mode)
-               (doom-modeline-icon 'material
-                (cond ((eq my-org-global-fold-cycle-state 'hide-all) "more_horiz")
-                      ((eq my-org-global-fold-cycle-state 'show-all) "format_align_left")
-                      (t "person"))
-                   "↕" "><" :face 'doom-modeline-warning :height  1.1 :v-adjust -0.3))
-             (when (or (buffer-narrowed-p)
-                       (and (bound-and-true-p fancy-narrow-mode)
-                            (fancy-narrow-active-p))
-                       (bound-and-true-p dired-narrow-mode))
-               (doom-modeline-buffer-file-state-icon
-                "unfold_less" "↕" "><" 'doom-modeline-warning)))))))
-
-  ;; mod
-  (doom-modeline-def-segment buffer-info
-  "Combined information about the current buffer, including the current working
-directory, the file name, and its state (modified, read-only or non-existent)."
-  (concat
-   (doom-modeline-spc)
-   (doom-modeline--buffer-mode-icon)
-   (doom-modeline--buffer-name)
-   (doom-modeline--buffer-state-icon)))
-
-  ;; mod
-  (doom-modeline-def-segment buffer-encoding
-  "Displays the eol and the encoding style of the buffer the same way Atom does."
-  (when doom-modeline-buffer-encoding
-    (let ((face (if (doom-modeline--active) 'mode-line 'mode-line-inactive))
-          (eouse-face 'mode-line-highlight))
-      (concat
-       (doom-modeline-spc)
-
-       ;; coding system
-       (propertize
-        (let ((sys (coding-system-plist buffer-file-coding-system)))
-          (cond ((memq (plist-get sys :category)
-                       '(coding-category-undecided coding-category-utf-8))
-                 "UTF-8")
-                (t (upcase (symbol-name (plist-get sys :name))))))
-        'face face
-        ;; 'mouse-face mouse-face
-        ;; 'help-echo 'mode-line-mule-info-help-echo
-        ;; 'local-map mode-line-coding-system-map
-        )
-
-       ;; eol type
-       (let ((eol (coding-system-eol-type buffer-file-coding-system)))
-         (propertize
-          (pcase eol
-            (0 "/LF")
-            (1 "/CRLF")
-            (2 "/CR")
-            (_ ""))
-          'face face
-          ;; 'mouse-face mouse-face
-          ;; 'help-echo (format "End-of-line style: %s\nmouse-1: Cycle"
-          ;;                    (pcase eol
-          ;;                      (0 "Unix-style LF")
-          ;;                      (1 "DOS-style CRLF")
-          ;;                      (2 "Mac-style CR")
-          ;;                      (_ "Undecided")))
-          ;; 'local-map (let ((map (make-sparse-keymap)))
-		  ;;              (define-key map [mode-line mouse-1] 'mode-line-change-eol)
-		  ;;              map)
-          ))
-
-       ))))
-
-  (doom-modeline-def-modeline 'main
-    ;; '(bar workspace-number window-number evil-state god-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
-    ;; '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
-    '(evil-state matches buffer-info remote-host parrot)
-    '(misc-info persp-name lsp github debug buffer-encoding linum-colnum minor-modes major-mode vcs))
-
-  (defun my-minor-modes-toggle ()
-    (interactive)
-    (setq doom-modeline-minor-modes (if doom-modeline-minor-modes nil t)))
-  ;; (remove-text-properties )
-
-  )
-
-;; ----------------------------------------------------------------------
 (use-package hide-mode-line
   :if window-system
   :hook ((neotree-mode) . hide-mode-line-mode)
-  )
-
-;; ----------------------------------------------------------------------
-(use-package common-header-mode-line
-  :disabled
-  :config
-  (common-mode-line-mode 1)
-  (common-header-line-mode 1)
-  ;; (setq common-header-mode-line-update-delay 0.5)
   )
 
 ;; ----------------------------------------------------------------------
@@ -2277,19 +2086,6 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   :config
   (define-key undo-tree-map (kbd "C-?") 'nil)
   (define-key undo-tree-map (kbd "C-r") 'nil)    ;; undo-tree-redo      FIXME: not work
-  )
-
-;; ----------------------------------------------------------------------
-(use-package dashboard
-  :disabled
-  ;; :defer t
-  :config
-  ;; (setq inhibit-startup-message t)
-  (setq dashboard-banner-logo-title "Life with Evil")
-  (setq dashboard-startup-banner "~/.emacs.d/img/e_splash.svg")
-  (dashboard-setup-startup-hook)
-  (setq dashboard-items '((recents  . 10)))
-  ;; (widget-forward 1)
   )
 
 ;; ----------------------------------------------------------------------
@@ -2469,20 +2265,6 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package guide-key-tip
-  :disabled
-  :after guide-key pos-tip
-  :init
-  (setq guide-key/guide-key-sequence '("C-x"))
-  (guide-key-mode 1)
-
-  :config
-  (setq guide-key-tip/enabled t)
-  (set-face-attribute 'guide-key-tip/pos-tip-face nil
-                      :foreground "#333333" :weight 'light :inherit nil)
-)
-
-;; ----------------------------------------------------------------------
 (use-package scratch-log
   :if window-system
   :ensure t
@@ -2595,43 +2377,6 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (setq org-bullets-bullet-list '("❖" "☯" "✪" "✿" "✜" "⬟" "⬢" "⬣"))
   (set-face-attribute 'org-level-1 nil :height 1.2)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-;; ----------------------------------------------------------------------
-(use-package google-translate
-  :if window-system
-  :config
-  (defvar google-translate-english-chars "[:ascii:]`‘’“”–'\"`"
-    "これらの文字が含まれているときは英語とみなす")
-
-  (defun google-translate-enja-or-jaen (&optional string)
-    "regionか、現在のセンテンスを言語自動判別でGoogle翻訳する。"
-    (interactive)
-    (setq string
-          (cond ((stringp string) string)
-                (current-prefix-arg
-                 (read-string "Google Translate: "))
-                ((use-region-p)
-                 (buffer-substring (region-beginning) (region-end)))
-                (t
-                 (save-excursion
-                   (let (s)
-                     (forward-char 1)
-                     (backward-sentence)
-                     (setq s (point))
-                     (forward-sentence)
-                     (buffer-substring s (point)))))))
-    (let* ((asciip (string-match
-                    (format "\\`[%s]+\\'" google-translate-english-chars)
-                    string)))
-      (run-at-time 0.1 nil 'deactivate-mark)
-      (google-translate-translate
-       (if asciip "en" "ja")
-       (if asciip "ja" "en")
-       string)))
-
-  :bind (("M-t" . google-translate-enja-or-jaen))
-
-  )
 
 ;; ----------------------------------------------------------------------
 (use-package dired
@@ -3827,52 +3572,6 @@ See URL `https://github.com/htacg/tidy-html5'."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package dot-editor
-  :disabled
-  :after evil
-  :config
-  (add-hook 'dot-editor-mode-hook #'(lambda ()
-    (evil-define-key 'motion dot-editor-mode-map (kbd "C-c C-e") 'dot-editor-encode-region)
-    (evil-define-key 'motion dot-editor-mode-map (kbd "C-c C-d") 'dot-editor-decode-region)
-    (evil-define-key 'motion dot-editor-mode-map (kbd "C-c C-c") 'dot-editor-insert-canvas)
-    (evil-define-key 'motion dot-editor-mode-map (kbd "C-c C-p") 'create-pbm-from-hex)
-    (evil-define-key 'motion dot-editor-mode-map (kbd "C-c C-r") 'dot-editor-reverse-region)
-    (define-key evil-normal-state-map (kbd "SPC") #'evil-force-normal-state)
-    (define-key evil-motion-state-map (kbd "SPC")    'dot-editor-reverse-square)))
-    ;; (evil-define-key 'normal dot-editor-mode-map (kbd "SPC")    'dot-editor-reverse-square)))
-  )
-
-;; ----------------------------------------------------------------------
-(use-package dimmer
-  :disabled
-  :defer 1
-  :config
-  (setq dimmer-exclusion-predicates '(window-minibuffer-p)
-        dimmer-exclusion-regexp-list '("^\\*Minibuf-[0-9]+\\*" "^*Messages*")
-        dimmer-fraction 0.35)
-
-  (dimmer-configure-which-key)
-  (dimmer-configure-org)
-  (dimmer-configure-posframe)
-  ;; (dimmer-configure-hydra)
-
-  (defun dimmer-off ()
-    (dimmer-process-all)
-    (dimmer-mode -1))
-
-  (defun dimmer-on ()
-    (dimmer-mode 1)
-    (dimmer-process-all))
-
-  (add-hook 'focus-out-hook #'dimmer-off)
-  (add-hook 'focus-in-hook  #'dimmer-on)
-  (add-hook 'minibuffer-setup-hook #'dimmer-off)
-  (add-hook 'minibuffer-exit-hook  #'dimmer-on)
-
-  (dimmer-mode t)
-  )
-
-;; ----------------------------------------------------------------------
 (use-package migemo
   :disabled
   :config
@@ -3911,6 +3610,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package org-tree-slide
+  :disabled
   :if window-system
   ;; :defer t
   :bind (:map org-mode-map
