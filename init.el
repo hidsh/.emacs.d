@@ -270,7 +270,7 @@
 (defun my-func ()
   "called \'my-func\'")
 
-(global-set-key [f2] '(lambda () (interactive) (message "%S" (funcall 'my-func))))
+(global-set-key [f2] (lambda () (interactive) (message "%S" (funcall 'my-func))))
 
 ;; (custom-set-faces
 ;;  ;; custom-set-faces was added by Custom. If you edit it by hand, you could mess it up, so be careful.
@@ -602,7 +602,8 @@
                       ;; (vc-mode vc-mode)
                       ;; mode-line-modes))
                       ))
-         (margin-env (case system-type
+         ;; (margin-env (case system-type
+         (margin-env (cl-case system-type   ;; 28.1
                        (darwin 1)
                        (windows-nt 8)
                        (t 0)))
@@ -702,7 +703,7 @@
 
   (tabbar-mwheel-mode nil)                  ;; マウスホイール無効
   (setq tabbar-buffer-groups-function nil)  ;; グループ無効             ;; モードラインがちらつく原因
-  (setq tabbar-buffer-groups-function '(lambda () (list "")))
+  (setq tabbar-buffer-groups-function (lambda () (list "")))
   (setq tabbar-use-images nil)              ;; 画像を使わない
 
   ;;----- 左側のボタンを消す
@@ -829,7 +830,7 @@ That is, a string used to represent it on the tab bar."
                       :overline '(:color "orange" :style 'wave)
                       )
 
-  (setq centaur-tabs-buffer-groups-function '(lambda () (list "-")))
+  (setq centaur-tabs-buffer-groups-function (lambda () (list "-")))
   ;; (setq centaur-tabs-buffer-groups-function nil)
 
   (defun my-centaur-tabs-hide-func (b)
@@ -2867,8 +2868,8 @@ directory, the file name, and its state (modified, read-only or non-existent)."
   (push '("\\.cpp$" flymake-cc-init) flymake-allowed-file-name-masks)
   (push '("\\.c++$" flymake-cc-init) flymake-allowed-file-name-masks)
 
-  (add-hook 'c++-mode-hook '(lambda () (flymake-mode t)))
-  (add-hook 'c-mode-hook   '(lambda () (flymake-mode t)))
+  (add-hook 'c++-mode-hook (lambda () (flymake-mode t)))
+  (add-hook 'c-mode-hook   (lambda () (flymake-mode t)))
 
   ;; (defun my-cpp-eglot-enable ()
   ;;   "enable variables and hooks for eglot cpp IDE"
@@ -4016,7 +4017,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 (use-package csharp-mode
   :config
   (add-hook 'csharp-mode-hook
-            '(lambda ()
+            (lambda ()
               (setq indent-tabs-mode nil)
               (setq c-basic-offset 4)
               (c-set-offset 'substatement-open 0)

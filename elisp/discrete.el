@@ -760,7 +760,7 @@ double quotation characters \(\"\) from given string."
       'buffer-no-mod)))
 
 (add-hook 'minibuffer-setup-hook
-	  '(lambda ()
+	  (lambda ()
 	     (when my-save-buffer-interactive-arg-active-p
 	       (end-of-line))))
 
@@ -957,7 +957,7 @@ is already narrowed."
 
 ;; ----------------------------------------------------------------------
 ;;@@ `ascii-table'
-(defalias 'ascii-table '(lambda () (interactive) (list-charset-chars 'ascii)))
+(defalias 'ascii-table (lambda () (interactive) (list-charset-chars 'ascii)))
 
 ;; ----------------------------------------------------------------------
 ;;@@ `my-save-frame'
