@@ -2,6 +2,10 @@
 ;;;
 ;;; init.el
 ;;;
+
+;; suppress to popup *warnings* buffer for emacs28's native-comp
+(setq native-comp-async-report-warnings-errors nil)
+
 (add-to-list 'load-path (locate-user-emacs-file "elisp"))
 (setq custom-theme-directory (locate-user-emacs-file "themes"))
 (set-default-coding-systems 'utf-8-unix)
