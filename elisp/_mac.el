@@ -38,12 +38,15 @@
   ;;   (server-start))
 
   ;; window size and position
-  (setq initial-frame-alist '(
+  (let ((wleft (if (= (cl-fourth (car (frame-monitor-attributes))) 1920)
+                   1009          ; EIZO EV3237 (1920x1080)
+                 529)))          ; Macbook Air late 2020 (2560x1600)
+
+    (setq initial-frame-alist `(
                               (top    . 0)
-                              (left   . 529)      ;; Macbook Pro 13"
-                              ;; (left   . 71)
+                              (left   . ,wleft)
                               (height . 64)
-                              (width  . 110)))
+                              (width  . 110))))
   (setq default-frame-alist initial-frame-alist)
 
   ;; font
