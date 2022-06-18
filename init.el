@@ -233,7 +233,7 @@
 (global-set-key (kbd "C-0") 'delete-window)
 (global-set-key (kbd "C-1") 'delete-other-windows)
 (global-set-key (kbd "C-2") 'my-split-window-below)
-(global-set-key (kbd "C-6") 'my-split-window-right)
+(global-set-key (kbd "C-3") 'my-split-window-right)
 (global-set-key (kbd "C-o") 'other-window)
 
 (global-set-key (kbd "M-9") 'insert-parentheses)
@@ -312,6 +312,14 @@
      (set-face-attribute 'line-number-current-line nil :family font :height my-face-adj-line-number-height))))
 
 (advice-add 'load-theme :after #'my-adv-load-theme--font-change)
+
+;; ----------------------------------------------------------------------
+;; appearance
+;; ----------------------------------------------------------------------
+;; (set-face-foreground 'vertical-border "red") ;; by theme
+(setq window-divider-default-right-width 1)
+(window-divider-mode 1)
+
 
 ;; ----------------------------------------------------------------------
 ;; package setting
