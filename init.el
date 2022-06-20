@@ -647,68 +647,11 @@
   :hook ((after-save   . tabbar-on-saving-buffer)
          (first-change . tabbar-on-modifying-buffer))
   :config
-  (tabbar-mode)
+  (tabbar-mode 1)
 
-; (defun my-adv-load-theme--tabbar-reset-appearance (&rest _)
   (set-face-attribute 'tabbar-default nil
                       :height 1.1
-                      :family (myfont 'ui)
-;                       :background (face-background 'mode-line)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline (face-background 'mode-line)
-                      )
-; 
-;   (set-face-attribute 'tabbar-selected nil
-;                       ;; :inherit 'tabbar-default
-;                       :foreground (face-background 'mode-line)
-;                       :background (face-foreground 'line-number-current-line)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline (face-foreground 'line-number-current-line)
-;                       )
-; 
-;   (set-face-attribute 'tabbar-unselected nil
-;                       ;; :inherit 'tabbar-default
-;                       :background (face-foreground 'tabbar-selected)
-;                       :foreground (face-background 'tabbar-selected)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline (face-foreground 'tabbar-selected)
-;                       )
-; 
-;   (set-face-attribute 'tabbar-selected-modified nil
-;                       ;; :inherit 'tabbar-default
-;                       :background (face-background 'tabbar-selected)
-;                       :foreground (face-foreground 'tabbar-selected)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline "orange"
-;                       )
-; 
-;   (set-face-attribute 'tabbar-modified nil
-;                       ;; :inherit 'tabbar-default
-;                       :background (face-attribute 'tabbar-unselected :background)
-;                       :foreground (face-attribute 'tabbar-unselected :foreground)
-;                       :slant 'normal
-;                       :weight 'light
-;                       :box nil
-;                       :overline "orange"
-;                       )
-; 
-  (set-face-attribute 'tabbar-separator nil
-                      ;; :inherit 'tabbar-default
-                      :background (face-attribute 'tabbar-selected :background))
-
-    (setq tabbar-separator '(0.2))
-;  )
-
-; (my-adv-load-theme--tabbar-reset-appearance)
-; (advice-add 'load-theme :after #'my-adv-load-theme--tabbar-reset-appearance)
+                      :family (myfont 'ui))
 
   (global-set-key (kbd "M-j") 'tabbar-backward-tab)
   (global-set-key (kbd "M-k") 'tabbar-forward-tab)

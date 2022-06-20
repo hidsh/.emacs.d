@@ -271,11 +271,12 @@ Can be an integer to determine the exact padding."
    (rjsx-attr :foreground yellow :slant 'italic :weight 'medium)
 
    ;; tabbar
-   (tabbar-default :foreground teal :background base1)
+   (tabbar-default :foreground teal :background base1 :underline teal :overline teal)
    (tabbar-selected          :inherit 'tabbar-default :foreground bg-alt :background teal)
    (tabbar-unselected        :inherit 'tabbar-default)
    (tabbar-selected-modified :inherit 'tabbar-selected)
    (tabbar-modified          :inherit 'tabbar-default)
+   (tabbar-separator         :background teal)
 
    ;; ivy, counsel
    (ivy-current-match :inherit 'cursor :foreground bg)
