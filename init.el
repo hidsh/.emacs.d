@@ -178,9 +178,6 @@
 
 ;; mode-line
 (column-number-mode t)
-(set-face-attribute 'mode-line          nil :box nil :height 1.1)   ; モードラインを非3D化
-(set-face-attribute 'mode-line-inactive nil :inherit 'mode-line)
-
 ;; ;; モードラインの割合表示を総行数表示に
 ;; (setq mode-line-position '(:eval (format "%%3c:%%l/%d"
 ;;                                          (count-lines (point-max) (point-min)))))
@@ -304,8 +301,8 @@
 (defun my-adv-load-theme--font-change (&rest _)
  (let ((font (myfont 'ui)))
    (when font
-     (set-face-attribute 'mode-line          nil :family font)
-     (set-face-attribute 'mode-line-inactive nil :family font)
+     (set-face-attribute 'mode-line          nil :family font :height 1.1)
+     (set-face-attribute 'mode-line-inactive nil :inherit 'mode-line)
      (set-face-attribute 'minibuffer-prompt  nil :family font)
 
      (set-face-attribute 'line-number              nil :family font :height my-face-adj-line-number-height)
