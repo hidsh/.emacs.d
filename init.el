@@ -2225,6 +2225,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :if window-system
   :init
   (defun flycheck-c-mode-hook-func ()
+    (flycheck-add-mode 'javascript-eslint 'js-mode)
+    (flycheck-add-mode 'javascript-eslint 'web-mode)
     ;; (flycheck-select-checker 'my-c)
     (flycheck-mode t)
     ;; (setq flycheck-check-syntax-automatically '(mode-enabled save)) ;; new-line also possible
@@ -2234,9 +2236,12 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
     (setq flycheck-checker 'ruby-rubocop)
     (flycheck-mode t))
 
-  :hook ((c-mode   . flycheck-c-mode-hook-func)
-         (js-mode  . flycheck-c-mode-hook-func)
-         (web-mode . flycheck-c-mode-hook-func)
+  (defun flycheck-js-mode-hook-func ()
+    (flycheck-mode t))
+
+  :hook ((c-mode    . flycheck-c-mode-hook-func)
+         (js-mode   . flycheck-js-mode-hook-func)
+         (web-mode  . flycheck-js-mode-hook-func)
          (ruby-mode . flycheck-ruby-mode-hook-func))
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
@@ -3107,6 +3112,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
 
 ;; ----------------------------------------------------------------------
 (use-package web-mode
+  :after flycheck
   :mode (("\\.html$" . web-mode))
   ;; :requires html-mode
   ;; :hook ((web-mode . lsp))
@@ -3118,7 +3124,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   (web-mode-css-indent-offset 2)
   (web-mode-code-indent-offset 2)
   (web-mode-enable-current-element-highlight t)
-  (web-mode-engines-alist '(("django" . "\\.html$")))     ;; django template (this is temporary)
+  ;; (web-mode-engines-alist '(("django" . "\\.html$")))     ;; django template (this is temporary)
 
   :config
   (setq-default web-mode-comment-formats
@@ -3252,6 +3258,13 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package web-beautify
+
+  )
+
+;; ----------------------------------------------------------------------
+(use-package js
+  :config
+  (setq js-indent-level 2)
 
   )
 
@@ -3841,6 +3854,11 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   (define-key evil-motion-state-map (kbd "g m") #'bm-toggle)
   (define-key evil-motion-state-map (kbd "g b") #'bm-next)
   )
+;; ----------------------------------------------------------------------
+(use-package add-node-modules-path
+  :hook (js-mode js2-mode)
+  )
+
 ;; ----------------------------------------------------------------------
 (use-package nodejs-repl
   :config
