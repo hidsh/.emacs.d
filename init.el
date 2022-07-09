@@ -1331,7 +1331,6 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; :disabled
   :config
   (defun my-consult-after-init-hook ()
-    (recentf-mode 1)
     (vertico-mode)
     (marginalia-mode)
     ;; savehist-modeを使ってVerticoの順番を永続化する
@@ -1371,13 +1370,14 @@ If COUNT is given, move COUNT - 1 lines downward first."
 (use-package vertico
   ;; :disabled
   :config
-  ;; (setq recentf-mode 1)
   (setq vertico-count 20)
-  (define-key vertico-map "?" #'minibuffer-completion-help)
+  (define-key vertico-map "?"           #'minibuffer-completion-help)
   (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
   (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
-  (define-key vertico-map (kbd "C-j") #'vertico-next)
-  (define-key vertico-map (kbd "C-k") #'vertico-previous)
+  (define-key vertico-map (kbd "C-j")   #'vertico-next)
+  (define-key vertico-map (kbd "C-k")   #'vertico-previous)
+  (define-key vertico-map (kbd "M-y")   #'vertico-save)
+  (define-key evil-motion-state-map (kbd "M-z")   #'vertico-repeat)
   )
 
 (use-package avy
@@ -3859,6 +3859,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
    ("C-l C-d" . lsp-ui-peek-find-definitions)
    ("C-l C-r" . lsp-ui-peek-find-references))
   )
+
 ;; ----------------------------------------------------------------------
 ;; (use-package lsp-ui
 ;;   ;; :disabled
