@@ -1,0 +1,4 @@
+ [submodule "libvterm"]
+	path = packages/vterm-20211226.817/build/libvterm-prefix/src/libvterm
+	url = /tmp/libvterm
+	ignore = dirty
