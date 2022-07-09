@@ -1298,6 +1298,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 ;; ----------------------------------------------------------------------
 (use-package evil-lion
+  :disabled
   :ensure t
   :after evil
   :config
