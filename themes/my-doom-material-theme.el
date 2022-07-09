@@ -194,6 +194,9 @@ Can be an integer to determine the exact padding."
    (lsp-face-highlight-textual :underline orange)
    (lsp-face-highlight-write :underline red)
 
+   ;; lsp-ui
+   (lsp-ui-peek-highlight :foreground black :background orange)
+
    ;; flycheck (fringe)
    (flycheck-fringe-info    :background nil :foreground teal)
    (flycheck-fringe-warning :background nil :foreground yellow)

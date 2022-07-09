@@ -3728,35 +3728,136 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   )
 ;; ----------------------------------------------------------------------
 (use-package lsp-mode
-  ;; :disabled
+  :disabled
   :ensure t
-  :commands lsp
-  :custom
-  (lsp-print-io t)                     ;; => *lsp-log*
-   (lsp-enable-snippet t)
-   ;; (lsp-enable-indentation nil)     ;; disable when using ccls
-   ;; (lsp-prefer-flymake t)
-   (lsp-prefer-capf t)              ;; use capf instead of company
-   (lsp-headerline-breadcrumb-enable nil)
-   (lsp-document-sync-method 2)
-   (lsp-inhibit-message t)
-   (lsp-message-project-root-warning nil)
-   (lsp-idle-delay 0.1)
-   (create-lockfiles nil)
-   (lsp-ui-sideline-enable nil)
-
-  :init
-  (unbind-key "C-l")
-  :bind
-  (("C-l C-l"  . lsp)
-   ("C-l h"    . lsp-describe-session)
-   ("C-l t"    . lsp-goto-type-definition)
-   ("C-l r"    . lsp-rename)
-   ("C-l <f5>" . lsp-restart-workspace)
-   ("C-l l"    . lsp-lens-mode))
+  :commands (lsp lsp-deferred)
   :hook
-  (prog-major-mode . lsp-prog-major-mode-enable)
-  (c++-mode . lsp)
+  ;; (prog-major-mode . lsp-prog-major-mode-enable)
+  ;; (c++-mode . lsp)
+  ;; (c-mode   . lsp)
+  (js-mode . lsp-deferred)
+
+  :custom
+  ;; debug
+  (lsp-print-io nil)                     ;; => *lsp-log*
+  (lsp-trace nil)
+  (lsp-print-performance nil)
+  ;; general
+  (lsp-auto-guess-root t)
+  ;; (lsp-document-sync-method 'incremental) ;; always send incremental document
+  (lsp-response-timeout 5)
+  ;; (lsp-enable-completion-at-point nil)
+  (lsp-enable-snippet t)
+  (lsp-enable-indentation nil)     ;; disable when using ccls
+  ;; (lsp-prefer-flymake t)
+  (lsp-prefer-capf t)              ;; use capf instead of company
+  (lsp-headerline-breadcrumb-enable nil)
+  ;; (lsp-document-sync-method 2)
+  (lsp-inhibit-message t)
+  (lsp-message-project-root-warning nil)
+  (lsp-idle-delay 0.1)
+  (create-lockfiles nil)
+
+  :config
+  ;; :init
+  ;; (unbind-key "C-l")
+  :bind
+  (
+   ;; ("C-l C-l"  . lsp)
+   ;; ("C-l h"    . lsp-describe-session)
+   ;; ("C-l <f5>" . lsp-restart-workspace)
+
+   ;; :map evil-motion-state-map
+   ;; ("g h" . xref-quit-and-pop-marker-stack)
+   ;; ("g t" . lsp-goto-type-definition)
+   ;; ("g d" . xref-find-definitions)
+   ;; ("g r" . xref-find-references)
+   ;; ("g R" . lsp-rename)
+   ;; ("g l" . lsp-lens-mode)
+
+   :map xref--xref-buffer-mode-map
+   ("C-o" . other-window)
+   ("C-0" . quit-window)
+   ("q q" . quit-window)
+   ("RET" . xref-goto-xref)
+   )
+  )
+
+;; ----------------------------------------------------------------------
+(use-package lsp-ui
+  :disabled
+  :commands lsp-ui-mode
+  :after lsp-mode
+  :custom
+  ;; lsp-ui-doc
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-header t)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-position 'top)
+  (lsp-ui-doc-max-width  60)
+  (lsp-ui-doc-max-height 20)
+  (lsp-ui-doc-use-childframe t)
+  (lsp-ui-doc-use-webkit nil)
+
+  ;; lsp-ui-flycheck
+  (lsp-ui-flycheck-enable nil)
+
+  ;; lsp-ui-sideline
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-symbol t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-sideline-show-diagnostics t)
+  (lsp-ui-sideline-show-code-actions t)
+
+  ;; lsp-ui-imenu
+  (lsp-ui-imenu-enable nil)
+  (lsp-ui-imenu-kind-position 'top)
+
+  ;; lsp-ui-peek
+  (lsp-ui-peek-enable t)
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-peek-peek-height 30)
+  (lsp-ui-peek-list-width 30)
+  (lsp-ui-peek-fontify 'always)
+
+  :hook
+  (lsp-mode . lsp-ui-mode)
+
+  :config
+  (defun my-lsp-ui-peek-select-next ()
+    (interactive)
+    (if ()))
+
+  :bind
+  (
+   ;; ("C-l C-l"  . lsp)
+   ;; ("C-l h"    . lsp-describe-session)
+   ;; ("C-l <f5>" . lsp-restart-workspace)
+   :map evil-motion-state-map
+   ("g s" . xref-quit-and-pop-marker-stack)
+   ("g t" . lsp-goto-type-definition)
+   ("g R" . lsp-rename)
+   ("g l" . lsp-lens-mode)
+
+   :map lsp-ui-mode-map
+   ("g d" . lsp-ui-peek-find-definitions)
+   ("g r" . lsp-ui-peek-find-references)
+
+   :map lsp-ui-peek-mode-map
+   ("j" . lsp-ui-peek--select-next)
+   ("k" . lsp-ui-peek--select-prev)
+
+   :map xref--xref-buffer-mode-map
+   ("C-o" . other-window)
+   ("C-0" . quit-window)
+   ("q q" . quit-window)
+   ("RET" . xref-goto-xref)
+   )
+
+  (("C-l s"   . lsp-ui-sideline-mode)
+   ("C-l C-d" . lsp-ui-peek-find-definitions)
+   ("C-l C-r" . lsp-ui-peek-find-references))
   )
 ;; ----------------------------------------------------------------------
 ;; (use-package lsp-ui
