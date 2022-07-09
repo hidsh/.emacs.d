@@ -3927,7 +3927,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   (set-face-background 'bm-face (face-foreground 'warning))
 
   (define-key evil-motion-state-map (kbd "g m") #'bm-toggle)
-  (define-key evil-motion-state-map (kbd "g b") #'bm-next)
+  (define-key evil-motion-state-map (kbd "g SPC") #'bm-next)
   )
 ;; ----------------------------------------------------------------------
 (use-package add-node-modules-path
