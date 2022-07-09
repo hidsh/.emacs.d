@@ -32,5 +32,7 @@ tutorial
 .check-emacs-setting/log.txt
 \.check-emacs-setting/batch-script\.el
 *.elc
+eln-cache/*
 projectile-bookmarks.eld
 .lsp-session-*
+.dap-breakpoints
