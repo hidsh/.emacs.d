@@ -137,14 +137,14 @@
 	   ("John Wiegley" . "jwiegley@gmail.com"))
 	  (:keywords "async"))])
  (auctex .
-	 [(13 1 2)
+	 [(13 1 3)
 	  ((emacs
-	    (24 3)))
+	    (25 1)))
 	  "Integrated environment for *TeX*" tar
 	  ((:url . "https://www.gnu.org/software/auctex/")
 	   (:keywords "tex" "latex" "texinfo" "context" "doctex" "preview-latex")
 	   (:maintainer nil . "auctex-devel@gnu.org")
-	   (:commit . "2568505587f0f6fb9bdac54ba59bda8503882a7a"))])
+	   (:commit . "b91f15b3a375445985143ed1d6e41490ea62780a"))])
  (aumix-mode .
 	     [(7)
 	      nil "run the aumix program in a buffer" single
@@ -184,7 +184,7 @@
 	 ("Oleh Krehel" . "ohwoeowho@gmail.com"))
 	(:keywords "point" "location"))])
  (bbdb .
-       [(3 2 2 1)
+       [(3 2 2 2)
 	((emacs
 	  (24))
 	 (cl-lib
@@ -192,7 +192,7 @@
 	"Big Brother DataBase" tar
 	((:maintainer "Roland Winkler" . "winkler@gnu.org")
 	 (:url . "https://elpa.gnu.org/packages/bbdb.html")
-	 (:commit . "387bb5f216dd7c2d901af186b07d84f005c583c4"))])
+	 (:commit . "715f35b5f53d6bcdcb3754b4f98933df01b57c15"))])
  (beacon .
 	 [(1 3 3)
 	  ((seq
@@ -856,7 +856,7 @@
 	      (:maintainer "Markus Triska" . "triska@metalevel.at")
 	      (:url . "https://www.metalevel.at/ediprolog/"))])
  (eev .
-      [(20220324)
+      [(20220416)
        ((emacs
 	 (24 4)))
        "Support for e-scripts (eepitch blocks, elisp hyperlinks, etc)" tar
@@ -865,7 +865,7 @@
 	(:maintainer "Eduardo Ochs" . "eduardoochs@gmail.com")
 	(:authors
 	 ("Eduardo Ochs" . "eduardoochs@gmail.com"))
-	(:commit . "515e876c5a0f7003cca272de616a60e3160eace6"))])
+	(:commit . "84a0b6e6bb247efcb519c1e32de172aa55e184c7"))])
  (eglot .
 	[(1 8)
 	 ((emacs
@@ -2276,7 +2276,7 @@
 	    ("Protesilaos Stavrou" . "info@protesilaos.com"))
 	   (:commit . "cdb7892a2b7e8e7cc644b8e24e5ab6bf0c51584d"))])
  (pyim .
-       [(4 1 0)
+       [(4 1 1)
 	((emacs
 	  (25 1))
 	 (async
@@ -2290,7 +2290,7 @@
 	 (:authors
 	  ("Ye Wenbin" . "wenbinye@163.com")
 	  ("Feng Shu" . "tumashu@163.com"))
-	 (:commit . "75ead11eeaaf801e342bb18d7c0ff93ed1c123ff"))])
+	 (:commit . "b3de11c39318c821d1febe4946b63ea1ed7b060b"))])
  (pyim-basedict .
 		[(0 5 0)
 		 nil "The default pinyin dict of pyim" tar
@@ -2993,6 +2993,17 @@
 	      (:maintainer "Jonas Bernoulli" . "jonas@bernoul.li")
 	      (:authors
 	       ("Jonas Bernoulli" . "jonas@bernoul.li")))])
+ (transient-cycles .
+		   [(1 0)
+		    ((emacs
+		      (27 1)))
+		    "Define command variants with transient cycling" tar
+		    ((:url . "https://git.spwhitton.name/dotfiles/tree/.emacs.d/site-lisp/transient-cycles.el")
+		     (:keywords "buffer" "window" "minor-mode" "convenience")
+		     (:maintainer "Sean Whitton" . "spwhitton@spwhitton.name")
+		     (:authors
+		      ("Sean Whitton" . "spwhitton@spwhitton.name"))
+		     (:commit . "a5b86dd04e84e7ff1cf8c4062843fccb92991145"))])
  (trie .
        [(0 5)
 	((tNFA
@@ -3150,7 +3161,7 @@
 	     ("Daniel Mendler" . "mail@daniel-mendler.de"))
 	    (:commit . "abf488b8bd501354cc36afb8901fa6929f34bbeb"))])
  (vertico-posframe .
-		   [(0 5 3)
+		   [(0 5 4)
 		    ((emacs
 		      (26 0))
 		     (posframe
@@ -3163,7 +3174,7 @@
 		     (:maintainer "Feng Shu" . "tumashu@163.com")
 		     (:authors
 		      ("Feng Shu" . "tumashu@163.com"))
-		     (:commit . "47e9aa75431e76830d826f6b8e4466f62449819e"))])
+		     (:commit . "7ca364d319e7ba8ccba26a0d57513f3e66f1b05b"))])
  (vigenere .
 	   [(1 0)
 	    ((emacs
@@ -3197,6 +3208,17 @@
        ((:url . "https://github.com/m00natic/vlfi")
 	(:maintainer "Andrey Kotlarski" . "m00naticus@gmail.com")
 	(:keywords "large files" "utilities"))])
+ (vundo .
+	[(1 0 0)
+	 ((emacs
+	   (28 1)))
+	 "Visual undo tree" tar
+	 ((:url . "https://github.com/casouri/vundo")
+	  (:keywords "undo" "text" "editing")
+	  (:maintainer "Yuan Fu" . "casouri@gmail.com")
+	  (:authors
+	   ("Yuan Fu" . "casouri@gmail.com"))
+	  (:commit . "0e3af84944c2c69ddaf5364868fe77c31f62527e"))])
  (wcheck-mode .
 	      [(2021)
 	       nil "General interface for text checkers" tar
