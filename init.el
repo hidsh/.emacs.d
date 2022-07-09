@@ -3149,6 +3149,16 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   (evil-define-key 'normal web-mode-map (kbd "M-[") 'web-mode-snippet-insert)
   (evil-define-key 'insert web-mode-map (kbd "M-[") 'web-mode-snippet-insert)
 
+  (defun cesco/django ()
+    (if (projectile-project-p)
+        (if (file-exists-p (concat (projectile-project-root) "manage.py"))
+            (web-mode-set-engine "django")
+            (message "do not exists") ;; You can safely delet this line
+            )
+        )
+    )
+
+  (add-hook 'web-mode-hook 'cesco/django)
 
   ;; :config
   ;; ;; flymake setting
@@ -3172,8 +3182,7 @@ according to `my-org-todo-publish-cemetery-accept-titles'."
   ;;              '("line \\([0-9]+\\) column \\([0-9]+\\) - \\(Warning\\|Error\\): \\(.*\\)"
   ;;                nil 1 2 4))
 
-  :after flycheck
-  :config
+  ;; :config
   ;; (flycheck-add-mode 'html-tidy 'web-mode)
 
   ;; re-defined
