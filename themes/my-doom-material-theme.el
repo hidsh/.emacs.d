@@ -81,6 +81,7 @@ Can be an integer to determine the exact padding."
    ;; face categories -- required for all themes
    (highlight      teal)
    (highlight-dark (doom-darken highlight 0.3))
+   (highlight-red  red)
    (vertical-bar   base2)
 ;; (selection      base4)
    (selection      nil)
@@ -157,7 +158,7 @@ Can be an integer to determine the exact padding."
    (fringe :background bg)
 
    ;; selection (region)
-   (region :foreground nil :background nil :underline highlight)
+   (region :foreground nil :background nil :underline highlight-red)
 
    (isearch :inherit 'lazy-highlight :foreground nil :background highlight-dark)
 

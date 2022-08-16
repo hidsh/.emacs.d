@@ -1071,7 +1071,7 @@ That is, a string used to represent it on the tab bar."
         (insert (char-to-string head)))))
 
   (defun my-evil-visual-surround-change (beg end s)
-    "Change surrounded character. Delete surround if you input RET."
+    "Change surrounding character pair with new character, or delete it if you input RET specifically."
     (let* ((prompt (format "Re-surround '%s' with:" (substring s 1 (1- (length s)))))
            (c (read-char prompt))
            (pair (my-evil-visual-surround-get-pair c))
@@ -1079,13 +1079,13 @@ That is, a string used to represent it on the tab bar."
       (if pair
           (setq head (car pair) tail (cdr pair))
         (setq head c tail c))
-    (save-excursion
-      (goto-char (1- end))
-      (delete-char 1)
-      (unless (eq tail #xd) (insert (char-to-string tail)))
-      (goto-char beg)
-      (delete-char 1)
-      (unless (eq head #xd) (insert (char-to-string head))))))
+      (save-excursion
+        (goto-char (1- end))
+        (delete-char 1)
+        (unless (eq tail #xd) (insert (char-to-string tail)))
+        (goto-char beg)
+        (delete-char 1)
+        (unless (eq head #xd) (insert (char-to-string head))))))
 
 (defun my-evil-visual-surround-get-tail (head)
   (or (cdr (assoc head my-evil-visual-surround-pairs))
