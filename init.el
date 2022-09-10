@@ -1388,6 +1388,8 @@ thx https://tam5917.hatenablog.com/entry/2022/02/11/090015"
   ;; :disabled
   :config
   (setq vertico-count 20)
+  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)   ;; for vertico-repeat (M-z)
+
   (define-key vertico-map "?"           #'minibuffer-completion-help)
   (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
   (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
