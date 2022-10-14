@@ -4012,6 +4012,30 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :config
   (define-key reb-mode-map (kbd "C-x k") 'reb-quit)
   )
+
+;; ----------------------------------------------------------------------
+(use-package ediff
+  :config
+  (setq ediff-split-window-function 'split-window-horizontally)     ;; side by side
+
+  (set-face-attribute 'ediff-fine-diff-A nil
+                      :foreground "white" :background "dark green")
+  )
+
+;; ----------------------------------------------------------------------
+(use-package disable-mouse
+  :config
+  (global-disable-mouse-mode)
+
+  ;; in evil
+  ;; need restart emacs to reflect changing
+  (mapc #'disable-mouse-in-keymap
+        (list evil-motion-state-map
+              evil-normal-state-map
+              evil-visual-state-map
+              evil-insert-state-map))
+  )
+
 ;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
