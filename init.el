@@ -162,7 +162,10 @@
 (setq-default left-margin-width 0 right-margin-width 0) ; Define new widths.
 (set-window-buffer nil (current-buffer))                ; Use them now.
 
-(add-hook 'prog-mode-hook #'(lambda () (setq-local show-trailing-whitespace t)))
+(add-hook 'prog-mode-hook #'(lambda ()
+                              (setq-local show-trailing-whitespace t)
+                              (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
+                              ))
 (set-face-background 'trailing-whitespace (face-foreground 'error))
 
 ;; save-place
@@ -751,7 +754,7 @@ That is, a string used to represent it on the tab bar."
 
   ;; evil keybindings
   (define-key evil-normal-state-map (kbd "M-c") #'ffap)                       ; M-RET
-  (define-key evil-insert-state-map (kbd "M-v") #'nop)                        ; prevent paste in Mac
+  ;; (define-key evil-insert-state-map (kbd "M-v") #'nop)                        ; prevent paste in Mac
   (define-key evil-visual-state-map (kbd "x") #'evil-delete)                  ; prevent paste in Mac
 
   ;; for package-mode
