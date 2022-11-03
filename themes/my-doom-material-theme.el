@@ -228,6 +228,10 @@ Can be an integer to determine the exact padding."
    (vertico-group-title :foreground base3 :background base8)
    (vertico-multiline :foreground base8)
 
+   ;; orderless
+   (orderless-match-face-0 :inherit 'match)                         ;; for recentf and others
+   (orderless-match-face-3 :foreground "#72a4ff" :weight 'bold)     ;; use color of orderless-match-face-0
+
    ;; consult
    (consult-preview-match :inherit 'match)                 ;; consult-grep
    (consult-separator :foreground base8 :background red)
