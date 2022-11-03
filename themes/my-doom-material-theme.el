@@ -223,7 +223,8 @@ Can be an integer to determine the exact padding."
 
    ;; vertico
    (vertico-group-separator :foreground red)
-   (vertico-current :foreground teal :background black :inverse-video t)
+   ;; (vertico-current :foreground teal :background black :inverse-video t)
+   (vertico-current :underline teal :background black)
    ;; (vertico-group-title :foreground orange :inverse-video t)
    (vertico-group-title :foreground base3 :background base8)
    (vertico-multiline :foreground base8)
