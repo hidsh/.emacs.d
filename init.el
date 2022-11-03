@@ -1393,6 +1393,11 @@ thx https://tam5917.hatenablog.com/entry/2022/02/11/090015"
   (setq vertico-count 20)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)   ;; for vertico-repeat (M-z)
 
+  ;; override from vertico.el for consult-ripgrep
+  (custom-set-variables '(vertico-group-format (concat ;; #("    " 0 4 (face vertico-group-separator))
+                                  #(" %s " 0 4 (face vertico-group-title))
+                                  #(" " 0 1 (face vertico-group-separator display (space :align-to right))))))
+
   (define-key vertico-map "?"           #'minibuffer-completion-help)
   (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
   (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)

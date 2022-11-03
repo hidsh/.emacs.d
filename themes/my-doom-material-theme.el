@@ -147,6 +147,7 @@ Can be an integer to determine the exact padding."
     :background modeline-bg-alt :foreground modeline-fg-alt
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg-alt)))
 
+   (cursor :foreground bg-alt :background teal)
 ;; (scroll-bar :background modeline-bg)
    (vertical-border :foreground highlight)
 
@@ -173,6 +174,9 @@ Can be an integer to determine the exact padding."
    ((org-block-begin-line &override) :background base2)
 
    ;; --- plugin faces -------------------
+   ;; emacs
+   (match :foreground orange :weight 'bold)
+
    ;; evil
    (my-evil-normal-tag-face :foreground black :background teal)
    (my-evil-emacs-tag-face :inherit 'my-evil-normal-tag-face :background yellow)
@@ -219,10 +223,13 @@ Can be an integer to determine the exact padding."
 
    ;; vertico
    (vertico-group-separator :foreground red)
-   (vertico-group-title :foreground orange)
+   (vertico-current :foreground teal :background black :inverse-video t)
+   ;; (vertico-group-title :foreground orange :inverse-video t)
+   (vertico-group-title :foreground base3 :background base8)
    (vertico-multiline :foreground base8)
 
    ;; consult
+   (consult-preview-match :inherit 'match)                 ;; consult-grep
    (consult-separator :foreground base8 :background red)
    (consult-grep-context :foreground base8 :background yellow)
    (consult-help :foreground base8 :background green)
