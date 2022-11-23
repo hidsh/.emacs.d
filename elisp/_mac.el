@@ -119,6 +119,13 @@
   ;; slime
   (setq ros-exe "/usr/local/bin/ros")
   (setq my-slime-helper "~/.roswell/helper.el")
+
+  ;; nim-mode
+  (let ((bin-path (expand-file-name "~/.nimble/bin")))
+   (add-to-list 'exec-path bin-path)
+   (setenv "PATH" (concat bin-path ":" (getenv "PATH")))
+    
+   )
   )
 
 (message "<-- done    \"_mac.el\"")

@@ -2273,7 +2273,11 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (defun flycheck-js-mode-hook-func ()
     (flycheck-mode t))
 
+  (defun flycheck-nim-mode-hook-func ()
+    (flycheck-mode t))
+
   :hook ((c-mode    . flycheck-c-mode-hook-func)
+         (nim-mode  . flycheck-nim-mode-hook-func)
          (js-mode   . flycheck-js-mode-hook-func)
          (web-mode  . flycheck-js-mode-hook-func)
          (ruby-mode . flycheck-ruby-mode-hook-func))
@@ -2491,6 +2495,21 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
   )
 
+;; ----------------------------------------------------------------------
+(use-package nim-mode
+  :mode (("\\.nim$" . nim-mode))
+  :hook (nim-mode . lsp)
+  :config
+  (use-package flycheck-nim)
+
+  ;; hook nim-mode into lsp
+  (add-to-list 'lsp-language-id-configuration '(nim-mode . "nim"))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection "nimlsp")
+                    :major-modes '(nim-mode)
+                    :server-id 'nimlsp))
+  ;; (add-hook 'nim-mode-hook #'lsp)
+  )
 ;; ----------------------------------------------------------------------
 (use-package arduino-mode
   :hook (arduino-mode . flymake-mode)
