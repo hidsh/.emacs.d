@@ -1271,7 +1271,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
   :after evil dired
   :config
   ;; (evil-collection-init '(edebug dired neotree slime help re-builder)) ;; fixme
-  (evil-collection-init '(edebug dired neotree slime help paren))
+  (evil-collection-init '(edebug dired neotree slime help paren calc ediff))
 
   (evil-define-key 'normal help-mode-map (kbd "C-o") 'other-window)
   (evil-define-key 'normal help-mode-map (kbd "C-0") 'delete-window)
@@ -1405,12 +1405,19 @@ thx https://tam5917.hatenablog.com/entry/2022/02/11/090015"
   (define-key vertico-map (kbd "C-k")   #'vertico-previous)
   (define-key vertico-map (kbd "M-y")   #'vertico-save)
   (define-key evil-motion-state-map (kbd "M-z")   #'vertico-repeat)
+
+  (use-package vertico-directory
+    :config
+    (define-key vertico-map (kbd "M-h") #'vertico-directory-up)
+    (define-key vertico-map (kbd "M-l") #'vertico-directory-enter)  ;; enter dired
+    (define-key vertico-map (kbd "M-d") #'vertico-directory-delete-char)
+    )
   )
 
-(use-package avy
-  :config
-  (setq avy-timeout-seconds 0.7)
-  )
+; (use-package avy
+;   :config
+;   (setq avy-timeout-seconds 0.7)
+;   )
 
 ;; ----------------------------------------------------------------------
 (use-package ivy
@@ -2231,8 +2238,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
       (dired-up-directory other-window)
       (kill-buffer b)))
 
-  :bind (("C-x d"    . my-dired)
-         ("C-x C-d"  . my-dired)
+  :bind (("C-x d"    . dired)
+         ("C-x C-d"  . dired)
          :map dired-mode-map
          ("C-o"   . nil)                     ;; other-window instead of dired-display-file
          ("o"     . dired-display-file)
