@@ -3855,7 +3855,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :custom
   ;; lsp-ui-doc
   (lsp-ui-doc-enable t)
-  (lsp-ui-doc-header t)
+  ;; (lsp-ui-doc-header t)           ;; tabbar.el が使うし、'>'が文字化けするので無効化
   (lsp-ui-doc-include-signature t)
   (lsp-ui-doc-position 'top)
   (lsp-ui-doc-max-width  60)
