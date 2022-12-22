@@ -2008,6 +2008,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :config
   (push 'er/mark-outside-pairs er/try-expand-list)
   (setq expand-region-smart-cursor nil)
+  (setq expand-region-subword-enabled t)
+  (setq expand-region-show-usage-message nil)
   ;; (setq expand-region-autocopy-register "e")
   ;; (setq expand-region-autocopy-kill-ring t)
   (define-key evil-normal-state-map (kbd "=") 'er/expand-region)
