@@ -1408,7 +1408,15 @@ thx https://tam5917.hatenablog.com/entry/2022/02/11/090015"
 
   (use-package vertico-directory
     :config
-    (define-key vertico-map (kbd "M-h") #'vertico-directory-up)
+    (setq vertico-directory-up ())
+    (defun my-vertico-directory-up ()
+      (interactive)
+      (call-interactively
+       (if (vertico-directory--completing-file-p)
+           #'vertico-directory-up
+         #'backward-kill-word)))
+
+    (define-key vertico-map (kbd "M-h") #'my-vertico-directory-up)
     (define-key vertico-map (kbd "M-l") #'vertico-directory-enter)  ;; enter dired
     (define-key vertico-map (kbd "M-d") #'vertico-directory-delete-char)
     )
