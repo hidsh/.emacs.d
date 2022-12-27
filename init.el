@@ -2503,14 +2503,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :hook (nim-mode . lsp)
   :config
   (use-package flycheck-nim)
-
-  ;; hook nim-mode into lsp
-  (add-to-list 'lsp-language-id-configuration '(nim-mode . "nim"))
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection "nimlsp")
-                    :major-modes '(nim-mode)
-                    :server-id 'nimlsp))
-  ;; (add-hook 'nim-mode-hook #'lsp)
   )
 ;; ----------------------------------------------------------------------
 (use-package arduino-mode
@@ -3799,6 +3791,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   ;; (prog-major-mode . lsp-prog-major-mode-enable)
   ;; (c++-mode . lsp)
   ;; (c-mode   . lsp)
+  ;; (nim-mode . lsp)
   (js-mode . lsp-deferred)
 
   :custom
@@ -3815,7 +3808,6 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   (lsp-enable-indentation nil)     ;; disable when using ccls
   ;; (lsp-prefer-flymake t)
   (lsp-prefer-capf t)              ;; use capf instead of company
-  (lsp-headerline-breadcrumb-enable nil)
   ;; (lsp-document-sync-method 2)
   (lsp-inhibit-message t)
   (lsp-message-project-root-warning nil)
@@ -3823,6 +3815,13 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   (create-lockfiles nil)
 
   :config
+  ;; nim-mode into lsp
+  (add-to-list 'lsp-language-id-configuration '(nim-mode . "nim"))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection "nimlsp")
+                    :major-modes '(nim-mode)
+                    :server-id 'nimlsp))
+
   ;; :init
   ;; (unbind-key "C-l")
   :bind
@@ -3849,7 +3848,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package lsp-ui
-  :disabled
+  ;; :disabled
   :commands lsp-ui-mode
   :after lsp-mode
   :custom
