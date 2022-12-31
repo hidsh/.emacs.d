@@ -156,7 +156,7 @@ Can be an integer to determine the exact padding."
 
 ;; (fringe :background base2)
    ;; (fringe :background base3)
-   (fringe :foreground base7 :background bg)
+   (fringe :foreground base7 :background base3)
 
    ;; selection (region)
    (region :foreground nil :background nil :underline highlight-red)
