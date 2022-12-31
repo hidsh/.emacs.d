@@ -190,9 +190,9 @@ Can be an integer to determine the exact padding."
    (git-gutter:added    :background teal   :foreground nil)
    (git-gutter:deleted  :background red    :foreground nil)
 
-   (git-gutter-fr:modified :background yellow :foreground nil)
-   (git-gutter-fr:added    :background teal :foreground nil)
-   (git-gutter-fr:deleted  :background red :foreground nil)
+   (git-gutter-fr:modified :foreground yellow :background "#A28915" )
+   (git-gutter-fr:added    :foreground teal   :background "#408C83" )
+   (git-gutter-fr:deleted  :foreground red    :background "#CC1436" )
 
    ;; lsp
    (lsp-face-highlight-read :underline teal)
