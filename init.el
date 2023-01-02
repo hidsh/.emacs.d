@@ -10,7 +10,7 @@
 (setq custom-theme-directory (locate-user-emacs-file "themes"))
 (set-default-coding-systems 'utf-8-unix)
 
-;; to hide message "ad-handle-definition: ‘vc-revert’ got redefined"
+;; to hide message "ad-handle-definition: `vc-revert` got redefined"
 (setq ad-redefinition-action 'accept)
 
 ;; (require 'cl) を見逃す
@@ -1342,6 +1342,9 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   (add-hook 'after-init-hook #'my-consult-after-init-hook)
 
+  ;; (setq consult-preview-key (kbd "C-l"))
+  (setq consult-preview-key '(:debounce 0.8 any))
+
   (setq my-consult-ripgrep-exclude-list
     '("#*#"
       ".eslintrc.*" "node_modules/**"
@@ -2583,8 +2586,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package slime
-  :if window-system
   :disabled
+  :if window-system
   :init
   (load (expand-file-name "~/.roswell/helper.el"))
 
@@ -4092,6 +4095,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package disable-mouse
+  :disabled
   :config
   (global-disable-mouse-mode)
 
