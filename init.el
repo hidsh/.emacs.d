@@ -1362,21 +1362,16 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   ;; (setq consult-ripgrep-args (concat "rg " "-g !#*# " consult-ripgrep-args-orig " ."))
 
-  (defun consult-ripgrep-symbol-at-point ()
-    "Invoke consult-ripgrep at point.
-thx https://tam5917.hatenablog.com/entry/2022/02/11/090015"
-    (interactive)
-    (consult-ripgrep nil (thing-at-point 'symbol)))
-
-  (defun my-consult-ripgrep (use-symbol)
-    "With C-u invoke genuine `consult-ripgrep`, otherwise `-symbol-at-point`."
-    (interactive "p")
-    (cond ((eq use-symbol 1)
-           (call-interactively 'consult-ripgrep-symbol-at-point))
-          ((eq use-symbol 4)
-           ;; todo specify top dir like my-counsel-rg at with empty search word
-           ;;(consult-ripgrep dir (thing-at-point 'symbol)))
-           (call-interactively 'consult-ripgrep))))
+(defun my-consult-ripgrep (&optional parg dir initial)
+  "`consult-ripgrep` with symbol-at-point.
+Besides, it can be Specified top directory to search using prefix-argument, e.g. C-u."
+  (interactive "p")
+  (setq initial (thing-at-point 'symbol))
+  (setq dir (pcase parg
+              (1 nil)               ;; not given prefix-arg
+              (t (let ((insert-default-directory t))
+                   (read-directory-name "Ripgrep Dir: ")))))
+  (consult-ripgrep dir initial))
 
   :bind (("M-r" . consult-recent-file)
          ("M-o" . my-consult-ripgrep)
