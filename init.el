@@ -1381,6 +1381,11 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
                      (read-directory-name "Ripgrep Dir: ")))))
     (consult-ripgrep dir initial))
 
+  ;; https://tam5917.hatenablog.com/entry/2022/02/05/202816
+  (defun my-consult-line-symbol-at-point ()
+    (interactive)
+    (consult-line (thing-at-point 'symbol)))
+
 
   :bind (("M-r" . consult-recent-file)
          ("M-o" . my-consult-ripgrep)
@@ -1388,6 +1393,8 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
          :map evil-motion-state-map
          ("C-x C-g" . consult-find)
          ("C-x C-b" . consult-buffer)
+         :map evil-normal-state-map
+         ("g ;" . my-consult-line-symbol-at-point)
          )
  )
 
