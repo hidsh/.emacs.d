@@ -286,16 +286,21 @@ double quotation characters \(\"\) from given string."
 ;; ----------------------------------------------------------------------
 ;; thx: https://sites.google.com/site/steveyegge2/my-dot-emacs-file
 
-(defun my-rename-file-and-buffer (new-name)
-  "Renames both current buffer and file it's visiting to NEW-NAME."
-  (interactive "sNew name: ")
+(defun mv-file-and-buffer (new-name)
+  "Renames or Move both current buffer and file it's visiting to NEW-NAME."
+  (interactive (list (read-file-name "mv: " nil nil nil (file-name-nondirectory (buffer-file-name)))))
   (let ((name (buffer-name))
-	    (filename (buffer-file-name)))
-    (if (not filename)
-	    (message "Buffer '%s' is not visiting a file!" name)
-      (if (get-buffer new-name)
-	      (message "A buffer named '%s' already exists!" new-name)
-	    (progn 	 (rename-file filename new-name 1) 	 (rename-buffer new-name) 	 (set-visited-file-name new-name) 	 (set-buffer-modified-p nil)))))) ;;
+        (filename (buffer-file-name)))
+    (unless filename
+      (error "Buffer '%s' is not visiting a file!" name))
+    (when (get-buffer new-name)
+      (error "A buffer named '%s' already exists!" new-name))
+    (rename-file filename new-name 1)
+    (rename-buffer new-name)
+    (set-visited-file-name new-name)
+    (set-buffer-modified-p nil)))
+
+(defalias 'mv 'mv-file-and-buffer)
 
 (defun my-move-buffer-file (dir)
   "Moves both current buffer and file it's visiting to DIR."
