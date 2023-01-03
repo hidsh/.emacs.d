@@ -1644,7 +1644,7 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
 
   ;--------------
   (defun my-counsel-write-file ()
-    "Supported creating unexisted parent-directories and 
+    "Supported creating unexisted parent-directories and
 using a new file name regardless of the candidates"
     (interactive)
     (let ((ivy-minibuffer-map (make-sparse-keymap)))
