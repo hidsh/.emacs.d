@@ -4107,6 +4107,12 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   )
 
 ;; ----------------------------------------------------------------------
+(use-package goto-chg
+  :bind (:map evil-normal-state-map
+         ("g ," . goto-last-change)
+         ("g ." . goto-last-change-reverse))
+  )
+;; ----------------------------------------------------------------------
 (use-package disable-mouse
   :disabled
   :config
