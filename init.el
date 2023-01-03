@@ -162,12 +162,15 @@
 (setq-default left-margin-width 0 right-margin-width 0) ; Define new widths.
 (set-window-buffer nil (current-buffer))                ; Use them now.
 
-(add-hook 'prog-mode-hook #'(lambda ()
-                              (setq-local show-trailing-whitespace t)
-                              (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
-                              (electric-pair-mode +1)
-                              (c-toggle-auto-newline +1)
-                              ))
+(defun prog-mode-hooks-func ()
+  (setq-local show-trailing-whitespace t)
+  (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
+  (electric-pair-mode +1)
+  (c-toggle-auto-newline +1)
+  (add-hook 'before-save-hook #'delete-trailing-whitespace nil 'buffer-local)
+  )
+(add-hook 'prog-mode-hook #'prog-mode-hooks-func)
+
 (set-face-background 'trailing-whitespace (face-foreground 'error))
 
 ;; save-place
