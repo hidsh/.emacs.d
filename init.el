@@ -1370,16 +1370,17 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   ;; (setq consult-ripgrep-args (concat "rg " "-g !#*# " consult-ripgrep-args-orig " ."))
 
-(defun my-consult-ripgrep (&optional parg dir initial)
-  "`consult-ripgrep` with symbol-at-point.
+  (defun my-consult-ripgrep (&optional parg dir initial)
+    "`consult-ripgrep` with symbol-at-point.
 Besides, it can be Specified top directory to search using prefix-argument, e.g. C-u."
-  (interactive "p")
-  (setq initial (thing-at-point 'symbol))
-  (setq dir (pcase parg
-              (1 nil)               ;; not given prefix-arg
-              (_ (let ((insert-default-directory t))
-                   (read-directory-name "Ripgrep Dir: ")))))
-  (consult-ripgrep dir initial))
+    (interactive "p")
+    (setq initial (thing-at-point 'symbol))
+    (setq dir (pcase parg
+                (1 nil)               ;; not given prefix-arg
+                (_ (let ((insert-default-directory t))
+                     (read-directory-name "Ripgrep Dir: ")))))
+    (consult-ripgrep dir initial))
+
 
   :bind (("M-r" . consult-recent-file)
          ("M-o" . my-consult-ripgrep)
