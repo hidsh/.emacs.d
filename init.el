@@ -165,6 +165,8 @@
 (add-hook 'prog-mode-hook #'(lambda ()
                               (setq-local show-trailing-whitespace t)
                               (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
+                              (electric-pair-mode +1)
+                              (c-toggle-auto-newline +1)
                               ))
 (set-face-background 'trailing-whitespace (face-foreground 'error))
 
