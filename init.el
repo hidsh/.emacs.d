@@ -1372,7 +1372,7 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
   (setq initial (thing-at-point 'symbol))
   (setq dir (pcase parg
               (1 nil)               ;; not given prefix-arg
-              (t (let ((insert-default-directory t))
+              (_ (let ((insert-default-directory t))
                    (read-directory-name "Ripgrep Dir: ")))))
   (consult-ripgrep dir initial))
 
