@@ -1329,13 +1329,17 @@ If COUNT is given, move COUNT - 1 lines downward first."
 (use-package orderless
   :config
   (setq completion-styles '(orderless))
+  ;; :custom
+  ;; `((completion-styles '(orderless))
+  ;;   (orderless-matching-styles
+  ;;    . '(orderless-prefixes
+  ;;        orderless-flex
+  ;;        orderless-regexp
+  ;;        orderless-initialism
+  ;;        orderless-literal)))
   )
 
 (use-package marginalia)
-
-(use-package embark)
-
-(use-package embark-consult)
 
 (use-package consult
   ;; :disabled
@@ -1398,6 +1402,30 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
          ("g ;" . my-consult-line-symbol-at-point)
          )
  )
+
+(use-package embark-consult)
+
+(use-package embark
+  :config
+  ;; re-define keymap for embark-act(M-e)
+  (define-key embark-file-map "f" nil)  ;; find-file)
+  (define-key embark-file-map "F" nil)  ;; find-file-literally)
+  (define-key embark-file-map "o" nil)  ;; find-file-other-window)
+  (define-key embark-file-map "j" nil)  ;; embark-dired-jump)
+  (define-key embark-file-map "!" nil)  ;; shell-command)
+  (define-key embark-file-map "&" nil)  ;; async-shell-command)
+  (define-key embark-file-map "$" nil)  ;; embark-eshell)
+  (define-key embark-file-map "<" nil)  ;; insert-file)
+  (define-key embark-file-map "\\" nil) ;; embark-recentf-remove)
+  (define-key embark-file-map "W" nil)  ;; embark-save-relative-path)
+  (define-key embark-file-map "e" nil)  ;; eww-open-file)
+  (define-key embark-file-map "l" nil)  ;; load-file)
+  (define-key embark-file-map "L" nil)  ;; load-file)
+  (define-key embark-file-map "B" nil)  ;; byte-compile-file)
+  (define-key embark-file-map "R" nil)  ;; byte-recompile-directory)
+  (define-key embark-file-map "v" nil)  ;; 'embark-vc-file-map)
+  (define-key embark-file-map "x" nil)  ;; #'consult-file-externally)
+  )
 
 (use-package vertico
   ;; :disabled
@@ -3725,8 +3753,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 ;; ----------------------------------------------------------------------
 (use-package company
   :ensure t
+  :hook (prog-mode . global-company-mode)
   :config
-  (global-company-mode)
   (setq company-idle-delay 0.1)
   (setq company-minimum-prefix-length 2)
   (setq company-selection-wrap-around t)
