@@ -3742,6 +3742,21 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
              ("C-c C-r" . slime-repl-send-region)
              ("C-c C-f" . slime-compile-defun))
   )
+
+;; ----------------------------------------------------------------------
+(use-package company-posframe
+  ;; :disabled
+  ;; :after company
+  :custom
+  (company-tooltip-minimum-width 40)
+
+  :init
+  (company-posframe-mode +1)
+  ;; :config
+  ;; (with-eval-after-load 'desktop
+  ;;   (push '(company-posframe-mode . nil) desktop-minor-mode-table))
+  )
+
 ;; ----------------------------------------------------------------------
 (use-package company-quickhelp
   :disabled
@@ -3753,7 +3768,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 ;; ----------------------------------------------------------------------
 (use-package company
   :ensure t
-  :hook (prog-mode . global-company-mode)
+  :hook ((prog-mode . company-mode))
   :config
   (setq company-idle-delay 0.1)
   (setq company-minimum-prefix-length 2)
@@ -3763,6 +3778,15 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   ;; (setq company-dabbrev-ignore-case nil)
   ;; (add-to-list 'company-backends 'company-yasnippet)
   ;; (company-quickhelp-mode +1)
+
+  ;; backend
+  (setq company-backends
+        '((company-dabbrev-code company-gtags company-etags company-keywords)
+          company-bbdb company-semantic company-cmake company-capf company-clang company-files
+          company-oddmuse company-dabbrev))
+
+  ;; sort order
+  (setq company-transformers '(company-sort-by-backend-importance))
 
   ;; 候補から数字を外す
   (push (apply-partially #'cl-remove-if
@@ -3826,6 +3850,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   (define-key company-active-map (kbd "C-j") 'company-select-next)
   (define-key company-active-map (kbd "C-k") 'company-select-previous)
   )
+
 ;; ----------------------------------------------------------------------
 (use-package yasnippet
   ;; :disabled
