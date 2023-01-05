@@ -1404,7 +1404,6 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
   :bind (("M-r" . consult-recent-file)
          ("M-o" . my-consult-ripgrep)
          ("M-e" . embark-act)
-         :map evil-motion-state-map
          ("C-x C-g" . consult-find)
          ("C-x C-b" . consult-buffer)
          :map evil-normal-state-map
