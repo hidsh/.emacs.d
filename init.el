@@ -3408,8 +3408,6 @@ See URL `https://github.com/htacg/tidy-html5'."
 ;; ----------------------------------------------------------------------
 (use-package ruby-mode
   :mode "\\.rb\\'"
-  :config
-  (setq flycheck)
   )
 ;; ----------------------------------------------------------------------
 (use-package python-mode
@@ -4163,11 +4161,21 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   )
 
 ;; ----------------------------------------------------------------------
+(use-package eshell
+  :config
+  (defun eshell-mode-hook-func ()
+    (define-key eshell-hist-mode-map (kbd "M-r") nil)
+    )
+
+  :hook (eshell-mode . eshell-mode-hook-func)
+  )
+;; ----------------------------------------------------------------------
 (use-package goto-chg
   :bind (:map evil-normal-state-map
          ("g ," . goto-last-change)
          ("g ." . goto-last-change-reverse))
   )
+
 ;; ----------------------------------------------------------------------
 (use-package disable-mouse
   :disabled
