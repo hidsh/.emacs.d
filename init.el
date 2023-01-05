@@ -920,6 +920,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-visual-state-map (kbd "a") #'my-evil-visual-align-region)
   (define-key evil-visual-state-map (kbd ";") #'my-evil-visual-comment-region)
   (define-key evil-visual-state-map (kbd "i") #'my-evil-visual-indent-region)
+  (define-key evil-visual-state-map (kbd "g g") #'beginning-of-buffer)
 
   ;; ;; not work, fixme
   ;; (add-hook 'macrostep-mode-hook #'(lambda ()
@@ -1422,10 +1423,12 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
     (setq vertico-directory-up ())
     (defun my-vertico-directory-up ()
       (interactive)
-      (call-interactively
        (if (vertico-directory--completing-file-p)
-           #'vertico-directory-up
-         #'backward-kill-word)))
+           (let ((pt (point)))
+             (call-interactively #'vertico-directory-up)    ;; first, trying this
+             (when (= pt (point))
+               (backward-kill-word 1)))                     ;; do this if it does not move the point
+         (backward-kill-word 1)))
 
     (define-key vertico-map (kbd "M-h") #'my-vertico-directory-up)
     (define-key vertico-map (kbd "M-l") #'vertico-directory-enter)  ;; enter dired
