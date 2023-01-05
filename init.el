@@ -4130,10 +4130,13 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 (use-package vterm
   :if window-system
   :ensure t
-  :config
-  (setq vterm-buffer-name-string "%s")
+  :custom
+  (vterm-buffer-name-string "%s")
+  (vterm-kill-buffer-on-exit t)
+  (vterm-max-scrollback 100000)
 
-  ;; send keys to terminal directly
+  :config
+  ;; send keys to terminal directly for `backward-kill-word` in vterm
   (define-key vterm-mode-map (kbd "M-h")
     (lambda () (interactive) (vterm-send-key (kbd "C-w"))))
 
@@ -4141,6 +4144,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   (dolist (k '("M-r" "M-o" "M-j" "M-k"
                "C-o" "C-0" "C-1" "C-2"))
     (define-key vterm-mode-map (kbd k) nil))
+
+  (define-key vterm-mode-map (kbd "C-M-f") #'toggle-frame-fullscreen)
 
   ;; force emacs-state
   (defun my-adv-switch-to-bufffer--force-evil-emacs-state-in-vterm (&rest _)
