@@ -375,6 +375,15 @@
   )
 
 ;; ----------------------------------------------------------------------
+(use-package saveplace
+  :disabled
+  :defer
+  :config
+  (setq save-place-file "~/.emacs.d/.emacs-places")
+  (save-place-mode t)                                     ; Enable save-place
+  )
+
+;; ----------------------------------------------------------------------
 ; host independent
 (require
  (cond ((eq system-type 'windows-nt) '_windows)
@@ -1549,15 +1558,15 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
 
   (define-key ivy-minibuffer-map [(return)] 'my-ivy-done)
 
-  (defun my-counsel-find-file ()
-    (interactive)
-    (let ((my-ivy-immediate-flag t))
-      (call-interactively
-       (cond ((and (fboundp 'counsel-gtags-find-file) (locate-dominating-file default-directory "GTAGS"))
-              'counsel-gtags-find-file)
-             ((and (fboundp 'magit-find-file) (locate-dominating-file default-directory ".git"))
-              'magit-find-file)
-             (t 'counsel-find-file)))))
+  ;; (defun my-counsel-find-file ()
+  ;;   (interactive)
+  ;;   (let ((my-ivy-immediate-flag t))
+  ;;     (call-interactively
+  ;;      (cond ((and (fboundp 'counsel-gtags-find-file) (locate-dominating-file default-directory "GTAGS"))
+  ;;             'counsel-gtags-find-file)
+  ;;            ((and (fboundp 'magit-find-file) (locate-dominating-file default-directory ".git"))
+  ;;             'magit-find-file)
+  ;;            (t 'counsel-find-file)))))
 
 
   ;; refrect .ignore to the root of the project
@@ -2366,8 +2375,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
   :config
-  (setq flycheck-display-errors-delay 0.1)
-  (setq flycheck-idle-change-delay 0.1)
+  (setq flycheck-display-errors-delay 0.0)
+  (setq flycheck-idle-change-delay 0.0)
   (setq flycheck-idle-buffer-switch-delay 0.0)
 
   (let ((color (face-foreground 'error)))
@@ -4095,7 +4104,6 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :config
   (add-hook 'js-mode-hook
           (lambda ()
-            (company-mode nil)
             (define-key js-mode-map (kbd "C-x C-e") 'nodejs-repl-send-last-expression)
             (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
             (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
