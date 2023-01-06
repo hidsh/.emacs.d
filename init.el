@@ -655,6 +655,18 @@
 ;; (require 'my-utf-8-eaw-fullwidth)
 
 ;; ----------------------------------------------------------------------
+;; multi byte file setting
+;;
+;; https://handlename.hatenablog.jp/entry/2014/10/17/103603
+(prefer-coding-system 'utf-8-unix)
+
+;; https://kokufu.blogspot.com/2016/05/emacs-undecided-unix-cannot-encode.html
+(add-hook 'find-file-hook '(lambda ()
+                             (cond ((string-match "undecided-?.*" (format "%s" buffer-file-coding-system))
+                                    (let ((coding-system-for-read 'utf-8))
+                                      (revert-buffer t t))))))
+
+;; ----------------------------------------------------------------------
 (use-package tabbar
   :if window-system
   ;; :disabled
