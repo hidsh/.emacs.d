@@ -1982,9 +1982,9 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 \\|ad-activate\\|ad-enable-advice\\|ad-disable-advice\\|propertize\\|run-hooks\\)[ \t\n]" . font-lock-keyword-face))))
 
 (add-hook 'emacs-lisp-mode-hook #'my-font-lock-add-keywords-elisp)
-(add-hook 'emacs-lisp-mode-hook #'flymake-mode)
+;; (add-hook 'emacs-lisp-mode-hook #'flymake-mode)
 (add-hook 'lisp-interaction-mode-hook #'my-font-lock-add-keywords-elisp)
-(add-hook 'lisp-interaction-mode-hook #'flymake-mode)
+;; (add-hook 'lisp-interaction-mode-hook #'flymake-mode)
 
 ;; ----------------------------------------------------------------------
 (use-package undo-tree
