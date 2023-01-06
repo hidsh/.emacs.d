@@ -12,7 +12,7 @@
 ;; to hide message "ad-handle-definition: `vc-revert` got redefined"
 (setq ad-redefinition-action 'accept)
 
-;; (require 'cl) を見逃す
+;; ignore `(require 'cl)'
 (setq byte-compile-warnings '(not cl-functions obsolete))
 ;; ----------------------------------------------------------------------
 ;; my-elisp
@@ -1373,8 +1373,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (defun my-consult-after-init-hook ()
     (vertico-mode)
     (marginalia-mode)
-    ;; savehist-modeを使ってVerticoの順番を永続化する
-    (savehist-mode))
+    (savehist-mode))        ;; Verticoの順番を永続化する
 
   (add-hook 'after-init-hook #'my-consult-after-init-hook)
 
