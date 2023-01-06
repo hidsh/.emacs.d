@@ -1799,6 +1799,7 @@ using a new file name regardless of the candidates"
 
 ;; ----------------------------------------------------------------------
 (use-package all-the-icons-ivy
+  :disabled
   :init
   (setq all-the-icons-scale-factor 1.0)
   (defun all-the-icons-ivy-icon-for-file (s)
