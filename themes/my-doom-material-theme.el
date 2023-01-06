@@ -173,6 +173,10 @@ Can be an integer to determine the exact padding."
    ((org-block-background &override) :background base2)
    ((org-block-begin-line &override) :background base2)
 
+   ;; paren
+   ;; (show-paren-match :background black)
+   (show-paren-match :background "#3A537E")
+
    ;; --- plugin faces -------------------
    ;; emacs
    (match :foreground orange :weight 'bold)
