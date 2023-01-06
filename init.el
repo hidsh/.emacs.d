@@ -8,7 +8,6 @@
 
 (add-to-list 'load-path (locate-user-emacs-file "elisp"))
 (setq custom-theme-directory (locate-user-emacs-file "themes"))
-(set-default-coding-systems 'utf-8-unix)
 
 ;; to hide message "ad-handle-definition: `vc-revert` got redefined"
 (setq ad-redefinition-action 'accept)
