@@ -917,7 +917,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-normal-state-map (kbd "M-k") nil)        ; outline-move-sutree-*
   (define-key evil-normal-state-map (kbd "u") #'undo-tree-undo)
   (define-key evil-normal-state-map (kbd "U") #'undo-tree-redo)
-  (define-key evil-normal-state-map (kbd "M-p") #'counsel-yank-pop)
+  ;; (define-key evil-normal-state-map (kbd "M-p") #'counsel-yank-pop)
   ;; (define-key evil-normal-state-map (kbd "SPC") #'evil-force-normal-state)
   (define-key evil-normal-state-map (kbd "g f") #'my-beginning-of-defun)
   (define-key evil-normal-state-map (kbd "A") #'nop)                 ; unmap A
