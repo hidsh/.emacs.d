@@ -1313,6 +1313,12 @@ If COUNT is given, move COUNT - 1 lines downward first."
 )
 
 ;; ----------------------------------------------------------------------
+(use-package evil-cleverparens
+  :config
+  (require 'evil-cleverparens-text-objects)
+
+  )
+;; ----------------------------------------------------------------------
 (use-package evil-escape
   :disabled
   :after evil
