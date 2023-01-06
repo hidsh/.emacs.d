@@ -4148,7 +4148,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :if window-system
   :ensure t
   :custom
-  (vterm-buffer-name-string "%s")
+  (vterm-buffer-name-string ">%s")
   (vterm-kill-buffer-on-exit t)
   (vterm-max-scrollback 100000)
 
