@@ -9,7 +9,7 @@
 (add-to-list 'load-path (locate-user-emacs-file "elisp"))
 (setq custom-theme-directory (locate-user-emacs-file "themes"))
 
-;; to hide message "ad-handle-definition: `vc-revert` got redefined"
+;; to hide message "ad-handle-definition: ‘vc-revert’ got redefined"
 (setq ad-redefinition-action 'accept)
 
 ;; ignore `(require 'cl)'
@@ -290,11 +290,11 @@
 ;; ----------------------------------------------------------------------
 ;; command aliases
 (defalias 'reb 're-builder)
-(defalias 'a 'counsel-apropos)
+(defalias 'a 'consult-apropos)
 
 (defalias 'dv 'describe-variable)
 (defalias 'dfun 'describe-function)
-(defalias 'face-list 'describe-face)
+(defalias 'face 'describe-face)
 (defalias 'dk 'describe-key)
 
 (defalias 'l 'display-line-numbers-mode)
@@ -355,8 +355,8 @@
 
 ;; ----------------------------------------------------------------------
 (use-package my-doom-material-theme
-  :if window-system
   :load-path "~/.emacs.d/themes"
+  :if window-system
   :config
   (defface my-evil-normal-tag-face `((t (:inherit default) :weight bold)) "")
   (copy-face 'my-evil-normal-tag-face 'my-evil-emacs-tag-face)
@@ -696,16 +696,19 @@
     (delq nil
           (mapcar #'(lambda (b)
                       (cond
-                       ;; Always include the current buffer.
-                       ((eq (current-buffer) b) b)
+                       ((eq (current-buffer) b) b)                          ;; Always include the current buffer.
+                       ;; ((memq (with-current-buffer b major-mode)            ;; popperで表示するのでtabbarでは表示しない
+                       ;;        '(vterm-mode                                  ; x vterm
+                       ;;          reb-mode)) nil)                             ; x reb
                        ((string= (buffer-name b) (file-name-nondirectory org-default-notes-file)) nil)  ; hide "notes.org"
                        ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
-                       ((buffer-file-name b) b)
-                       ((char-equal ?\  (aref (buffer-name b) 0)) nil)
+                       ((buffer-file-name b) b)                             ; ファイル持ちのバッファは表示する
+                       ((char-equal ?\  (aref (buffer-name b) 0)) nil)      ; 空白で始まりのバッファ名は表示しない
                        ((equal "*scratch*" (buffer-name b)) b)              ; *scratch*バッファは表示する
                        ((char-equal ?* (aref (buffer-name b) 0)) nil)       ; それ以外の * で始まるバッファは表示しない
                        ((string-match "^magit" (buffer-name b)) nil)        ; magit が開くバッファは表示しない
-                       ((buffer-live-p b) b)))
+                       ((buffer-live-p b) b)
+                       ))
                   (buffer-list))))
 
   (setq tabbar-buffer-list-function 'my-tabbar-buffer-list)
