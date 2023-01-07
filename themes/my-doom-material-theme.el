@@ -132,6 +132,10 @@ Can be an integer to determine the exact padding."
    ;; highlight-thing
    (highlight-thing :background region :distant-foreground fg-alt)
 
+   ;; minibuffer
+   (completions-annotations :foreground doc-comments)
+
+   ;; modeline
    (mode-line
     :background modeline-bg :foreground modeline-fg :overline teal
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
@@ -303,12 +307,18 @@ Can be an integer to determine the exact padding."
 
    ;; paren
    ;; (paren-face-match :foreground nil :background base0)
-   (paren-face-match :foreground nil :background nil)
+   (paren-face-match :foreground nil :background black)
    (sp-show-pair-match-face :background highlight-dark)
 
    ;; company
-   (company-tooltip-selection :foreground bg :background highlight)
+   (company-tooltip-selection :foreground modeline-bg :background highlight)
+   (company-tooltip :foreground "#e4e4e4":background modeline-bg)
+   (company-scrollbar-bg :background modeline-bg)
 
+   ;; popper
+   (popper-echo-area :foreground modeline-bg :background teal )
+   (popper-echo-area-buried :inherit 'popper-echo-area :inverse-video t)
+   (popper-echo-dispatch-hint :inherit 'popper-echo-area)
    ;; beacon
    (beacon-color :inherit 'cursor)
 
