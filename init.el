@@ -516,35 +516,35 @@
                       'face (mode-line-choose-face 'my-mode-line-accent-face))
           (line-number-at-pos (point-max))))
 
-(defun moon-flymake-mode-line ()
-  "https://emacs-china.org/t/flymake-mode-line/7878"
-  (let* ((known (hash-table-keys flymake--backend-state))
-         (running (flymake-running-backends))
-         (disabled (flymake-disabled-backends))
-         (reported (flymake-reporting-backends))
-         (diags-by-type (make-hash-table))
-         (all-disabled (and disabled (null running)))
-         (some-waiting (cl-set-difference running reported)))
-    (maphash (lambda (_b state)
-               (mapc (lambda (diag)
-                       (push diag
-                             (gethash (flymake--diag-type diag)
-                                      diags-by-type)))
-                     (flymake--backend-state-diags state)))
-             flymake--backend-state)
-    (apply #'concat
-           (mapcar (lambda (args)
-                     (apply (lambda (num str face)
-                              (propertize
-                               (format str num) 'face face))
-                            ;; (format str num) 'face `(:family `(myfont 'default3))))
-                            args))
-                   ;; `((,(length (gethash :error diags-by-type)) "\uf79f%d " error)    ;; nf-mdi-ghost
-                   ;; (,(length (gethash :warning diags-by-type)) "\uf071%d " warning)    ;; nf-fa-warning
-                   ;; (,(length (gethash :note diags-by-type)) "\uf05a%d" success))))))   ;; nf-fa-info_circle
-                   `((,(length (gethash :error diags-by-type)) "%d " error)
-                     (,(length (gethash :warning diags-by-type)) "%d " warning)
-                     (,(length (gethash :note diags-by-type)) "%d" success))))))
+;; (defun moon-flymake-mode-line ()
+;;   "https://emacs-china.org/t/flymake-mode-line/7878"
+;;   (let* ((known (hash-table-keys flymake--backend-state))
+;;          (running (flymake-running-backends))
+;;          (disabled (flymake-disabled-backends))
+;;          (reported (flymake-reporting-backends))
+;;          (diags-by-type (make-hash-table))
+;;          (all-disabled (and disabled (null running)))
+;;          (some-waiting (cl-set-difference running reported)))
+;;     (maphash (lambda (_b state)
+;;                (mapc (lambda (diag)
+;;                        (push diag
+;;                              (gethash (flymake--diag-type diag)
+;;                                       diags-by-type)))
+;;                      (flymake--backend-state-diags state)))
+;;              flymake--backend-state)
+;;     (apply #'concat
+;;            (mapcar (lambda (args)
+;;                      (apply (lambda (num str face)
+;;                               (propertize
+;;                                (format str num) 'face face))
+;;                             ;; (format str num) 'face `(:family `(myfont 'default3))))
+;;                             args))
+;;                    ;; `((,(length (gethash :error diags-by-type)) "\uf79f%d " error)    ;; nf-mdi-ghost
+;;                    ;; (,(length (gethash :warning diags-by-type)) "\uf071%d " warning)    ;; nf-fa-warning
+;;                    ;; (,(length (gethash :note diags-by-type)) "\uf05a%d" success))))))   ;; nf-fa-info_circle
+;;                    `((,(length (gethash :error diags-by-type)) "%d " error)
+;;                      (,(length (gethash :warning diags-by-type)) "%d " warning)
+;;                      (,(length (gethash :note diags-by-type)) "%d" success))))))
 
 (defun my-flycheck-mode-line ()
   (let-alist (flycheck-count-errors flycheck-current-errors)
