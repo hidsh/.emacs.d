@@ -4220,6 +4220,41 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   )
 
 ;; ----------------------------------------------------------------------
+(use-package popper
+  :ensure t ; or :straight t
+  :bind (("M-0"   . popper-toggle-latest)
+         ("M--"   . popper-cycle)
+         ("C-M-0" . popper-toggle-type)
+         ;; :map popper-mode-map
+         ;; ("M-j" .  #'my-popper-echo)
+         ;; ("M-k" .  #'my-popper-echo)
+         )
+  :init
+  (setq popper-reference-buffers
+        '("\\*Messages\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          ;; "\\*scratch\\*"
+          ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
+          reb-mode
+          help-mode
+          compilation-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1)             ; For echo area hints
+
+  ;; :custom
+  (setq popper-mode-line nil)       ; hide modeline from popper
+  (setq popper-echo-dispatch-keys '())
+  (setq popper-echo-prompt "")
+  (setq popper-echo-prompt-group-format "GG (%%s)")
+  (setq popper-echo-delimiter " ")
+
+  :config
+  (defun my-popper-echo () (interactive) (popper-echo))
+
+  )
+
+;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
 (load custom-file nil t)
