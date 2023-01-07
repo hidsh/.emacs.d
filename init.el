@@ -4281,6 +4281,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   ;;    reb            -        o
   (setq popper-reference-buffers
         '("\\*Messages\\*"
+          "\\*Warnings\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
           ;; "\\*scratch\\*"
@@ -4296,7 +4297,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   (setq popper-echo-dispatch-keys '())
   (setq popper-echo-prompt "")
   (setq popper-echo-prompt-group-format "GG (%%s)")
-  (setq popper-echo-delimiter " ")
+  (setq popper-echo-delimiter "|")
 
   :config
   (defun my-popper-echo () (interactive) (popper-echo))
