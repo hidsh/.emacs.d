@@ -1369,6 +1369,39 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 (use-package marginalia)
 
+(use-package embark
+  :config
+  ;; re-define
+  (embark-define-keymap embark-file-map
+    "Keymap for Embark file actions."
+    ("RET" find-file)
+    ("f" find-file)
+    ("F" nil)                   ;; find-file-literally)
+    ("o" nil)                   ;; find-file-other-window)
+    ("d" delete-file)
+    ("D" delete-directory)
+    ("r" rename-file)
+    ("c" copy-file)
+    ;; ("j" embark-dired-jump)
+    ("!" nil)                   ;; shell-command)
+    ("&" nil)                   ;;async-shell-command)
+    ("$" nil)                   ;; embark-eshell)
+    ("<" nil)                   ;; insert-file)
+    ("m" nil)                   ;; chmod)
+    ("M" chmod)
+    ("=" nil)                   ;; ediff-files)
+    ("+" make-directory)
+    ("\\" nil)                  ;; embark-recentf-remove)
+    ("I" nil)                   ;; embark-insert-relative-path)
+    ("W" nil)                   ;; embark-save-relative-path)
+    ;; ("e" eww-open-file)
+    ("L" nil)                   ;; load-file)
+    ("B" nil)                   ;; byte-compile-file)
+    ;; ("R" byte-recompile-directory)
+    ("v" nil)                   ;; 'embark-vc-file-map)
+    )
+  )
+
 (use-package consult
   ;; :disabled
   :config
