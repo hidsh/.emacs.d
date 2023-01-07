@@ -294,7 +294,7 @@
 
 (defalias 'dv 'describe-variable)
 (defalias 'dfun 'describe-function)
-(defalias 'dface 'describe-face)
+(defalias 'face-list 'describe-face)
 (defalias 'dk 'describe-key)
 
 (defalias 'l 'display-line-numbers-mode)
@@ -617,7 +617,6 @@
                       " "
                       (cond
                        (flycheck-mode (my-flycheck-mode-line))
-                       ;; (flymake-mode (moon-flymake-mode-line))       ;; NG todo fixme
                        (t "     "))
                       " "
                       mode-name
@@ -1415,7 +1414,6 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
   (defun my-consult-line-symbol-at-point ()
     (interactive)
     (consult-line (thing-at-point 'symbol)))
-
 
   :bind (("M-r" . consult-recent-file)
          ("M-o" . my-consult-ripgrep)
