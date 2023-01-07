@@ -1981,7 +1981,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (add-hook 'emacs-lisp-mode-hook #'my-font-lock-add-keywords-elisp)
 ;; (add-hook 'emacs-lisp-mode-hook #'flymake-mode)
 (add-hook 'lisp-interaction-mode-hook #'my-font-lock-add-keywords-elisp)
-;; (add-hook 'lisp-interaction-mode-hook #'flymake-mode)
+(add-hook 'lisp-interaction-mode-hook #'flymake-mode)   ;; これを削除すると .elファイルを開くときに↓のエラーが出るので注意
+;;                                                         File mode specification error: (wrong-type-argument stringp
 
 ;; ----------------------------------------------------------------------
 (use-package undo-tree
