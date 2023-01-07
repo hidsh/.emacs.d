@@ -697,9 +697,9 @@
           (mapcar #'(lambda (b)
                       (cond
                        ((eq (current-buffer) b) b)                          ;; Always include the current buffer.
-                       ;; ((memq (with-current-buffer b major-mode)            ;; popperで表示するのでtabbarでは表示しない
-                       ;;        '(vterm-mode                                  ; x vterm
-                       ;;          reb-mode)) nil)                             ; x reb
+                       ((memq (with-current-buffer b major-mode)            ;; popperで表示するのでtabbarでは表示しない
+                              '(vterm-mode                                  ; x vterm
+                                reb-mode)) nil)                             ; x reb
                        ((string= (buffer-name b) (file-name-nondirectory org-default-notes-file)) nil)  ; hide "notes.org"
                        ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
                        ((buffer-file-name b) b)                             ; ファイル持ちのバッファは表示する
@@ -4206,6 +4206,12 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
   (add-to-list 'evil-emacs-state-modes 'vterm-mode)
 
+  ;; vterm in popper
+  ;; thx to https://www.reddit.com/r/emacs/comments/u5rx6z/comment/i54fdpt/?utm_source=reddit&utm_medium=web2x&context=3
+  (defun vt ()
+    "Open vterm in popper."
+    (interactive)
+    (vterm--internal popper-display-function))
   )
 
 ;; ----------------------------------------------------------------------
@@ -4266,12 +4272,19 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
          ;; ("M-k" .  #'my-popper-echo)
          )
   :init
+
+  ;; my-tabbar-buffer-list と popper-reference-buffers でとちらで表示するかを考える
+  ;;                tabbar    popper
+  ;;    -----------------------------
+  ;;    *scratch*      o        -
+  ;;    vterm          -        o
+  ;;    reb            -        o
   (setq popper-reference-buffers
         '("\\*Messages\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
           ;; "\\*scratch\\*"
-          ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
+          "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
           reb-mode
           help-mode
           compilation-mode))
