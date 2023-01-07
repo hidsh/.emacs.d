@@ -4240,6 +4240,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :hook (eshell-mode . eshell-mode-hook-func)
   )
 ;; ----------------------------------------------------------------------
+;; yet another point-undo
 (use-package goto-chg
   :bind (:map evil-normal-state-map
          ("g ," . goto-last-change)
