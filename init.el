@@ -806,6 +806,11 @@ That is, a string used to represent it on the tab bar."
            ;; evil-operator-state-tag (propertize " O " 'face 'my-evil-operator-tag-face))))
            evil-operator-state-tag (propertize " O " 'face 'my-evil-operator-tag-face))
 
+     (setq evil-normal-state-cursor `(box ,(face-background 'my-evil-normal-tag-face))
+           evil-insert-state-cursor `((bar . 3) ,(face-background 'my-evil-insert-tag-face))
+           evil-visual-state-cursor `(hollow ,(face-background 'my-evil-visual-tag-face))
+           evil-emacs-state-cursor  `((hbar . 5) ,(face-background 'my-evil-emacs-tag-face)))
+
   ;; ----------
   ;; currently not use
   (defmacro define-key-evil-visual (vsel key cmd)
