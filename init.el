@@ -700,7 +700,8 @@
                       (cond
                        ((eq (current-buffer) b) b)                          ;; Always include the current buffer.
                        ((memq (with-current-buffer b major-mode)            ;; popperで表示するのでtabbarでは表示しない
-                              '(vterm-mode                                  ; x vterm
+                              '(
+                                ;; vterm-mode                                  ; x vterm
                                 reb-mode)) nil)                             ; x reb
                        ((string= (buffer-name b) (file-name-nondirectory org-default-notes-file)) nil)  ; hide "notes.org"
                        ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
@@ -4294,7 +4295,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   ;;                tabbar    popper
   ;;    -----------------------------
   ;;    *scratch*      o        -
-  ;;    vterm          -        o
+  ;;    vterm          o        -
   ;;    reb            -        o
   (setq popper-reference-buffers
         '("\\*Messages\\*"
@@ -4302,7 +4303,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
           "Output\\*$"
           "\\*Async Shell Command\\*"
           ;; "\\*scratch\\*"
-          "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
+          ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
           reb-mode
           help-mode
           compilation-mode))
