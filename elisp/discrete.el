@@ -17,6 +17,14 @@
   (interactive)
   (message "no operation"))
 
+;; https://qiita.com/itiut@github/items/d917eafd6ab255629346
+;; note: signal や error 関数には効かない
+(defmacro with-suppressed-message (&rest body)
+  "Suppress new messages temporarily in the echo area and the `*Messages*' buffer while BODY is evaluated."
+  (declare (indent 0))
+  (let ((message-log-max nil))
+    `(with-temp-message (or (current-message) "") ,@body)))
+
 (defun my-face-properties-at-point ()
   (let ((faces (face-at-point nil t))
         (s ""))
@@ -314,7 +322,7 @@ double quotation characters \(\"\) from given string."
 
     (if (not filename)
 	    (message "Buffer '%s' is not visiting a file!" name)
-      (progn 	(copy-file filename newname 1) 	(delete-file filename) 	(set-visited-file-name newname) 	(set-buffer-modified-p nil) 	t)))) 
+      (progn 	(copy-file filename newname 1) 	(delete-file filename) 	(set-visited-file-name newname) 	(set-buffer-modified-p nil) 	t))))
 
 ;; ----------------------------------------------------------------------
 ;; @@ `my-beginning-of-defun'
@@ -323,7 +331,7 @@ double quotation characters \(\"\) from given string."
 (defun my-beginning-of-defun ()
   (interactive)
   (if (and (eq last-command this-command) my-beginning-of-defun-pos)
-      (progn 
+      (progn
         (goto-char my-beginning-of-defun-pos)
         (setq my-beginning-of-defun-pos nil))
     (setq my-beginning-of-defun-pos (point))
@@ -350,7 +358,7 @@ double quotation characters \(\"\) from given string."
       (replace-regexp "^" (concat comment-start comment-padding) nil (point-min) (point-max)))
     (goto-char (point-max))
     (widen)))
- 
+
 (defun my-comment-inline-comment-start-pos ()
   "Return comment-start position in current line, otherwise return -1."
   (save-excursion
@@ -360,7 +368,7 @@ double quotation characters \(\"\) from given string."
                  (point))))
 	  (if (= (following-char) (string-to-char (substring comment-start 0 1)))
 		  -1
-		(if (and (< (line-beginning-position) pos (1- (line-end-position))))	
+		(if (and (< (line-beginning-position) pos (1- (line-end-position))))
 			pos
 		  -1)))))
 
@@ -381,7 +389,7 @@ double quotation characters \(\"\) from given string."
         (when indent-tabs-mode
 	      (tabify (line-beginning-position) (line-end-position)))))))
 
-(defun my-comment-dwim (&optional arg)                                          
+(defun my-comment-dwim (&optional arg)
   "My *customized* comment-dwim (Do What I Mean) as follows.
      arg is non-nil:                     call `comment-kill'
      region is active:                   call `my-comment-or-uncomment-region'
@@ -430,7 +438,7 @@ double quotation characters \(\"\) from given string."
     (if (< thr c) (values c pos) nil)))
 
 (defun my-comment-set-column (&optional arg)
-  "Set `comment-column' accordance with current position as follows. 
+  "Set `comment-column' accordance with current position as follows.
      arg is non-nil :              use `point' value
      current line is comment only: use previous beginning position of the comment
      point is on inline comment:   use beginning position of the comment at this line
@@ -498,17 +506,22 @@ double quotation characters \(\"\) from given string."
 ;; @@ `my-kill-buffer'
 ;; C-u C-x k     kill all buffer
 ;;     C-x k     kill selected buffer
-(defvar my-kill-buffer-excludes '("*scratch*"))
+(defvar my-kill-buffer-burys '("*scratch*"))
+(defvar my-kill-buffer-ignores '())
 (defvar my-kill-buffer-window-close-list '("*Help*" "*recentf*"))
 
 (defun my-kill-buffer (&optional ARG)
   (interactive "P")
-  (cond (ARG
-         (dolist (name (mapcar #'buffer-name (buffer-list)))
-           (unless (member name my-kill-buffer-excludes)
-             (kill-buffer name)))
-         (delete-other-windows))
-        (t (kill-buffer (current-buffer)))))
+  (let ((bury-or-kill #'(lambda (name)
+                          (cond ((member name my-kill-buffer-burys)
+                                 (bury-buffer name))
+                                ((not (member name my-kill-buffer-ignores))
+                                 (kill-buffer name))))))
+    (cond (ARG
+           (dolist (name (mapcar #'buffer-name (buffer-list)))
+             (funcall bury-or-kill name))
+           (delete-other-windows))
+          (t (funcall bury-or-kill (buffer-name))))))
 
 (global-set-key (kbd "C-x k") 'my-kill-buffer)
 
