@@ -3,6 +3,8 @@
 ;;; init.el
 ;;;
 
+;; (setq debug-on-error t)
+
 ;; suppress to popup *warnings* buffer for emacs28's native-comp
 (setq native-comp-async-report-warnings-errors nil)
 
