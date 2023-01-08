@@ -4210,10 +4210,24 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
   ;; vterm in popper
   ;; thx to https://www.reddit.com/r/emacs/comments/u5rx6z/comment/i54fdpt/?utm_source=reddit&utm_medium=web2x&context=3
-  (defun vt ()
+  (defun vt-in-popper ()
     "Open vterm in popper."
     (interactive)
     (vterm--internal popper-display-function))
+
+  (defun my-vterm-return-to-emacs-state ()
+    (interactive)
+    (when (or (evil-normal-state-p)
+              (evil-visual-state-p))
+      (evil-normal-state +1)
+      (evil-emacs-state +1)
+      (goto-char (1- (point-max)))
+      (call-interactively 'keyboard-quit)))
+
+  (evil-define-key 'motion vterm-mode-map (kbd "C-g") #'my-vterm-return-to-emacs-state)
+
+  (evil-define-key 'emacs vterm-mode-map (kbd "C-S-j") #'(lambda () (interactive) (funcall #'scroll-up 1)))
+  (evil-define-key 'emacs vterm-mode-map (kbd "C-S-k") #'(lambda () (interactive) (funcall #'scroll-down 1)))
   )
 
 ;; ----------------------------------------------------------------------
