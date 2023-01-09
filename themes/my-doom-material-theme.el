@@ -319,8 +319,11 @@ Can be an integer to determine the exact padding."
    (popper-echo-area :foreground modeline-bg :background teal )
    (popper-echo-area-buried :inherit 'popper-echo-area :inverse-video t)
    (popper-echo-dispatch-hint :inherit 'popper-echo-area)
+
    ;; beacon
    (beacon-color :inherit 'cursor)
+
+   (trailing-whitespace :background error)
 
    ;; tooltip
    (tooltip              :background (doom-darken bg-alt 0.2) :foreground fg)))

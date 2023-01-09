@@ -2681,11 +2681,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package prog-mode
   :config
   (defun prog-mode-hooks-func ()
-    (setq-local show-trailing-whitespace t)
     (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
     (electric-pair-mode +1)
     (c-toggle-auto-newline +1)
     (add-hook 'before-save-hook #'delete-trailing-whitespace nil 'buffer-local)
+
+    ;; (set-face-background 'trailing-whitespace (face-foreground 'error))      ;; should be defined by theme
+    (setq show-trailing-whitespace t)
     )
 
   (add-hook 'prog-mode-hook #'prog-mode-hooks-func)
