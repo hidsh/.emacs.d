@@ -1,4 +1,4 @@
-;;; -*- coding:utf-8; mode:emacs-lisp -*-
+;;; -*- coding:utf-8-unix; mode:emacs-lisp -*-
 ;;;
 ;;; init.el
 ;;;
@@ -646,6 +646,11 @@
 ;; ----------------------------------------------------------------------
 ;; multi byte file setting
 ;;
+;; https://github.com/uwabami/emacs#cp5022xel
+(require 'cp5022x)
+(set-charset-priority 'ascii 'japanese-jisx0208 'latin-jisx0201 'katakana-jisx0201 'iso-8859-1 'unicode)
+(set-coding-system-priority 'utf-8 'euc-jp 'iso-2022-jp 'cp932)
+
 ;; https://handlename.hatenablog.jp/entry/2014/10/17/103603
 (prefer-coding-system 'utf-8-unix)
 
