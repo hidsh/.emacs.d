@@ -269,7 +269,7 @@
 (defun my-func ()
   "called \'my-func\'")
 
-(global-set-key [f2] (lambda () (interactive) (message "%S" (funcall 'my-func))))
+(global-set-key [f2] #'(lambda () (interactive) (message "%S" (funcall 'my-func))))
 
 ;; (custom-set-faces
 ;;  ;; custom-set-faces was added by Custom. If you edit it by hand, you could mess it up, so be careful.
@@ -655,7 +655,7 @@
 (prefer-coding-system 'utf-8-unix)
 
 ;; https://kokufu.blogspot.com/2016/05/emacs-undecided-unix-cannot-encode.html
-(add-hook 'find-file-hook '(lambda ()
+(add-hook 'find-file-hook #'(lambda ()
                              (cond ((string-match "undecided-?.*" (format "%s" buffer-file-coding-system))
                                     (let ((coding-system-for-read 'utf-8-unix))
                                       (revert-buffer t t))))))
@@ -2093,7 +2093,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
     (interactive)
     (text-scale-adjust 0)
     (text-scale-decrease 1))
-  (add-hook 'neo-after-create-hook (lambda (_)(call-interactively 'text-scale-twice)))
+  (add-hook 'neo-after-create-hook #'(lambda (_)(call-interactively 'text-scale-twice)))
 
   )
 
@@ -2388,7 +2388,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :config
   (setq org-bullets-bullet-list '("❖" "☯" "✪" "✿" "✜" "⬟" "⬢" "⬣"))
   (set-face-attribute 'org-level-1 nil :height 1.2)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  (add-hook 'org-mode-hook #'(lambda () (org-bullets-mode 1))))
 
 ;; ----------------------------------------------------------------------
 (use-package dired
@@ -2563,7 +2563,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (advice-add 'c-update-modeline :around #'ignore)      ;; C++//l => C++
 
   (add-hook 'c-mode-common-hook
-            (lambda ()
+            #'(lambda ()
               (local-set-key "\C-m" 'reindent-then-newline-and-indent)
               (local-set-key "\C-i" 'indent-or-insert-tab)
               ;; (local-set-key "(" 'my-insert-paren)
@@ -2633,8 +2633,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (push '("\\.cpp$" flymake-cc-init) flymake-allowed-file-name-masks)
   (push '("\\.c++$" flymake-cc-init) flymake-allowed-file-name-masks)
 
-  (add-hook 'c++-mode-hook (lambda () (flymake-mode t)))
-  (add-hook 'c-mode-hook   (lambda () (flymake-mode t)))
+  (add-hook 'c++-mode-hook #'(lambda () (flymake-mode t)))
+  (add-hook 'c-mode-hook   #'(lambda () (flymake-mode t)))
 
   ;; (defun my-cpp-eglot-enable ()
   ;;   "enable variables and hooks for eglot cpp IDE"
@@ -2733,7 +2733,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
          ([S-up]   . flymake-goto-prev-error))
   :config
   (setq mq4-compiler "C:/Users/g/AppData/Roaming/MetaQuotes/WebInstall/mt4clw/metaeditor.exe")
-  (add-hook 'mql-mode-hook (lambda ()
+  (add-hook 'mql-mode-hook #'(lambda ()
                              (flycheck-mode -1)
                              (flymake-mode t)
                              (counsel-gtags-mode -1)
@@ -2754,7 +2754,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (defalias 'slime-reset 'slime-restart-inferior-lisp)
   (setq inferior-lisp-program "ros -Q run")
   (setq slime-net-coding-system 'utf-8-unix)
-  (add-hook 'slime-load-hook (lambda () (require 'slime-fancy)))
+  (add-hook 'slime-load-hook #'(lambda () (require 'slime-fancy)))
   (slime-setup '(slime-fancy slime-banner))
 
   ;; 分割したウィンドウでslime起動
@@ -2781,7 +2781,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
   ;; LISPモードで新しくファイルを開いたらウィンドウが上下に分割して下にREPL
   (add-hook 'lisp-mode-hook
-            (lambda ()
+            #'(lambda ()
               (global-set-key "\C-cC-h" 'hyperspec-lookup)
               (cond ((not (featurep 'slime))
                      (require 'slime)
@@ -3773,7 +3773,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 (use-package csharp-mode
   :config
   (add-hook 'csharp-mode-hook
-            (lambda ()
+            #'(lambda ()
               (setq indent-tabs-mode nil)
               (setq c-basic-offset 4)
               (c-set-offset 'substatement-open 0)
@@ -3798,7 +3798,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
       (error "Not found slime helper: %s" helper))
   (load my-slime-helper)
   (setq inferior-lisp-program (format "%s -Q run" ros-exe))
-  (add-hook 'slime-load-hook (lambda () (require 'slime-fancy)))
+  (add-hook 'slime-load-hook #'(lambda () (require 'slime-fancy)))
   (slime-setup '(slime-repl slime-fancy slime-banner))
 
   (defun slime-smart-quit ()
@@ -3837,7 +3837,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
   ;; LISPモードで新しくファイルを開いたらウィンドウが上下に分割して下にREPL
   (add-hook 'lisp-mode-hook
-            (lambda ()
+            #'(lambda ()
               (global-set-key "\C-cC-h" 'hyperspec-lookup)
               (cond ((not (featurep 'slime))
                      (require 'slime)
@@ -3902,7 +3902,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
   ;; 候補から数字を外す
   (push (apply-partially #'cl-remove-if
-                         (lambda (c)
+                         #'(lambda (c)
                            (or (string-match-p "[^\x00-\x7F]+" c)
                                (string-match-p "[0-9]+" c)
                                (if (equal major-mode "org")
@@ -4208,7 +4208,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 (use-package nodejs-repl
   :config
   (add-hook 'js-mode-hook
-          (lambda ()
+          #'(lambda ()
             (define-key js-mode-map (kbd "C-x C-e") 'nodejs-repl-send-last-expression)
             (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
             (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
@@ -4243,7 +4243,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :config
   ;; send keys to terminal directly for `backward-kill-word` in vterm
   (define-key vterm-mode-map (kbd "M-h")
-    (lambda () (interactive) (vterm-send-key (kbd "C-w"))))
+    #'(lambda () (interactive) (vterm-send-key (kbd "C-w"))))
 
   ;; unbinding keys
   (dolist (k '("M-r" "M-o" "M-j" "M-k"
