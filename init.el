@@ -1291,6 +1291,15 @@ If COUNT is given, move COUNT - 1 lines downward first."
     (when (eq (char-after) ?\ )
       (delete-char 1)))
   (advice-add 'evil-join :after #'my-adv--evil-join--delete-space)
+
+  ;; moving without no message such as 'Beginning of buffer' or 'End of buffer'
+  (defun no-error-evil-cmd (func &optional count crossline)
+    (funcall func count crossline t))
+
+  (define-key evil-motion-state-map "h" #'(lambda () (interactive) (evil-backward-char 1 nil t)))
+  (define-key evil-motion-state-map "j" #'(lambda () (interactive) (evil-line-move 1 t)))
+  (define-key evil-motion-state-map "k" #'(lambda () (interactive) (evil-line-move -1 t)))
+  (define-key evil-motion-state-map "l" #'(lambda () (interactive) (evil-forward-char 1 nil t)))
 )
 
 ;; ----------------------------------------------------------------------
