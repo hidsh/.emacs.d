@@ -2745,59 +2745,60 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package slime
-  :disabled
-  :if window-system
-  :init
-  (load (expand-file-name "~/.roswell/helper.el"))
+;; disable for byte-compile due to: Error (use-package): slime/:config: Not found roswell: /usr/local/bin/ros Disable showing Disable logging
+;; (use-package slime
+;;   :disabled
+;;   :if window-system
+;;   :init
+;;   (load (expand-file-name "~/.roswell/helper.el"))
 
-  :config
-  (setq slime-startup-animation nil)
-  (defalias 'slime-reset 'slime-restart-inferior-lisp)
-  (setq inferior-lisp-program "ros -Q run")
-  (setq slime-net-coding-system 'utf-8-unix)
-  (add-hook 'slime-load-hook #'(lambda () (require 'slime-fancy)))
-  (slime-setup '(slime-fancy slime-banner))
+;;   :config
+;;   (setq slime-startup-animation nil)
+;;   (defalias 'slime-reset 'slime-restart-inferior-lisp)
+;;   (setq inferior-lisp-program "ros -Q run")
+;;   (setq slime-net-coding-system 'utf-8-unix)
+;;   (add-hook 'slime-load-hook #'(lambda () (require 'slime-fancy)))
+;;   (slime-setup '(slime-fancy slime-banner))
 
-  ;; 分割したウィンドウでslime起動
-  (defun my-slime (&optional command coding-system)
-    "Run slime and split window."
-    (interactive)
-    (if (< (count-windows) 2)
-        (split-window-vertically))
-    (slime command coding-system))
+;;   ;; 分割したウィンドウでslime起動
+;;   (defun my-slime (&optional command coding-system)
+;;     "Run slime and split window."
+;;     (interactive)
+;;     (if (< (count-windows) 2)
+;;         (split-window-vertically))
+;;     (slime command coding-system))
 
-  ;; 選択範囲をslime-replへ送って評価
-  (defun slime-repl-send-region (start end)
-    "Send region to slime-repl."
-    (interactive "r")
-    (let ((buf-name (buffer-name (current-buffer)))
-          (sbcl-buf (get-buffer "*slime-repl sbcl*")))
-      (cond (sbcl-buf
-             (copy-region-as-kill start end)
-             (switch-to-buffer-other-window sbcl-buf)
-             (yank)
-             (slime-repl-send-input "\n")
-             (switch-to-buffer-other-window buf-name))
-            (t (message "Not exist *slime-repl sbcl* buffer!")))))
+;;   ;; 選択範囲をslime-replへ送って評価
+;;   (defun slime-repl-send-region (start end)
+;;     "Send region to slime-repl."
+;;     (interactive "r")
+;;     (let ((buf-name (buffer-name (current-buffer)))
+;;           (sbcl-buf (get-buffer "*slime-repl sbcl*")))
+;;       (cond (sbcl-buf
+;;              (copy-region-as-kill start end)
+;;              (switch-to-buffer-other-window sbcl-buf)
+;;              (yank)
+;;              (slime-repl-send-input "\n")
+;;              (switch-to-buffer-other-window buf-name))
+;;             (t (message "Not exist *slime-repl sbcl* buffer!")))))
 
-  ;; LISPモードで新しくファイルを開いたらウィンドウが上下に分割して下にREPL
-  (add-hook 'lisp-mode-hook
-            #'(lambda ()
-              (global-set-key "\C-cC-h" 'hyperspec-lookup)
-              (cond ((not (featurep 'slime))
-                     (require 'slime)
-                     (normal-mode)))
-              (my-slime)
-              (other-window)))
+;;   ;; LISPモードで新しくファイルを開いたらウィンドウが上下に分割して下にREPL
+;;   (add-hook 'lisp-mode-hook
+;;             #'(lambda ()
+;;               (global-set-key "\C-cC-h" 'hyperspec-lookup)
+;;               (cond ((not (featurep 'slime))
+;;                      (require 'slime)
+;;                      (normal-mode)))
+;;               (my-slime)
+;;               (other-window)))
 
-  :bind (:map lisp-mode-map
-             ("M-r" . nil)
-             ("C-x C-e" . slime-eval-last-expression-in-repl)
-             ("C-c C-c" . slime-compile-and-load-file)
-             ("C-c C-r" . slime-repl-send-region)
-             ("C-c C-f" . slime-compile-defun))
-  )
+;;   :bind (:map lisp-mode-map
+;;              ("M-r" . nil)
+;;              ("C-x C-e" . slime-eval-last-expression-in-repl)
+;;              ("C-c C-c" . slime-compile-and-load-file)
+;;              ("C-c C-r" . slime-repl-send-region)
+;;              ("C-c C-f" . slime-compile-defun))
+;;   )
 
 ;; ----------------------------------------------------------------------
 (use-package org
