@@ -170,6 +170,7 @@
   (c-toggle-auto-newline +1)
   (add-hook 'before-save-hook #'delete-trailing-whitespace nil 'buffer-local)
   )
+
 (add-hook 'prog-mode-hook #'prog-mode-hooks-func)
 
 (set-face-background 'trailing-whitespace (face-foreground 'error))
@@ -768,8 +769,6 @@ That is, a string used to represent it on the tab bar."
   (setq evil-replace-state-message nil)
   (setq evil-visual-state-message nil)
 
-  (defalias #'forward-evil-word #'forward-evil-symbol)
-
   (evil-ex-define-cmd "q[uit]" #'kill-this-buffer)
 
   ;; インサートモードではEmacsキーバインド
@@ -1321,6 +1320,47 @@ If COUNT is given, move COUNT - 1 lines downward first."
     "q"        'kill-current-buffer
     "r"        'revert-buffer)                                    ; reload
 )
+
+;; ----------------------------------------------------------------------
+(use-package evil-little-word
+  :load-path "elisp"
+  :config
+  ;; (defalias #'forward-evil-word #'forward-evil-symbol) ;; CAUTION!! `'evil-little-word' does NOT working
+
+(defun my-forward-evil-symbol ()
+  (interactive)
+  (unless (= (char-syntax (char-after)) ?w)
+    (forward-char +1))
+  (forward-evil-symbol +2)
+  (forward-evil-symbol -1))
+
+(defun my-backward-evil-symbol ()
+  (interactive)
+  (forward-evil-symbol -1))
+
+(defun my-forward-evil-symbol-end ()
+  (interactive)
+  (let ((pt (point)))
+    (unless (and (= (char-syntax (char-after)) ?w)
+                 (= (char-syntax (char-after (1+ (point)))) ?w))
+      (forward-char +1))
+    (forward-evil-symbol +1)
+    (evil-backward-little-word-end)))
+
+(defun my-evil-forward-little-word-begin ()
+    (interactive)
+    (evil-forward-little-word-begin +1)
+    (unless (= (char-syntax (char-after)) ?w) (forward-char +1))
+    )
+
+  (define-key evil-normal-state-map (kbd "w") 'my-forward-evil-symbol)
+  (define-key evil-normal-state-map (kbd "b") 'my-backward-evil-symbol)
+  (define-key evil-normal-state-map (kbd "e") 'my-forward-evil-symbol-end)
+  (evil-define-key 'motion prog-mode-map (kbd "g w") 'my-evil-forward-little-word-begin)
+  (evil-define-key 'normal prog-mode-map (kbd "g w") 'my-evil-forward-little-word-begin)
+  (evil-define-key 'motion prog-mode-map (kbd "g e") 'evil-forward-little-word-end)
+  (evil-define-key 'motion prog-mode-map (kbd "g b") 'evil-backward-little-word-begin)
+  )
 
 ;; ----------------------------------------------------------------------
 (use-package evil-cleverparens
@@ -2539,7 +2579,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
               (c-set-style "stroustrup")
               (c-set-offset 'case-label '+)
               (c-set-offset 'statement-cont 'c-lineup-math)
-              (modify-syntax-entry ?_ "w")                ; アンダーバーをワード区切りとしない
               (setq comment-start "//")                   ; コメントを // にする
               (setq comment-end "")
               ;; (setq compilation-read-command nil)         ; make のオプションの確認は不要
