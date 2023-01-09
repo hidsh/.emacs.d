@@ -1296,10 +1296,10 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (defun no-error-evil-cmd (func &optional count crossline)
     (funcall func count crossline t))
 
-  (define-key evil-motion-state-map "h" #'(lambda () (interactive) (evil-backward-char 1 nil t)))
-  (define-key evil-motion-state-map "j" #'(lambda () (interactive) (evil-line-move 1 t)))
-  (define-key evil-motion-state-map "k" #'(lambda () (interactive) (evil-line-move -1 t)))
-  (define-key evil-motion-state-map "l" #'(lambda () (interactive) (evil-forward-char 1 nil t)))
+  (define-key evil-normal-state-map "h" #'(lambda () (interactive) (evil-backward-char 1 nil t)))
+  (define-key evil-normal-state-map "j" #'(lambda () (interactive) (evil-line-move 1 t)))
+  (define-key evil-normal-state-map "k" #'(lambda () (interactive) (evil-line-move -1 t)))
+  (define-key evil-normal-state-map "l" #'(lambda () (interactive) (evil-forward-char 1 nil t)))
 )
 
 ;; ----------------------------------------------------------------------
