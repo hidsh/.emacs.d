@@ -11,7 +11,7 @@
 (add-to-list 'load-path (locate-user-emacs-file "elisp"))
 (setq custom-theme-directory (locate-user-emacs-file "themes"))
 
-;; to hide message "ad-handle-definition: ‘vc-revert’ got redefined"
+;; to hide message "ad-handle-definition: `vc-revert' got redefined"
 (setq ad-redefinition-action 'accept)
 
 ;; ignore `(require 'cl)'
@@ -162,18 +162,6 @@
 ;; margin
 (setq-default left-margin-width 0 right-margin-width 0) ; Define new widths.
 (set-window-buffer nil (current-buffer))                ; Use them now.
-
-(defun prog-mode-hooks-func ()
-  (setq-local show-trailing-whitespace t)
-  (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
-  (electric-pair-mode +1)
-  (c-toggle-auto-newline +1)
-  (add-hook 'before-save-hook #'delete-trailing-whitespace nil 'buffer-local)
-  )
-
-(add-hook 'prog-mode-hook #'prog-mode-hooks-func)
-
-(set-face-background 'trailing-whitespace (face-foreground 'error))
 
 ;; save-place
 (setq save-place-file "~/.emacs.d/.emacs-places")
@@ -664,7 +652,7 @@
 ;; https://kokufu.blogspot.com/2016/05/emacs-undecided-unix-cannot-encode.html
 (add-hook 'find-file-hook '(lambda ()
                              (cond ((string-match "undecided-?.*" (format "%s" buffer-file-coding-system))
-                                    (let ((coding-system-for-read 'utf-8))
+                                    (let ((coding-system-for-read 'utf-8-unix))
                                       (revert-buffer t t))))))
 
 ;; ----------------------------------------------------------------------
@@ -2682,6 +2670,20 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;; (dolist (f '(compilation-info compilation-warning compilation-error))
   ;;   (set-face-background f (face-attribute 'telephone-line-accent-inactive :background)))
 
+  )
+
+;; ----------------------------------------------------------------------
+(use-package prog-mode
+  :config
+  (defun prog-mode-hooks-func ()
+    (setq-local show-trailing-whitespace t)
+    (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
+    (electric-pair-mode +1)
+    (c-toggle-auto-newline +1)
+    (add-hook 'before-save-hook #'delete-trailing-whitespace nil 'buffer-local)
+    )
+
+  (add-hook 'prog-mode-hook #'prog-mode-hooks-func)
   )
 
 ;; ----------------------------------------------------------------------
