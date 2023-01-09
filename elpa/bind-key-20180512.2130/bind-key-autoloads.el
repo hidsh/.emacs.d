@@ -1,4 +1,4 @@
-;;; bind-key-autoloads.el --- automatically extracted autoloads  -*- lexical-binding: t -*-
+;;; bind-key-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
 
@@ -19,12 +19,10 @@ spelled-out keystrokes, e.g., \"C-c C-z\". See documentation of
 
 COMMAND must be an interactive function or lambda form.
 
-KEYMAP, if present, should be a keymap variable or symbol.
+KEYMAP, if present, should be a keymap and not a quoted symbol.
 For example:
 
   (bind-key \"M-h\" #'some-interactive-function my-mode-map)
-
-  (bind-key \"M-h\" #'some-interactive-function 'my-mode-map)
 
 If PREDICATE is non-nil, it is a form evaluated to determine when
 a key should be bound. It must return non-nil in such cases.
@@ -69,9 +67,11 @@ function symbol (unquoted).
 \(fn &rest ARGS)" nil t)
 
 (autoload 'describe-personal-keybindings "bind-key" "\
-Display all the personal keybindings defined by `bind-key'." t nil)
+Display all the personal keybindings defined by `bind-key'.
 
-(register-definition-prefixes "bind-key" '("bind-key" "compare-keybindings" "get-binding-description" "override-global-m" "personal-keybindings"))
+\(fn)" t nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "bind-key" '("compare-keybindings" "get-binding-description" "bind-key" "personal-keybindings" "override-global-m")))
 
 ;;;***
 
