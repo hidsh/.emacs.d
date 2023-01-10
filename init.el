@@ -146,6 +146,8 @@
  ;; lock file to `.#hoge'
  create-lockfiles nil                   ; disabled
 
+ isearch-wrap-pause nil                 ; never wrap like evil-seach-forward/backward
+
  ) ;; setq-default
 
 ;; ----------------------------------------------------------------------
