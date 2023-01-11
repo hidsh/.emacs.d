@@ -2456,24 +2456,18 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
     (flycheck-add-mode 'javascript-eslint 'js-mode)
     (flycheck-add-mode 'javascript-eslint 'web-mode)
     ;; (flycheck-select-checker 'my-c)
-    (flycheck-mode t)
+    ;; (flycheck-mode t)
     ;; (setq flycheck-check-syntax-automatically '(mode-enabled save)) ;; new-line also possible
     )
 
   (defun flycheck-ruby-mode-hook-func ()
-    (setq flycheck-checker 'ruby-rubocop)
-    (flycheck-mode t))
+    (setq flycheck-checker 'ruby-rubocop))
 
-  (defun flycheck-js-mode-hook-func ()
-    (flycheck-mode t))
-
-  (defun flycheck-nim-mode-hook-func ()
-    (flycheck-mode t))
-
-  :hook ((c-mode    . flycheck-c-mode-hook-func)
-         (nim-mode  . flycheck-nim-mode-hook-func)
-         (js-mode   . flycheck-js-mode-hook-func)
-         (web-mode  . flycheck-js-mode-hook-func)
+  :hook (
+         ;; (c-mode    . flycheck-c-mode-hook-func)
+         ;; (nim-mode  . flycheck-nim-mode-hook-func)
+         ;; (js-mode   . flycheck-js-mode-hook-func)
+         ;; (web-mode  . flycheck-js-mode-hook-func)
          (ruby-mode . flycheck-ruby-mode-hook-func))
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
@@ -2599,7 +2593,22 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
               (setq hide-ifdef-shadow t)
               (hide-ifdef-mode 1)
+
+              (setq flycheck--automatically-enabled-checkers '(c/c++-gcc))
+              (flycheck-disable-checker 'c/c++-clang)
+              ;; (flycheck-mode 1)      ;; flycheck will be enabled in prog-mode
               ))
+
+
+  (defun my-flycheck-c-setup ()
+    (setq flycheck-c/c++-gcc-executable "gcc")
+    (setq flycheck-clang-language-standard "gnu99"))
+  (add-hook 'c-mode-hook #'my-flycheck-c-setup)
+
+  (defun my-flycheck-c++-setup ()
+    (setq flycheck-c/c++-gcc-executable "g++")
+    (setq flycheck-clang-language-standard "c++11"))
+  (add-hook 'c++-mode-hook #'my-flycheck-c++-setup)
 
   ;; never show *compilation* buffer
   (defadvice compilation-start (around inhidbit-display (command &optional mode name-function highlight-regexp))
@@ -2640,12 +2649,12 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
         (error "Not found: %s" compiler))
       (list compiler (list "-Wall" "-Wextra" "-fsyntax-only" local-file))))
 
-  (push '("\\.c$" flymake-cc-init) flymake-allowed-file-name-masks)
-  (push '("\\.cpp$" flymake-cc-init) flymake-allowed-file-name-masks)
-  (push '("\\.c++$" flymake-cc-init) flymake-allowed-file-name-masks)
+  ;; (push '("\\.c$" flymake-cc-init) flymake-allowed-file-name-masks)
+  ;; (push '("\\.cpp$" flymake-cc-init) flymake-allowed-file-name-masks)
+  ;; (push '("\\.c++$" flymake-cc-init) flymake-allowed-file-name-masks)
 
-  (add-hook 'c++-mode-hook #'(lambda () (flymake-mode t)))
-  (add-hook 'c-mode-hook   #'(lambda () (flymake-mode t)))
+  ;; (add-hook 'c++-mode-hook #'(lambda () (flymake-mode t)))
+  ;; (add-hook 'c-mode-hook   #'(lambda () (flymake-mode t)))
 
   ;; (defun my-cpp-eglot-enable ()
   ;;   "enable variables and hooks for eglot cpp IDE"
@@ -2699,6 +2708,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
     ;; (set-face-background 'trailing-whitespace (face-foreground 'error))      ;; should be defined by theme
     (setq show-trailing-whitespace t)
+
+    (flycheck-mode +1)
     )
 
   (add-hook 'prog-mode-hook #'prog-mode-hooks-func)
