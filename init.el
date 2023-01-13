@@ -1357,6 +1357,12 @@ If COUNT is given, move COUNT - 1 lines downward first."
     (unless (= (char-syntax (char-after)) ?w) (forward-char +1))
     )
 
+(defun my-evil-backward-kill-word ()
+  (interactive)
+  (let ((end (point)))
+    (forward-evil-little-word -1)
+    (evil-delete (point) end)))
+
   (define-key evil-normal-state-map (kbd "w") 'my-forward-evil-symbol)
   (define-key evil-normal-state-map (kbd "b") 'my-backward-evil-symbol)
   (define-key evil-normal-state-map (kbd "e") 'my-forward-evil-symbol-end)
@@ -1364,6 +1370,8 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (evil-define-key 'normal prog-mode-map (kbd "g w") 'my-evil-forward-little-word-begin)
   (evil-define-key 'motion prog-mode-map (kbd "g e") 'evil-forward-little-word-end)
   (evil-define-key 'motion prog-mode-map (kbd "g b") 'evil-backward-little-word-begin)
+
+  (global-set-key "\M-h" 'my-evil-backward-kill-word)
   )
 
 ;; ----------------------------------------------------------------------

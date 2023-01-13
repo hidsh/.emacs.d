@@ -573,16 +573,16 @@ double quotation characters \(\"\) from given string."
     (let ((pt (save-excursion (forward-word 1) (point))))
       (goto-char (min (get-pt-end-of-line) pt)))))
 
-(defun my-backward-kill-word ()
-  (interactive)
-  (if (bolp)
-	 (delete-backward-char 1)
-    (let ((pt (save-excursion (forward-word -1) (point))))
-      (delete-region (point) (max (get-pt-beginning-of-line) pt)))))
+;; (defun my-backward-kill-word ()
+;;   (interactive)
+;;   (if (bolp)
+;; 	 (delete-backward-char 1)
+;;     (let ((pt (save-excursion (forward-word -1) (point))))
+;;       (delete-region (point) (max (get-pt-beginning-of-line) pt)))))
 
 (global-set-key "\M-b" 'my-backward-word)
 (global-set-key "\M-f" 'my-forward-word)
-(global-set-key "\M-h" 'my-backward-kill-word)
+;; (global-set-key "\M-h" 'my-backward-kill-word)
 
 ;; ----------------------------------------------------------------------
 ;; @@ `insert-tab-character'
