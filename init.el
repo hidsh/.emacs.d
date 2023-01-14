@@ -753,7 +753,6 @@ That is, a string used to represent it on the tab bar."
 
   :config
   (evil-mode 1)
-  (evil-search-wrap nil)                ;; disable wrap-around for evil-search
   (evil-set-initial-state 'help-mode 'emacs)
   (evil-set-initial-state 'slime-editing-mode 'emacs)
 
@@ -764,6 +763,7 @@ That is, a string used to represent it on the tab bar."
   (setq evil-operator-state-message nil)
   (setq evil-replace-state-message nil)
   (setq evil-visual-state-message nil)
+  (setq evil-search-wrap nil)                ;; disable wrap-around for evil-search
 
   (evil-ex-define-cmd "q[uit]" #'kill-this-buffer)
 
