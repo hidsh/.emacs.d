@@ -934,7 +934,7 @@ That is, a string used to represent it on the tab bar."
 
   ;; insert-state-map
   (define-key evil-insert-state-map (kbd "C-h") #'delete-backward-char)
-  (define-key evil-insert-state-map (kbd "M-h") #'my-backward-kill-word)
+  ;; (define-key evil-insert-state-map (kbd "M-h") #'my-backward-kill-word)
   (define-key evil-insert-state-map (kbd "TAB") #'(lambda () (interactive) (insert-tab)))
   ;; (define-key evil-insert-state-map (kbd "'") #'my-insert-squote)
   ;; (define-key evil-insert-state-map (kbd "\"") #'my-insert-dquote)
