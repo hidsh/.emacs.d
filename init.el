@@ -763,7 +763,7 @@ That is, a string used to represent it on the tab bar."
   (setq evil-operator-state-message nil)
   (setq evil-replace-state-message nil)
   (setq evil-visual-state-message nil)
-  (setq evil-search-wrap nil)                ;; disable wrap-around for evil-search
+  ;; (setq evil-search-wrap nil)                ;; disable wrap-around for evil-search
 
   (evil-ex-define-cmd "q[uit]" #'kill-this-buffer)
 
@@ -1298,6 +1298,14 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; moving without no message such as 'Beginning of buffer' or 'End of buffer'
   (defun no-error-evil-cmd (func &optional count crossline)
     (funcall func count crossline t))
+
+  (defun my-adv-evil-search-next/previous-no-wrap (orig-fun &rest _arg)
+    "Disable `evil-wrap-search' before this command"
+    (let ((evil-search-wrap nil))
+          (apply orig-fun _arg)))
+
+  (advice-add 'evil-search-next :around #'my-adv-evil-search-next/previous-no-wrap)
+  (advice-add 'evil-search-previous :around #'my-adv-evil-search-next/previous-no-wrap)
 
   (define-key evil-normal-state-map "h" #'(lambda () (interactive) (evil-backward-char 1 nil t)))
   (define-key evil-normal-state-map "j" #'(lambda () (interactive) (evil-line-move 1 t)))
