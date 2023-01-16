@@ -2738,6 +2738,12 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :hook (nim-mode . lsp)
   :config
   (use-package flycheck-nim)
+  :bind (;; global
+         ;; (""   . #'func)
+         ;; :map nim-mode-map
+         ;; ("M-j" .  #'my-popper-echo)
+         ;; ("M-k" .  #'my-popper-echo)
+         )
   )
 ;; ----------------------------------------------------------------------
 (use-package arduino-mode
