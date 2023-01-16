@@ -4015,6 +4015,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
 
   (defalias 'yas #'yas-new-snippet)
+  (defalias 'yas-edit #'yas-visit-snippet-file)
 
   (defun my-adv--yas-load-snippet-buffer--kill-buffer (&rest _)
     (kill-buffer (current-buffer)))
@@ -4028,9 +4029,9 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 # name: $1
 # key: ${2:${1:$(yas--key-from-desc yas-text)}}
 # --
-#$0`(yas-escape-text yas-selected-text)`
+$0`(yas-escape-text yas-selected-text)`
 
-# 例: \\$0 \\${1:hoge}")
+# e.g.: console.log('\\${1:debug} \\${2:value}: ' + \\$2);\\$0")
 
   (yas-global-mode 1)
   )

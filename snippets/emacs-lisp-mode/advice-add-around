@@ -1,0 +1,23 @@
+(advice-remove 'yas-new-snippet #'my-adv--yas-new-snippet--with-evil-insert)
+
+
+(setq evil-search-wrap nil)
+(defun my-evil-backward-kill-word ()
+  (interactive)
+  (let ((end (point)))
+    (forward-evil-little-word -1)
+    (evil-delete (point) end)))
+
+(defun my-mv-buffer-file (new-path)
+  "'mv' both current buffer and file visiting to NEW-PATH."
+  (interactive "FNew directory: ")
+  (let ((name (buffer-name))
+        (old-path (buffer-file-name)))
+
+    (if (not old-path)
+	    (message "Buffer '%s' is not visiting a file!" name)
+      (message "mv: %s -> %s" old-path new-path))))
+      (copy-file old-path new-path 1)
+      (delete-file old-path)
+ 	  (set-visited-file-name new-path)
+ 	  (set-buffer-modified-p nil))))
