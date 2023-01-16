@@ -2745,6 +2745,22 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
          ;; ("M-k" .  #'my-popper-echo)
          )
   )
+
+;;; ----------------------------------------------------------------------
+(use-package rust-mode
+  :mode (("\\.rs$" . rust-mode))
+  :hook (rust-mode . lsp)
+  ;; :init
+
+  ;; :config
+
+  ;; :bind (;; global
+  ;;        ("S-M-C-;"   . #'func)
+  ;;        :map rust-mode-map
+  ;;        ("S-M-C-;" .  #'func)
+  ;;        )
+  )
+
 ;; ----------------------------------------------------------------------
 (use-package arduino-mode
   :hook (arduino-mode . flymake-mode)
