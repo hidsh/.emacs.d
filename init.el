@@ -4418,6 +4418,7 @@ $0`(yas-escape-text yas-selected-text)`
           "\\*Warnings\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
+          "\\*quickrun\\*"
           ;; "\\*scratch\\*"
           ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
           reb-mode
@@ -4436,6 +4437,21 @@ $0`(yas-escape-text yas-selected-text)`
   :config
   (defun my-popper-echo () (interactive) (popper-echo))
 
+  )
+
+;; ----------------------------------------------------------------------
+(use-package quickrun
+  :config
+  ;; (defun my-adv-around--quickrun--with-selected-window (orig-fn &rest plist)
+  ;;     (apply orig-fn plist)
+  ;;     (other-window -1))
+  ;; (advice-add 'quickrun :around #'my-adv-around--quickrun--with-selected-window)
+
+  (defun my-hook--quickrun-after-run-hook--with-selected-window ()
+      (other-window -1))
+  (add-hook 'quickrun-after-run-hook #'my-hook--quickrun-after-run-hook--with-selected-window)
+
+  (defalias 'r 'quickrun)
   )
 
 ;; ----------------------------------------------------------------------
