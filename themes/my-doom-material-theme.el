@@ -1,9 +1,16 @@
-;;; doom-material-theme.el --- inspired by Material Theme by equinusocio -*- no-byte-compile: t; -*-
+;;; doom-material-theme.el --- Something like dark material theme  -*- no-byte-compile: t; -*-
+
 (require 'doom-themes)
 
-;;
+;;; Commentary:
+
+;; Pale color a little
+;; Inspired by Material Theme by equinusocio, thanks!
+
+;;; Code:
+
 (defgroup my-doom-material-theme nil
-  "Options for doom-themes"
+  "Options for doom-themes."
   :group 'doom-themes)
 
 (defcustom doom-material-padded-modeline doom-themes-padded-modeline
@@ -21,7 +28,7 @@ Can be an integer to determine the exact padding."
   ((bg         '("#212B31" nil       nil))
    (bg-alt     '("#1C262B" nil       nil))
    (base0      '("#171F24" nil       nil))
-   (base1      '("#1C262B" "#262626" "brightblack"))
+   (base1      '("#232B31" "#262626" "brightblack"))    ;; from title bar at dark mode of Mac
    (base2      '("#222D32" "#303030" "brightblack"))
    (base3      '("#171F24" "#3a3a3a" "brightblack"))
    (base4      '("#314048" "#444444" "brightblack"))
@@ -110,7 +117,8 @@ Can be an integer to determine the exact padding."
    ;; custom categories
 ;; (modeline-fg     base8)
    (modeline-fg     fg-alt)
-   (modeline-bg     base4)
+   ;; (modeline-bg     base4)
+   (modeline-bg     base1)
 
    (modeline-fg-alt base7)
 ;; (modeline-bg-alt (doom-darken bg 0.01))
