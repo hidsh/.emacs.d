@@ -763,6 +763,7 @@ That is, a string used to represent it on the tab bar."
   (setq evil-replace-state-message nil)
   (setq evil-visual-state-message nil)
   ;; (setq evil-search-wrap nil)                ;; disable wrap-around for evil-search
+  (setq evil-regexp-search nil)
 
   (evil-ex-define-cmd "q[uit]" #'kill-this-buffer)
 
