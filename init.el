@@ -541,11 +541,10 @@
 
 (defun my-flycheck-mode-line ()
   (let-alist (flycheck-count-errors flycheck-current-errors)
-    (let* ((status flycheck-last-status-change)
-           (info (or .info 0))
+    (let* ((info (or .info 0))
            (warnings (or .warning 0))
            (errors (or .error 0)))
-      (when status
+      (when flycheck-last-status-change
         (concat
          (propertize (int-to-string errors)   'face (mode-line-choose-face 'error)) " "
          (propertize (int-to-string warnings) 'face (mode-line-choose-face 'warning)) " "
@@ -3670,7 +3669,17 @@ See URL `https://github.com/htacg/tidy-html5'."
   )
 
 ;; ----------------------------------------------------------------------
+(use-package flycheck-pos-tip
+  :custom
+  (flycheck-pos-tip-timeout 10)
+
+  :config
+  (flycheck-pos-tip-mode)
+  )
+
+;; ----------------------------------------------------------------------
 (use-package flycheck-posframe
+  :disabled
   :if window-system
   :ensure t
   :after flycheck
