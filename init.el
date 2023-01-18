@@ -1573,6 +1573,21 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
   (define-key vertico-map (kbd "M-y")   #'vertico-save)
   (define-key evil-motion-state-map (kbd "M-z")   #'vertico-repeat)
 
+    ;; 補完候補以外を選びづらい問題 https://misohena.jp/blog/2022-08-15-transition-ivy-to-vertico.html
+    (defun my-vertico--recompute (original-fun &rest args)
+      "vertico--update-candidatesの最後の処理を置き換える。"
+      (let ((result (apply original-fun args)))
+        (when result
+          (let ((lock         (alist-get 'vertico--lock-candidate result))
+                (allow-prompt (alist-get 'vertico--allow-prompt result))
+                (index        (alist-get 'vertico--index result)))
+            (when (and (not lock)
+                       allow-prompt)
+              ;; lockされておらず, require-matchじゃない場合は現在入力中の文字列を選択する。
+              (setf (alist-get 'vertico--index result) -1))))
+        result))
+    (advice-add 'vertico--recompute :around #'my-vertico--recompute)
+
   (use-package vertico-directory
     :config
     (setq vertico-directory-up ())
