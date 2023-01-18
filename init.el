@@ -146,7 +146,7 @@
  ;; lock file to `.#hoge'
  create-lockfiles nil                   ; disabled
 
- isearch-wrap-pause nil                 ; never wrap like evil-seach-forward/backward
+ ;; isearch-wrap-pause nil                 ; never wrap like evil-seach-forward/backward
 
  ) ;; setq-default
 
@@ -861,6 +861,15 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd "g g") #'my-evil-beginning/end-of-buffer)
 
   ;; ----------
+  (defun my-evil-search-word-forward ()
+    (interactive)
+    (evil-search-word-forward 1 (symbol-at-point)))
+
+  (defun my-evil-search-word-backward ()
+    (interactive)
+    (evil-search-word-backward 1 (symbol-at-point)))
+
+  ;; ----------
   ;; motion-state-map
   (define-key evil-motion-state-map (kbd "!") #'nop)                            ; unmap
   (define-key evil-motion-state-map (kbd "@") #'nop)                            ; unmap
@@ -872,8 +881,8 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd "*") #'nop)                            ; unmap
   (define-key evil-motion-state-map (kbd "(") #'nop)                            ; unmap
   (define-key evil-motion-state-map (kbd ")") #'nop)                            ; unmap
-  (define-key evil-motion-state-map (kbd "3") #'evil-search-word-backward)      ; works as #
-  (define-key evil-motion-state-map (kbd "8") #'evil-search-word-forward)       ; works as *
+  (define-key evil-motion-state-map (kbd "3") #'my-evil-search-word-backward)      ; works as #
+  (define-key evil-motion-state-map (kbd "8") #'my-evil-search-word-forward)       ; works as *
 
   (define-key evil-motion-state-map (kbd "i")   #'nop)                          ; unmap
   ;; (define-key evil-motion-state-map (kbd "V")   #'nop)                          ; unmap
@@ -1296,16 +1305,16 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (advice-add 'evil-join :after #'my-adv--evil-join--delete-space)
 
   ;; moving without no message such as 'Beginning of buffer' or 'End of buffer'
-  (defun no-error-evil-cmd (func &optional count crossline)
-    (funcall func count crossline t))
+  ;; (defun no-error-evil-cmd (func &optional count crossline)
+  ;;   (funcall func count crossline t))
 
-  (defun my-adv-evil-search-next/previous-no-wrap (orig-fun &rest _arg)
-    "Disable `evil-wrap-search' before this command"
-    (let ((evil-search-wrap nil))
-          (apply orig-fun _arg)))
-
-  (advice-add 'evil-search-next :around #'my-adv-evil-search-next/previous-no-wrap)
-  (advice-add 'evil-search-previous :around #'my-adv-evil-search-next/previous-no-wrap)
+  ;; (defun my-adv-evil-search-next/previous-no-wrap (orig-fun &rest _arg)
+  ;;   "Disable `evil-wrap-search' before this command"
+  ;;   (let ((evil-search-wrap nil))
+  ;;         (apply orig-fun _arg)))
+  ;;
+  ;; (advice-add 'evil-search-next :around #'my-adv-evil-search-next/previous-no-wrap)
+  ;; (advice-add 'evil-search-previous :around #'my-adv-evil-search-next/previous-no-wrap)
 
   (define-key evil-normal-state-map "h" #'(lambda () (interactive) (evil-backward-char 1 nil t)))
   (define-key evil-normal-state-map "j" #'(lambda () (interactive) (evil-line-move 1 t)))
