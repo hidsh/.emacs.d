@@ -4455,6 +4455,13 @@ $0`(yas-escape-text yas-selected-text)`
   )
 
 ;; ----------------------------------------------------------------------
+(use-package flash-mode-line
+  :custom
+  (flash-mode-line-color (face-background 'cursor))
+
+  )
+
+;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
 (load custom-file nil t)
