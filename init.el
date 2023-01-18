@@ -4457,6 +4457,7 @@ $0`(yas-escape-text yas-selected-text)`
 ;; ----------------------------------------------------------------------
 (use-package flash-mode-line
   :custom
+  (flash-mode-line-time 0.5)
   (flash-mode-line-color (face-background 'cursor))
 
   )
