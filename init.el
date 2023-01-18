@@ -1601,8 +1601,6 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
   :bind (:map evil-motion-state-map
          ("M-z" .  vertico-repeat)
          :map vertico-map
-         ("?"     . minibuffer-completion-help)
-         ("M-RET" . minibuffer-force-complete-and-exit)
          ("M-TAB" . minibuffer-complete)
          ("C-j"   . vertico-next)
          ("C-k"   . vertico-previous)
