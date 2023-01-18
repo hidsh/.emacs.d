@@ -1565,14 +1565,6 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
                                   #(" %s " 0 4 (face vertico-group-title))
                                   #(" " 0 1 (face vertico-group-separator display (space :align-to right))))))
 
-  (define-key vertico-map "?"           #'minibuffer-completion-help)
-  (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
-  (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
-  (define-key vertico-map (kbd "C-j")   #'vertico-next)
-  (define-key vertico-map (kbd "C-k")   #'vertico-previous)
-  (define-key vertico-map (kbd "M-y")   #'vertico-save)
-  (define-key evil-motion-state-map (kbd "M-z")   #'vertico-repeat)
-
     ;; 補完候補以外を選びづらい問題 https://misohena.jp/blog/2022-08-15-transition-ivy-to-vertico.html
     (defun my-vertico--recompute (original-fun &rest args)
       "vertico--update-candidatesの最後の処理を置き換える。"
@@ -1593,18 +1585,29 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
     (setq vertico-directory-up ())
     (defun my-vertico-directory-up ()
       (interactive)
-       (if (vertico-directory--completing-file-p)
+       (if (eq 'file (vertico--metadata-get 'category))
            (let ((pt (point)))
              (call-interactively #'vertico-directory-up)    ;; first, trying this
              (when (= pt (point))
                (backward-kill-word 1)))                     ;; do this if it does not move the point
          (backward-kill-word 1)))
 
-    (define-key vertico-map (kbd "M-h") #'my-vertico-directory-up)
-    (define-key vertico-map (kbd "M-l") #'vertico-directory-enter)  ;; enter dired
-    (define-key vertico-map (kbd "M-d") #'vertico-directory-delete-char)
-    )
-  )
+    :bind (:map vertico-map
+           ("M-h" . my-vertico-directory-up)
+           ("M-l" . vertico-directory-enter)  ;; enter dired
+           ("M-d" . vertico-directory-delete-char)
+           ))
+
+  :bind (:map evil-motion-state-map
+         ("M-z" .  vertico-repeat)
+         :map vertico-map
+         ("?"     . minibuffer-completion-help)
+         ("M-RET" . minibuffer-force-complete-and-exit)
+         ("M-TAB" . minibuffer-complete)
+         ("C-j"   . vertico-next)
+         ("C-k"   . vertico-previous)
+         ("M-y"   . vertico-save)
+         ))
 
 ; (use-package avy
 ;   :config
