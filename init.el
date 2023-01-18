@@ -2153,11 +2153,21 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; ----------------------------------------------------------------------
 (use-package swap-buffers
   :config
-  ;; (global-set-key (kbd "C-c b") 'swap-buffers)
-  (defun my-swap-buffer ()
-    (interactive)
-    (let ((current-prefix-arg 4)) ;; emulate C-u
-      (call-interactively 'swap-buffers)))
+  ;; override
+  (defun swap-buffers-display-number (win num)
+  "Create an overlay to diplay in the WIN window with label NUM while choosing."
+  (let* ((label (swap-buffers-label num))
+         (buffer (window-buffer win))
+         (wp (window-point win))
+         (ol (make-overlay wp wp buffer)))
+    ;; (overlay-put ol 'before-string (propertize label 'face (list :height 4.0 :foreground "red")))
+    (overlay-put ol 'before-string (propertize label 'face 'swap-buffers-label-face))
+    (overlay-put ol 'window win)
+    ol))
+
+  (defface swap-buffers-label-face  `((t (:height 4.0 :foreground "red"))) "Face that is used as window indicators by swap-buffers.")
+
+  :bind (("S-C-o" . swap-buffers))
   )
 ;; ----------------------------------------------------------------------
 (use-package recentf
