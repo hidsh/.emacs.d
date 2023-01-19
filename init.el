@@ -674,8 +674,8 @@
                       :height 1.1
                       :family (myfont 'ui))
 
-  (global-set-key (kbd "M-j") 'tabbar-backward-tab)
-  (global-set-key (kbd "M-k") 'tabbar-forward-tab)
+  (global-set-key (kbd "M-u") 'tabbar-backward-tab)
+  (global-set-key (kbd "M-i") 'tabbar-forward-tab)
 
   (tabbar-mwheel-mode nil)                  ;; マウスホイール無効
   (setq tabbar-buffer-groups-function nil)  ;; グループ無効             ;; モードラインがちらつく原因
@@ -927,8 +927,8 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-normal-state-map (kbd "m") nil)
   (define-key evil-normal-state-map (kbd "M-.") nil)        ; evil-repeat-pop-next
   (define-key evil-normal-state-map (kbd "C-p") nil)        ; evil-paste-pop
-  (define-key evil-normal-state-map (kbd "M-j") nil)        ; outline-move-sutree-*
-  (define-key evil-normal-state-map (kbd "M-k") nil)        ; outline-move-sutree-*
+  (define-key evil-normal-state-map (kbd "M-u") nil)
+  (define-key evil-normal-state-map (kbd "M-i") nil)
   (define-key evil-normal-state-map (kbd "u") #'undo-tree-undo)
   (define-key evil-normal-state-map (kbd "U") #'undo-tree-redo)
   ;; (define-key evil-normal-state-map (kbd "M-p") #'counsel-yank-pop)
@@ -3953,8 +3953,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
                      (normal-mode)))
               (my-slime)))
 
-  (evil-define-key 'normal sldb-mode-map (kbd "M-j") 'centaur-tabs-backward)
-  (evil-define-key 'normal sldb-mode-map (kbd "M-k") 'centaur-tabs-forward)
+  ;; (evil-define-key 'normal sldb-mode-map (kbd "M-j") 'centaur-tabs-backward)
+  ;; (evil-define-key 'normal sldb-mode-map (kbd "M-k") 'centaur-tabs-forward)
 
   :bind (:map lisp-mode-map
              ("M-r" . nil)
@@ -4356,7 +4356,7 @@ $0`(yas-escape-text yas-selected-text)`
     #'(lambda () (interactive) (vterm-send-key (kbd "C-w"))))
 
   ;; unbinding keys
-  (dolist (k '("M-r" "M-o" "M-j" "M-k"
+  (dolist (k '("M-r" "M-o" "M-u" "M-i"
                "C-o" "C-0" "C-1" "C-2"))
     (define-key vterm-mode-map (kbd k) nil))
 
@@ -4446,10 +4446,11 @@ $0`(yas-escape-text yas-selected-text)`
   :bind (("M-0"   . popper-toggle-latest)
          ("M--"   . popper-cycle)
          ("C-M-0" . popper-toggle-type)
-         ;; :map popper-mode-map
-         ;; ("M-j" .  #'my-popper-echo)
-         ;; ("M-k" .  #'my-popper-echo)
-         )
+         :map popper-mode-map
+         ("M-j"   . my-test)    ;; 慣れるまで無効化しとく(デバッグに使う)
+         ("M-k"   . my-test)    ;; 慣れるまで無効化しとく(デバッグに使う)
+         ("M-u"   . my-prev-tab)
+         ("M-i"   . my-next-tab))
   :init
 
   ;; my-tabbar-buffer-list と popper-reference-buffers でとちらで表示するかを考える
@@ -4459,7 +4460,9 @@ $0`(yas-escape-text yas-selected-text)`
   ;;    vterm          o        -
   ;;    reb            -        o
   (setq popper-reference-buffers
-        '("\\*Messages\\*"
+        '("\\*Backtrace\\*"
+          "\\*Apropos\\*"
+          "\\*Messages\\*"
           "\\*Warnings\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
@@ -4482,6 +4485,37 @@ $0`(yas-escape-text yas-selected-text)`
   :config
   (defun my-popper-echo () (interactive) (popper-echo))
 
+  (defun my-adv--before--close-popper (&rest _)
+    "Close popper window prior to execute specified　command.
+For example, `consult-recent-file' try to embed its preview into popper window if popper already opened.
+This advice can be used to prevent these glitch."
+    (when popper-popup-status
+      ;; (message "close popper")
+      (popper-close-latest)))
+  (advice-add 'consult-recent-file :before #'my-adv--before--close-popper)
+
+  (defun my-next-tab ()
+    (interactive)
+    (cond ((minibuffer-p)
+           'nop)
+          (popper-popup-status
+           (with-selected-window (previous-window nil 'no-minibuf)
+             (tabbar-forward-tab)))
+          (t (tabbar-forward-tab))))
+
+  (defun my-prev-tab ()
+    (interactive)
+    (cond ((minibuffer-p)
+           'nop)
+          (popper-popup-status
+           (with-selected-window (previous-window nil 'no-minibuf)
+             (tabbar-backward-tab)))
+          (t (tabbar-backward-tab))))
+
+  (defun my-test ()
+    (interactive)
+    (message "%s" popper-popup-status))
+    ;; (message (if (minibuffer-p)
   )
 
 ;; ----------------------------------------------------------------------
