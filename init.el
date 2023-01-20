@@ -1,4 +1,5 @@
 ;;; -*- coding:utf-8-unix; mode:emacs-lisp -*-
+
 ;;;
 ;;; init.el
 ;;;
@@ -285,6 +286,7 @@
 (defalias 'reb 're-builder)
 (defalias 'a 'consult-apropos)
 
+(defalias 'dm 'describe-mode)
 (defalias 'dv 'describe-variable)
 (defalias 'dfun 'describe-function)
 (defalias 'face 'describe-face)
@@ -798,7 +800,7 @@ That is, a string used to represent it on the tab bar."
     (kbd "n")       'evil-search-next
     (kbd "N")       'evil-search-previous)
 
-  ;; modeline
+  ;; evil modeline indicator
   (delq 'w32-ime-mode-line-state-indicator mode-line-format)
   ;; (add-hook 'emacs-startup-hook (lambda ()
      (setq evil-mode-line-format '(before . mode-line-front-space))
@@ -811,6 +813,7 @@ That is, a string used to represent it on the tab bar."
            ;; evil-operator-state-tag (propertize " O " 'face 'my-evil-operator-tag-face))))
            evil-operator-state-tag (propertize " O " 'face 'my-evil-operator-tag-face))
 
+     ;; cursor color
      (setq evil-normal-state-cursor `(box ,(face-background 'my-evil-normal-tag-face))
            evil-insert-state-cursor `((bar . 3) ,(face-background 'my-evil-insert-tag-face))
            evil-visual-state-cursor `(hollow ,(face-background 'my-evil-visual-tag-face))
@@ -1287,24 +1290,24 @@ If COUNT is given, move COUNT - 1 lines downward first."
     (nop))        ;; do *not* exit from emacs after :q and :wq
 
   ;; paste in evil-normal-state
-  (evil-define-command my-evil-normal-paste-to-prev-line ()
-    (if (evil-visual-state-p)
-        (call-interactively 'evil-paste-before)
-      (evil-first-non-blank)
-      (yank)
-      (newline)
-      (call-interactively #'evil-indent-line)))
-
+  ;; (evil-define-command my-evil-normal-paste-to-prev-line ()
+  ;;   (if (evil-visual-state-p)
+  ;;       (call-interactively 'evil-paste-before)
+  ;;     (evil-first-non-blank)
+  ;;     (yank)
+  ;;     (newline)
+  ;;     (call-interactively #'evil-indent-line)))
+  ;;
   ;; (define-key evil-normal-state-map "P" #'my-evil-normal-paste-to-prev-line)
 
-  (evil-define-command my-evil-normal-paste-to-next-line ()
-    (if (evil-visual-state-p)
-        (call-interactively 'evil-paste-after)
-      (end-of-line)
-      (newline)
-      (call-interactively #'evil-indent-line)
-      (yank)))
-
+  ;; (evil-define-command my-evil-normal-paste-to-next-line ()
+  ;;   (if (evil-visual-state-p)
+  ;;       (call-interactively 'evil-paste-after)
+  ;;     (end-of-line)
+  ;;     (newline)
+  ;;     (call-interactively #'evil-indent-line)
+  ;;     (yank)))
+  ;;
   ;; (define-key evil-normal-state-map "p" #'my-evil-normal-paste-to-next-line)
 
   (fset 'evil-backward-section-begin #'nop)     ;; disabled
@@ -2536,7 +2539,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :config
   (setq flycheck-display-errors-delay 0.0)
   (setq flycheck-idle-change-delay 0.0)
-  (setq flycheck-idle-buffer-switch-delay 0.0)
+  (setq flycheck-idle-buffer-switch-delay 0.5)
 
   (let ((color (face-foreground 'error)))
     (set-face-underline 'flycheck-error `(:style wave :color ,color)))
@@ -2555,45 +2558,29 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
           #b00110110
           #b00011011))
 
-(flycheck-define-error-level 'error
-  :severity 100
-  :compilation-level 2
-  :overlay-category 'flycheck-error-overlay
-  :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
-  :fringe-face 'flycheck-fringe-error
-  :error-list-face 'flycheck-error-list-error)
+;; (flycheck-define-error-level 'error
+;;   :severity 100
+;;   :compilation-level 2
+;;   :overlay-category 'flycheck-error-overlay
+;;   :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
+;;   :fringe-face 'flycheck-fringe-error
+;;   :error-list-face 'flycheck-error-list-error)
 
-  (flycheck-define-error-level 'warning
-    :severity 10
-    :compilation-level 1
-    :overlay-category 'flycheck-warning-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
-    :fringe-face 'flycheck-fringe-warning
-    :error-list-face 'flycheck-error-list-warning)
+;;   (flycheck-define-error-level 'warning
+;;     :severity 10
+;;     :compilation-level 1
+;;     :overlay-category 'flycheck-warning-overlay
+;;     :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
+;;     :fringe-face 'flycheck-fringe-warning
+;;     :error-list-face 'flycheck-error-list-warning)
 
-  (flycheck-define-error-level 'info
-    :severity -10
-    :compilation-level 0
-    :overlay-category 'flycheck-info-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-    :fringe-face 'flycheck-fringe-info
-    :error-list-face 'flycheck-error-list-info)
-
-;;   (load "~/.emacs.d/packages/flycheck-tip-20171020.1048/error-tip.el")
-;;   (defun flycheck-tip-cycle (&optional reverse)
-;;     "Move to next error if it's exists.
-;; If it wasn't exists then move to previous error.
-;; Move to previous error if REVERSE is non-nil."
-;;     (interactive)
-;;   (error-tip-cycle
-;;    (error-tip-collect-current-file-errors flycheck-current-errors) reverse))
-
-;;   (defun flycheck-tip-cycle-reverse ()
-;;     "Do `flycheck-tip-cycle by reverse order."
-;;     (interactive)
-;;     (flycheck-tip-cycle t))
-;;   (define-key evil-motion-state-map (kbd "g j") 'flycheck-tip-cycle)
-;;   (define-key evil-motion-state-map (kbd "g k") 'flycheck-tip-cycle-reverse)
+;;   (flycheck-define-error-level 'info
+;;     :severity -10
+;;     :compilation-level 0
+;;     :overlay-category 'flycheck-info-overlay
+;;     :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
+;;     :fringe-face 'flycheck-fringe-info
+;;     :error-list-face 'flycheck-error-list-info)
 
   ;; :config
   ;; (flycheck-define-checker my-c
@@ -2608,6 +2595,17 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;;                              line-end))
   ;;   :modes (c-mode c++-mode))
   ;;
+
+  ;; ;; The following might be needed to ensure flycheck is loaded.
+  ;; ;; Hooking is required if flycheck is installed as an ELPA package (from any repo).
+  ;; ;; If you use ELPA, you might want to merge this with any existing hook you might have.
+  ;; (add-hook 'after-init-hook
+  ;;           #'(lambda ()
+  ;;               (after-packages-loaded-hook)))
+
+  ;; (defun after-packages-loaded-hook ()
+  ;;   (require 'flycheck))
+
   )
 
 ;; ----------------------------------------------------------------------
