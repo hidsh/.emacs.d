@@ -149,15 +149,8 @@ Can be an integer to determine the exact padding."
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
 
    (mode-line-inactive
-    :background modeline-bg :foreground modeline-fg-alt :overline nil
+    :background modeline-bg :foreground modeline-fg-alt :overline modeline-fg-alt
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
-
-   (solaire-mode-line-face
-    :background modeline-bg :foreground modeline-fg
-    :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
-   (solaire-mode-line-inactive-face
-    :background modeline-bg-alt :foreground modeline-fg-alt
-    :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg-alt)))
 
    (cursor :foreground bg-alt :background teal)
 ;; (scroll-bar :background modeline-bg)
