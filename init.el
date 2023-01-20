@@ -4544,6 +4544,17 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 
 ;; ----------------------------------------------------------------------
+;; https://gist.github.com/jordonbiondo/6385874a70420b05de18
+(use-package imenu
+  :config
+  (defun zakame/imenu-use-package ()
+    (add-to-list 'imenu-generic-expression
+                 '("use-package"
+                   "\\(^\\s-*(use-package +\\)\\(\\_<.+\\_>\\)" 2)))
+  (add-hook 'emacs-lisp-mode-hook #'zakame/imenu-use-package)
+  )
+
+;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
 (load custom-file nil t)
