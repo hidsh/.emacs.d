@@ -3667,6 +3667,15 @@ See URL `https://github.com/htacg/tidy-html5'."
   :if window-system
   :config
   (setq posframe-mouse-banish nil)
+
+  (defun my-adv--frame-redraw (&rest _)
+    ;; (message "!")
+    ;; (redraw-display))                       ;; work but frickering
+    ;; (redraw-frame (selected-frame)))        ;; not work
+    (redraw-modeline 'all))                 ;; working good!
+    ;; (force-mode-line-update t))             ;; work but frickering
+  (advice-add 'posframe-show :after #'my-adv--frame-redraw)
+  ;; (advice-remove 'posframe-show  #'my-adv--frame-redraw) ;; for testing
   )
 
 ;; ----------------------------------------------------------------------
@@ -3680,7 +3689,6 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flycheck-posframe
-  :disabled
   :if window-system
   :ensure t
   :after flycheck
@@ -4485,14 +4493,14 @@ $0`(yas-escape-text yas-selected-text)`
   :config
   (defun my-popper-echo () (interactive) (popper-echo))
 
-  (defun my-adv--before--colose-popper (&rest _)
+  (defun my-adv--before--close-popper (&rest _)
     "Close popper window prior to execute specified　command.
 For example, `consult-recent-file' try to embed its preview into popper window if popper already opened.
 This advice can be used to prevent these glitch."
     (when popper-popup-status
       ;; (message "close popper")
       (popper-close-latest)))
-  (advice-add 'consult-recent-file :before #'my-adv--before--colose-popper)
+  (advice-add 'consult-recent-file :before #'my-adv--before--close-popper)
 
   (defun my-next-tab ()
     (interactive)
