@@ -4505,30 +4505,30 @@ $0`(yas-escape-text yas-selected-text)`
 
   (defun my-adv--before--close-popper (&rest _)
     "Close popper window prior to execute specified　command.
-For example, `consult-recent-file' try to embed its preview into popper window if popper already opened.
-This advice can be used to prevent these glitch."
+For example, `consult-recent-file' try to embed its preview into popper window if popper already opened. This advice can be used to prevent these glitch."
     (when popper-popup-status
       ;; (message "close popper")
       (popper-close-latest)))
   (advice-add 'consult-recent-file :before #'my-adv--before--close-popper)
 
-  (defun my-next-tab ()
-    (interactive)
-    (cond ((minibuffer-p)
-           'nop)
+  (defun my-next-tab-1 (func)
+    "Move to previous window before call the `tabbar-forward/backward-tab' to prevent tabbar embed buffer content into popper window."
+    (cond ((minibuffer-p) 'nop)
           (popper-popup-status
            (with-selected-window (previous-window nil 'no-minibuf)
-             (tabbar-forward-tab)))
-          (t (tabbar-forward-tab))))
+             (funcall func)))
+          (t (funcall func)))
+    )
+
+  (defun my-next-tab ()
+    "My customized `tabbar-forward-tab' to consider the popper and flycheck-posframe."
+    (interactive)
+    (my-next-tab-1 #'tabbar-forward-tab))
 
   (defun my-prev-tab ()
+    "My customized `tabbar-backward-tab' to consider the popper and flycheck-posframe."
     (interactive)
-    (cond ((minibuffer-p)
-           'nop)
-          (popper-popup-status
-           (with-selected-window (previous-window nil 'no-minibuf)
-             (tabbar-backward-tab)))
-          (t (tabbar-backward-tab))))
+    (my-next-tab-1 #'tabbar-backward-tab))
 
   (defun my-test ()
     (interactive)
