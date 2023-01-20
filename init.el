@@ -629,6 +629,16 @@
     (concat left-part margin right-part)))
 (setq-default mode-line-format '(:eval (my-mode-line--form)))
 
+;; other-window でウィンドウを切り替えたときにミニバッファの色がおかしくなるのをなんとかする
+;; もっさりしてて釈然としないけどとりあえず
+(defun my-adv--other-window (&rest _)
+  "Workaround for glitch of modeline color after `otehr-window'.
+This makes use of the fact that by `message' a newline, the window configuration changes and the entire screen is redrawn."
+  (message "\n")
+  (message nil))
+(advice-add 'other-window :after #'my-adv--other-window)
+;; (advice-remove 'other-window  #'my-adv--other-window)    ;; for testing
+
 ;; (kill-local-variable 'mode-line-format)
 
 ;; ;; modeline の右端が切れる問題 East Asian Ambiguous Width
