@@ -3667,6 +3667,15 @@ See URL `https://github.com/htacg/tidy-html5'."
   :if window-system
   :config
   (setq posframe-mouse-banish nil)
+
+  (defun my-adv--frame-redraw (&rest _)
+    ;; (message "!")
+    ;; (redraw-display))                       ;; work but frickering
+    ;; (redraw-frame (selected-frame)))        ;; not work
+    (redraw-modeline 'all))                 ;; working good!
+    ;; (force-mode-line-update t))             ;; work but frickering
+  (advice-add 'posframe-show :after #'my-adv--frame-redraw)
+  ;; (advice-remove 'posframe-show  #'my-adv--frame-redraw) ;; for testing
   )
 
 ;; ----------------------------------------------------------------------
@@ -3680,7 +3689,6 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flycheck-posframe
-  :disabled
   :if window-system
   :ensure t
   :after flycheck
