@@ -2610,19 +2610,12 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package cc-mode
-  :after flymake
   :mode (("\\.c$" . c-mode)
          ;; ("\\.h$" . c-mode)
          ("\\.h$"       . c++-mode)
          ("\\.cpp$"     . c++-mode)
          ("\\.c\\+\\+$" . c++-mode)
          ("\\.hpp$"     . c++-mode))
-  :bind (:map c-mode-map
-         ([S-down] . flymake-goto-next-error)
-         ([S-up]   . flymake-goto-prev-error)
-         :map c++-mode-map
-         ([S-down] . flymake-goto-next-error)
-         ([S-up]   . flymake-goto-prev-error))
 
   :config
   (advice-add 'c-update-modeline :around #'ignore)      ;; C++//l => C++
