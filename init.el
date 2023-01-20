@@ -2426,8 +2426,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
       "..XXXX.."
       "..XXXX.."))
 
-  :bind (([M-down] . git-gutter:next-hunk)
-         ([M-up]   . git-gutter:previous-hunk))
+  :bind (("M-j" . git-gutter:next-hunk)
+         ("M-k" . git-gutter:previous-hunk))
   )
 
 ;; ----------------------------------------------------------------------
@@ -4465,8 +4465,6 @@ $0`(yas-escape-text yas-selected-text)`
          ("M--"   . popper-cycle)
          ("C-M-0" . popper-toggle-type)
          :map popper-mode-map
-         ("M-j"   . my-test)    ;; 慣れるまで無効化しとく(デバッグに使う)
-         ("M-k"   . my-test)    ;; 慣れるまで無効化しとく(デバッグに使う)
          ("M-u"   . my-prev-tab)
          ("M-i"   . my-next-tab))
   :init
@@ -4529,11 +4527,6 @@ For example, `consult-recent-file' try to embed its preview into popper window i
     "My customized `tabbar-backward-tab' to consider the popper and flycheck-posframe."
     (interactive)
     (my-next-tab-1 #'tabbar-backward-tab))
-
-  (defun my-test ()
-    (interactive)
-    (message "%s" popper-popup-status))
-    ;; (message (if (minibuffer-p)
   )
 
 ;; ----------------------------------------------------------------------
