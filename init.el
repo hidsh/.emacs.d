@@ -20,8 +20,6 @@
 ;; ----------------------------------------------------------------------
 ;; my-elisp
 (require 'discrete)
-(require 'my-backup)
-(setq my-backup-directory "~/bak")
 
 ;; check-emacs-setting
 ;; (require 'check-emacs-setting)
@@ -4559,6 +4557,19 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   (add-hook 'emacs-lisp-mode-hook #'zakame/imenu-use-package)
   )
 
+;; ----------------------------------------------------------------------
+(use-package my-backup
+  :load-path "elisp"
+  :defer 3
+
+  :config
+  (setq my-backup-directory "~/bak")
+
+  (defalias 'bak 'my-backup)
+  (defalias 'bak-list 'my-backup-show-list)
+  (defalias 'bak-restore 'my-backup-restore)
+
+  )
 ;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
