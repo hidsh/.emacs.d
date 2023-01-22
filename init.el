@@ -711,7 +711,8 @@ This makes use of the fact that by `message' a newline, the window configuration
                               '(
                                 ;; vterm-mode                                  ; x vterm
                                 reb-mode)) nil)                             ; x reb
-                       ((string= (buffer-name b) (file-name-nondirectory org-default-notes-file)) nil)  ; hide "notes.org"
+                       ((and (boundp 'org-default-notes-file)               ; hide "notes.org"
+                             (string= (buffer-name b) (file-name-nondirectory org-default-notes-file))) nil)
                        ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
                        ((buffer-file-name b) b)                             ; ファイル持ちのバッファは表示する
                        ((char-equal ?\  (aref (buffer-name b) 0)) nil)      ; 空白で始まりのバッファ名は表示しない
