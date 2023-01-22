@@ -329,8 +329,11 @@
 ;; (add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/") t)
 (setq package-user-dir "~/.emacs.d/packages")
 (package-initialize)
-(unless (require 'use-package nil t)
-  (defmacro use-package (&rest args)))
+
+(eval-when-compile
+  (require 'use-package))
+(require 'diminish)                ;; if you use :diminish
+(require 'bind-key)                ;; if you use any :bind variant
 
 ;; ----------------------------------------------------------------------
 ;; ここから use-package
@@ -2193,6 +2196,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   )
 ;; ----------------------------------------------------------------------
 (use-package recentf
+  :defer .5
   :config
   (setq recentf-max-saved-items 5000) ;; 履歴保存の数
   ;; (setq recentf-auto-cleanup 'never)  ;; 存在しないファイルは消さない network経由のときに有効にする
