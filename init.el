@@ -4548,6 +4548,7 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 
 ;; ----------------------------------------------------------------------
 ;; https://gist.github.com/jordonbiondo/6385874a70420b05de18
+;; e.g. M-x consult-imenu RET use evil
 (use-package imenu
   :config
   (defun zakame/imenu-use-package ()
