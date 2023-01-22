@@ -44,7 +44,8 @@
 ;;      (setq my-backup-directory "~/backup_files")
 
 
-(require 'consult)
+(require 'consult)          ;; consult--read
+(require 'discrete)         ;; path-join
 
 ;;; Code:
 (defvar my-backup-default-ext "bak"
@@ -229,11 +230,10 @@ is NOT reloaded after the restoring, otherwise it will be reloaded
 automatically."
   (interactive)
   (let* ((dest-buf (current-buffer))
-         (dest-path (expand-file-name (buffer-file-name dest-buf)))
+         (dest-path (expand-file-name (or (buffer-file-name dest-buf)
+                                          (error "Buffer \"%s\" does not visit any file" dest-buf))))
          (src-path (path-join (expand-file-name my-backup-directory)
                               (progn
-              (unless dest-path
-                (error "Buffer \"%s\" does not visit any file" (buffer-name dest-buf)))
               (unless (file-exists-p dest-path)
                 (error "File \"%s\" does not exist. Not save yet?" dest-path))
               (let ((backup-list (my-backup-get-backup-list dest-buf)))
