@@ -4480,6 +4480,7 @@ $0`(yas-escape-text yas-selected-text)`
           "\\*quickrun\\*"
           ;; "\\*scratch\\*"
           ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
+          shortdoc
           reb-mode
           help-mode
           compilation-mode))
