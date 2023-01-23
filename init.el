@@ -709,6 +709,7 @@ This makes use of the fact that by `message' a newline, the window configuration
                        ((eq (current-buffer) b) b)                          ;; Always include the current buffer.
                        ((memq (with-current-buffer b major-mode)            ;; popperで表示するのでtabbarでは表示しない
                               '(
+                                magit
                                 ;; vterm-mode                                  ; x vterm
                                 reb-mode)) nil)                             ; x reb
                        ((and (boundp 'org-default-notes-file)               ; hide "notes.org"
@@ -4491,6 +4492,7 @@ $0`(yas-escape-text yas-selected-text)`
   ;;    *scratch*      o        -
   ;;    vterm          o        -
   ;;    reb            -        o
+  ;;    magit          -        o
   (setq popper-reference-buffers
         '("\\*Backtrace\\*"
           "\\*Apropos\\*"
@@ -4499,6 +4501,7 @@ $0`(yas-escape-text yas-selected-text)`
           "Output\\*$"
           "\\*Async Shell Command\\*"
           "\\*quickrun\\*"
+          "^magit:"
           ;; "\\*scratch\\*"
           ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
           shortdoc
@@ -4593,6 +4596,17 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   (defalias 'bak-list 'my-backup-show-list)
   (defalias 'bak-restore 'my-backup-restore)
 
+  )
+;; ----------------------------------------------------------------------
+(use-package magit
+  :config
+  (dolist (f '(magit-diff-our-highlight
+               magit-diff-base-highlight
+               magit-diff-added-highlight
+               magit-diff-their-highlight
+               magit-diff-context-highlight
+               magit-diff-removed-highlight))
+    (set-face-attribute f nil :weight 'normal))
   )
 ;; ----------------------------------------------------------------------
 ;; customize setting
