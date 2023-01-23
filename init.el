@@ -1473,35 +1473,24 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 (use-package embark
   :config
-  ;; re-define
-  (embark-define-keymap embark-file-map
-    "Keymap for Embark file actions."
-    ("RET" find-file)
-    ("f" find-file)
-    ("F" nil)                   ;; find-file-literally)
-    ("o" nil)                   ;; find-file-other-window)
-    ("d" delete-file)
-    ("D" delete-directory)
-    ("r" rename-file)
-    ("c" copy-file)
-    ;; ("j" embark-dired-jump)
-    ("!" nil)                   ;; shell-command)
-    ("&" nil)                   ;;async-shell-command)
-    ("$" nil)                   ;; embark-eshell)
-    ("<" nil)                   ;; insert-file)
-    ("m" nil)                   ;; chmod)
-    ("M" chmod)
-    ("=" nil)                   ;; ediff-files)
-    ("+" make-directory)
-    ("\\" nil)                  ;; embark-recentf-remove)
-    ("I" nil)                   ;; embark-insert-relative-path)
-    ("W" nil)                   ;; embark-save-relative-path)
-    ;; ("e" eww-open-file)
-    ("L" nil)                   ;; load-file)
-    ("B" nil)                   ;; byte-compile-file)
-    ;; ("R" byte-recompile-directory)
-    ("v" nil)                   ;; 'embark-vc-file-map)
-    )
+  ;; re-define keymap for embark-act(M-e)
+  (define-key embark-file-map "f" nil)  ;; find-file)
+  (define-key embark-file-map "F" nil)  ;; find-file-literally)
+  (define-key embark-file-map "o" nil)  ;; find-file-other-window)
+  (define-key embark-file-map "j" nil)  ;; embark-dired-jump)
+  (define-key embark-file-map "!" nil)  ;; shell-command)
+  (define-key embark-file-map "&" nil)  ;; async-shell-command)
+  (define-key embark-file-map "$" nil)  ;; embark-eshell)
+  (define-key embark-file-map "<" nil)  ;; insert-file)
+  (define-key embark-file-map "\\" nil) ;; embark-recentf-remove)
+  (define-key embark-file-map "W" nil)  ;; embark-save-relative-path)
+  (define-key embark-file-map "e" nil)  ;; eww-open-file)
+  (define-key embark-file-map "l" nil)  ;; load-file)
+  (define-key embark-file-map "L" nil)  ;; load-file)
+  (define-key embark-file-map "B" nil)  ;; byte-compile-file)
+  (define-key embark-file-map "R" nil)  ;; byte-recompile-directory)
+  (define-key embark-file-map "v" nil)  ;; 'embark-vc-file-map)
+  (define-key embark-file-map "x" nil)  ;; #'consult-file-externally)
   )
 
 (use-package consult
@@ -1564,28 +1553,6 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
  )
 
 (use-package embark-consult)
-
-(use-package embark
-  :config
-  ;; re-define keymap for embark-act(M-e)
-  (define-key embark-file-map "f" nil)  ;; find-file)
-  (define-key embark-file-map "F" nil)  ;; find-file-literally)
-  (define-key embark-file-map "o" nil)  ;; find-file-other-window)
-  (define-key embark-file-map "j" nil)  ;; embark-dired-jump)
-  (define-key embark-file-map "!" nil)  ;; shell-command)
-  (define-key embark-file-map "&" nil)  ;; async-shell-command)
-  (define-key embark-file-map "$" nil)  ;; embark-eshell)
-  (define-key embark-file-map "<" nil)  ;; insert-file)
-  (define-key embark-file-map "\\" nil) ;; embark-recentf-remove)
-  (define-key embark-file-map "W" nil)  ;; embark-save-relative-path)
-  (define-key embark-file-map "e" nil)  ;; eww-open-file)
-  (define-key embark-file-map "l" nil)  ;; load-file)
-  (define-key embark-file-map "L" nil)  ;; load-file)
-  (define-key embark-file-map "B" nil)  ;; byte-compile-file)
-  (define-key embark-file-map "R" nil)  ;; byte-recompile-directory)
-  (define-key embark-file-map "v" nil)  ;; 'embark-vc-file-map)
-  (define-key embark-file-map "x" nil)  ;; #'consult-file-externally)
-  )
 
 (use-package vertico
   ;; :disabled
