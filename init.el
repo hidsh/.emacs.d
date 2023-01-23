@@ -761,6 +761,7 @@ That is, a string used to represent it on the tab bar."
 ;; ----------------------------------------------------------------------
 (use-package evil
   :init
+  ;; (setq evil-want-keybinding nil)
   (setq evil-want-integration nil)
   (setq evil-kill-on-visual-paste nil)
 
@@ -794,7 +795,7 @@ That is, a string used to represent it on the tab bar."
   ;; evil keybindings
   (define-key evil-normal-state-map (kbd "M-c") #'ffap)                       ; M-RET
   ;; (define-key evil-insert-state-map (kbd "M-v") #'nop)                        ; prevent paste in Mac
-  (define-key evil-visual-state-map (kbd "x") #'evil-delete)                  ; prevent paste in Mac
+  (define-key evil-visual-state-map (kbd "x") #'evil-delete)
 
   ;; for package-mode
   (evil-add-hjkl-bindings package-menu-mode-map 'emacs
