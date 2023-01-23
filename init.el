@@ -611,7 +611,7 @@
                       (my-mode-line-vc-string)
                       " "
                       (cond
-                       (flycheck-mode (my-flycheck-mode-line))
+                       ((and (boundp 'flycheck-mode) flycheck-mode) (my-flycheck-mode-line))
                        (t "     "))
                       " "
                       mode-name
