@@ -760,9 +760,10 @@ That is, a string used to represent it on the tab bar."
 
 ;; ----------------------------------------------------------------------
 (use-package evil
+  :ensure t
   :init
-  ;; (setq evil-want-keybinding nil)
-  (setq evil-want-integration nil)
+  (setq evil-want-integration t)    ;; for evil-collection
+  (setq evil-want-keybinding nil)   ;; for evil-collection
   (setq evil-kill-on-visual-paste nil)
 
   :config
@@ -1342,16 +1343,15 @@ If COUNT is given, move COUNT - 1 lines downward first."
 ;; ----------------------------------------------------------------------
 (use-package evil-collection
   ;; :disabled
-  :after evil dired magit
-  :config
-  ;; (evil-collection-init '(edebug dired neotree slime help re-builder)) ;; fixme
-  (evil-collection-init '(edebug dired neotree slime help paren calc ediff magit))
+  :after evil
+  :ensure t
+  :custom
+  (evil-collection-term-sync-state-and-mode-p nil)
 
-  ;; optional: this is the evil state that evil-magit will use
-  (setq evil-magit-state 'normal)
-  ;; optional: disable additional bindings for yanking text
-  (setq evil-magit-use-y-for-yank nil)
-  ;; (require 'evil-collection-magit)
+  :init
+  (evil-collection-init)
+
+  :config
 
   (evil-define-key 'normal help-mode-map (kbd "C-o") 'other-window)
   (evil-define-key 'normal help-mode-map (kbd "C-0") 'delete-window)

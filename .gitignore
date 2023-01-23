@@ -36,3 +36,4 @@ eln-cache/*
 projectile-bookmarks.eld
 .lsp-session-*
 .dap-breakpoints
+transient/*
