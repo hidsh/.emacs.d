@@ -2174,6 +2174,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package projectile
+  :defer 61
   :config
   (projectile-mode +1)
   ;; Recommended keymap prefix on macOS
@@ -2930,6 +2931,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package org
+  :disabled
   :if window-system
   :config
   ;; (setq org-directory "~/Dropbox/org")       ;; defined in _windows.el or _mac.el
