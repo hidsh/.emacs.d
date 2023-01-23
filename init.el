@@ -956,6 +956,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-normal-state-map (kbd "' a") #'my-copy-whole-buffer)
   (define-key evil-normal-state-map "x" 'delete-forward-char)       ; "x" command without kill-new
   (define-key evil-normal-state-map "X" 'delete-backward-char)      ; "X" command without kill-new
+  (define-key evil-normal-state-map "]" #'evil-jump-item)
 
   ;; insert-state-map
   (define-key evil-insert-state-map (kbd "C-h") #'delete-backward-char)
