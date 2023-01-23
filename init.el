@@ -1,8 +1,8 @@
-;;; -*- coding:utf-8-unix; mode:emacs-lisp -*-
+;;; init.el --- my init  -*- coding:utf-8-unix; mode:emacs-lisp -*-
 
-;;;
-;;; init.el
-;;;
+;;; Commentary:
+
+;; init.el a.k.a my BONSAI thing XD
 
 ;; (setq debug-on-error t)
 
@@ -3680,15 +3680,6 @@ See URL `https://github.com/htacg/tidy-html5'."
     ;; (force-mode-line-update t))             ;; work but frickering
   (advice-add 'posframe-show :after #'my-adv--frame-redraw)
   ;; (advice-remove 'posframe-show  #'my-adv--frame-redraw) ;; for testing
-  )
-
-;; ----------------------------------------------------------------------
-(use-package flycheck-pos-tip
-  :custom
-  (flycheck-pos-tip-timeout 10)
-
-  :config
-  (flycheck-pos-tip-mode)
   )
 
 ;; ----------------------------------------------------------------------
