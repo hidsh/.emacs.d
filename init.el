@@ -1504,8 +1504,8 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   (add-hook 'after-init-hook #'my-consult-after-init-hook)
 
-  ;; (setq consult-preview-key (kbd "C-l"))
-  (setq consult-preview-key '(:debounce 0.8 any))
+  (setq consult-preview-key (kbd "C-l"))
+  ;; (setq consult-preview-key '(:debounce 0.8 any))
 
   (setq my-consult-ripgrep-exclude-list
     '("#*#"
@@ -1529,7 +1529,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
   (defun my-consult-ripgrep (&optional parg dir initial)
     "`consult-ripgrep` with symbol-at-point.
-Besides, it can be Specified top directory to search using prefix-argument, e.g. C-u."
+Besides, it can be specified top directory to search using prefix-argument, e.g. C-u."
     (interactive "p")
     (setq initial (thing-at-point 'symbol))
     (setq dir (pcase parg

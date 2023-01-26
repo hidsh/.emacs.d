@@ -37,3 +37,4 @@ projectile-bookmarks.eld
 .lsp-session-*
 .dap-breakpoints
 transient/*
+semanticdb/*
