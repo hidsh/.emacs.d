@@ -720,6 +720,7 @@ This makes use of the fact that by `message' a newline, the window configuration
                        ((equal "*scratch*" (buffer-name b)) b)              ; *scratch*バッファは表示する
                        ((char-equal ?* (aref (buffer-name b) 0)) nil)       ; それ以外の * で始まるバッファは表示しない
                        ((string-match "^magit" (buffer-name b)) nil)        ; magit が開くバッファは表示しない
+                       ((string-match "^/dev/cu\\..+$" (buffer-name b)) nil); serial port バッファは表示しない
                        ((buffer-live-p b) b)
                        ))
                   (buffer-list))))
@@ -2800,27 +2801,60 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package arduino-mode
-  :hook (arduino-mode . flymake-mode)
   :mode (("\\.pde$" . arduino-mode)
          ("\\.ino$" . arduino-mode))
-  :config
-  (defun flymake-arduino-init ()
-    (unless arduino-exe-path
-      (error "Not defined arduino-exe-path"))
-    (unless (file-exists-p arduino-exe-path)
-      (error "Not found %s" arduino-exe-path))
-    (unless (file-executable-p arduino-exe-path)
-      (error "Not found %s" arduino-exe-path))
-    (let* ((temp-file   (flymake-proc-init-create-temp-buffer-copy
-                         ;; 'flymake-create-temp-inplace))
-                         'flymake-proc-create-temp-with-folder-structure))
-           (local-dir   (file-name-directory buffer-file-name)))
-      (list arduino-exe-path (list "compile"
-                                   (concat "--fqbn=" arduino-fqbn)
-                                   (substring local-dir 0 -1)))))
+  :bind (:map arduino-mode-map
+         ("C-c C-c" . arduino-upload)
+         ("C-c C-v" . arduino-verify)
+         ("C-c C-s" . my-arduino-serial-monitor)
+         ("C-c C-m" . my-arduino-serial-monitor)
+         ("C-c C-t" . my-arduino-serial-monitor))
 
-  (push '("\\.ino$" flymake-arduino-init) flymake-proc-allowed-file-name-masks)
-  (push '("^\\(.+\.ino\\):\\([0-9]+\\):\\([0-9]+\\): \\(.+\\)$" 1 2 3 4) flymake-err-line-patterns)
+  :custom
+  (arduino-mode-home "~/Dropbox/Arduino")
+  (arduino-executable "/Applications/Arduino.app/Contents/MacOS/Arduino")   ;; Mac
+
+  :config
+  ;; "thx https://emacs.stackexchange.com/questions/328/how-to-override-keybindings-for-term"
+  (defun expose-global-binding-in-term (key)
+    "make a specific key in global-map transparent to term-map"
+    (define-key term-raw-map key
+      (lookup-key (current-global-map) key)))
+
+  (expose-global-binding-in-term (kbd "M-0"))   ;; popper-toggle-latest
+  (expose-global-binding-in-term (kbd "M--"))   ;; popper-cycle
+
+  ;; from my gist  https://gist.github.com/hidsh/9ac57f7fa0deca4dca925fdfdca00a43
+  (defun my-hook--arduino--input-serial-port ()
+    "Input port number as default string."
+    (insert "cu.usbmodem")  ;; Mac
+    (remove-hook 'minibuffer-setup-hook 'my-hook--arduino--input-serial-port))
+
+  (defun my-arduino-serial-monitor ()
+    "Open serial-monitor in `term-mode' with specified port number."
+    (interactive)
+    (add-hook 'minibuffer-setup-hook 'my-hook--arduino--input-serial-port)
+    (call-interactively 'arduino-serial-monitor))
+
+
+  ;; (defun flymake-arduino-init ()
+  ;;   (unless arduino-exe-path
+  ;;     (error "Not defined arduino-exe-path"))
+  ;;   (unless (file-exists-p arduino-exe-path)
+  ;;     (error "Not found %s" arduino-exe-path))
+  ;;   (unless (file-executable-p arduino-exe-path)
+  ;;     (error "Not found %s" arduino-exe-path))
+  ;;   (let* ((temp-file   (flymake-proc-init-create-temp-buffer-copy
+  ;;                        ;; 'flymake-create-temp-inplace))
+  ;;                        'flymake-proc-create-temp-with-folder-structure))
+  ;;          (local-dir   (file-name-directory buffer-file-name)))
+  ;;     (list arduino-exe-path (list "compile"
+  ;;                                  (concat "--fqbn=" arduino-fqbn)
+  ;;                                  (substring local-dir 0 -1)))))
+
+  ;; (push '("\\.ino$" flymake-arduino-init) flymake-proc-allowed-file-name-masks)
+  ;; (push '("^\\(.+\.ino\\):\\([0-9]+\\):\\([0-9]+\\): \\(.+\\)$" 1 2 3 4) flymake-err-line-patterns)
+
   )
 
 ;; ----------------------------------------------------------------------
@@ -4469,6 +4503,7 @@ $0`(yas-escape-text yas-selected-text)`
           "\\*Async Shell Command\\*"
           "\\*quickrun\\*"
           "^magit:"
+          "^/dev/cu\\..+$"
           ;; "\\*scratch\\*"
           ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
           shortdoc
