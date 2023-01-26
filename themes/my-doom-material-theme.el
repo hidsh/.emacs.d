@@ -327,7 +327,14 @@ Can be an integer to determine the exact padding."
    (trailing-whitespace :background error)
 
    ;; tooltip
-   (tooltip              :background (doom-darken bg-alt 0.2) :foreground fg)))
+   (tooltip              :background (doom-darken bg-alt 0.2) :foreground fg)
+
+   ;; hide-ifdef-mode
+   (hide-ifdef-shadow :foreground comments)
+   ))
+
+
+
 
 (provide 'doom-material-theme)
 ;;; my-doom-material-theme.el ends here
