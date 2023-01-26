@@ -4576,6 +4576,11 @@ For example, `consult-recent-file' try to embed its preview into popper window i
     (set-face-attribute f nil :weight 'normal))
   )
 ;; ----------------------------------------------------------------------
+(use-package markdown-mode
+  :custom
+  (truncate-lines nil)
+  )
+;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
 (load custom-file nil t)
