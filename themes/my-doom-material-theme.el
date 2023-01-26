@@ -1,4 +1,4 @@
-;;; doom-material-theme.el --- Something like dark material theme  -*- no-byte-compile: t; -*-
+;;; doom-material-theme.el --- Something like material dark theme  -*- no-byte-compile: t; -*-
 
 (require 'doom-themes)
 
