@@ -849,7 +849,7 @@ That is, a string used to represent it on the tab bar."
       (interactive)
       (if (bolp)
           (back-to-indentation)
-          (beginning-of-line)))
+        (beginning-of-line)))
 
   ;; ----------
   (defun my-end-of-line ()
@@ -933,7 +933,7 @@ That is, a string used to represent it on the tab bar."
   ;; (define-key evil-motion-state-map (kbd "g e") #'my-evil-end-of-buffer)
   ;; (define-key evil-motion-state-map (kbd "g h") 'evil-jump-backward)
   ;; (define-key evil-motion-state-map (kbd "Y") #'my-evil-yank-whole-buffer)
-  (define-key evil-motion-state-map (kbd "TAB") #'evil-indent-line)
+  ;; (define-key evil-motion-state-map (kbd "TAB") #'evil-indent-line)
   (define-key evil-motion-state-map "/" #'evil-search-forward)
   (define-key evil-motion-state-map "?" #'evil-search-backward)
   (define-key evil-motion-state-map (kbd ":") #'nop)        ; unmap :
@@ -1335,6 +1335,16 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;;
   ;; (advice-add 'evil-search-next :around #'my-adv-evil-search-next/previous-no-wrap)
   ;; (advice-add 'evil-search-previous :around #'my-adv-evil-search-next/previous-no-wrap)
+
+  (defun my-evil-indent-line-or-goto-bol ()
+    (interactive)
+    (let ((pt (point)))
+      (call-interactively #'evil-indent-line)
+      (back-to-indentation)
+      (when (= pt (point))
+        (goto-char (line-beginning-position)))))
+  (define-key evil-motion-state-map(kbd "TAB") #'my-evil-indent-line-or-goto-bol)
+
 
   (define-key evil-normal-state-map "h" #'(lambda () (interactive) (evil-backward-char 1 nil t)))
   (define-key evil-normal-state-map "j" #'(lambda () (interactive) (evil-line-move 1 t)))
