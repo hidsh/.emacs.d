@@ -2632,13 +2632,14 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :config
   (advice-add 'c-update-modeline :around #'ignore)      ;; C++//l => C++
 
-  (add-hook 'c-mode-common-hook
+  (defun my-hook--c-mode-common ()
             #'(lambda ()
               (local-set-key "\C-m" 'reindent-then-newline-and-indent)
               (local-set-key "\C-i" 'indent-or-insert-tab)
               ;; (local-set-key "(" 'my-insert-paren)
               ;; (local-set-key "{" 'my-insert-brace)
               ;; (setq case-fold-search nil)                 ; case sensitive
+              (setq tab-width 2)
               (c-set-style "stroustrup")
               (c-set-offset 'case-label '+)
               (c-set-offset 'statement-cont 'c-lineup-math)
@@ -2665,6 +2666,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
               ;; (flycheck-disable-checker 'c/c++-clang)
               ;; (flycheck-mode +1)
               ))
+  (add-hook 'c-mode-common-hook #'my-hook--c-mode-common)
 
 
   (defun my-flycheck-c-setup ()
