@@ -2817,8 +2817,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
          ("\\.ino$" . arduino-mode))
   :bind (:map arduino-mode-map
          ("C-c C-c" . arduino-upload)
-         ("C-c C-v" . arduino-verify)
-         ("C-c C-s" . my-arduino-serial-monitor)
+         ;; ("C-c C-v" . arduino-verify)
          ("C-c C-m" . my-arduino-serial-monitor)
          ("C-c C-t" . my-arduino-serial-monitor))
 
@@ -2867,6 +2866,24 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;; (push '("\\.ino$" flymake-arduino-init) flymake-proc-allowed-file-name-masks)
   ;; (push '("^\\(.+\.ino\\):\\([0-9]+\\):\\([0-9]+\\): \\(.+\\)$" 1 2 3 4) flymake-err-line-patterns)
 
+  (use-package arduino-cli-mode
+    :disabled
+    :ensure t
+    :after arduino-mode
+    :hook arduino-mode
+    :mode "\\.ino\\'"
+    :bind (:map arduino-mode-map
+                ("C-c C-c" . arduino-cli-compile-and-upload)
+                ;; ("C-c C-v" . arduino-cli-compile)
+                )
+    :config
+    ;; (push "D:/pgm/" exec-path)        ;; win
+    (push "/opt/homebrew/bin/avrdude" exec-path)        ;; mac, for avrdude, arduino-cli
+
+    :custom
+    (arduino-cli-warnings 'all)
+    (arduino-cli-verify t)
+    )
   )
 
 ;; ----------------------------------------------------------------------
@@ -4374,18 +4391,7 @@ $0`(yas-escape-text yas-selected-text)`
             (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
 
   )
-;; ----------------------------------------------------------------------
-(use-package arduino-cli-mode
-  :ensure t
-  ;; :hook arduino-mode
-  ;; :mode "\\.ino\\'"
-  :config
-  (push "D:/pgm/" exec-path)
 
-  :custom
-  (arduino-cli-warnings 'all)
-  (arduino-cli-verify t)
-  )
 ;; ----------------------------------------------------------------------
 (use-package minibuffer-timer)
 
