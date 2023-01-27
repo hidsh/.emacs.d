@@ -2203,11 +2203,12 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (advice-add 'recentf-save-list :around #'my-adv--recentf--without-message)
   (advice-add 'recentf-cleanup   :around #'my-adv--recentf--without-message)
 
-  (setq recentf-auto-save-timer (run-with-idle-timer 10 t 'recentf-save-list))
+  ;; (cancel-timer recentf-cleanup)
+  ;; (setq recentf-auto-save-timer (run-with-idle-timer 10 t 'recentf-save-list))
 
   ;; note:
   ;; Function `recentf-cleanup' is called periodically and automatically from
-  ;; other function `recentf-auto-cleanup' because custom `recentf-auto-cleanup'
+  ;; another function `recentf-auto-cleanup' because custom `recentf-auto-cleanup'
   ;; was set 60 sec in custom.el.
   ;;
   ;; On the other hand, function `recentf-save-list' has no such mechanisms,
