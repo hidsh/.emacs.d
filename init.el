@@ -4524,7 +4524,12 @@ $0`(yas-escape-text yas-selected-text)`
           "\\*arduino-upload\\*"
           ;; "\\*.+\\*$"    ;; todo *scratch*が引っかかるのでNG
           "^magit:"
-          "^/dev/cu\\..+$"
+          ;; "^/dev/cu\\..+$"
+          "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
+          "^\\*shell.*\\*$"  shell-mode  ;shell as a popup
+          "^\\*term.*\\*$"   term-mode   ;term as a popup
+          "^\\*vterm.*\\*$"  vterm-mode  ;vterm as a popup
+
           ;; "\\*scratch\\*"
           ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
           shortdoc
