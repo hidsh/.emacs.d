@@ -2823,6 +2823,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :custom
   (arduino-mode-home "~/Dropbox/Arduino")
   (arduino-executable "/Applications/Arduino.app/Contents/MacOS/Arduino")   ;; Mac
+  (comment-start "//")                   ; コメントを // にする
+  (comment-end "")
 
   :config
   ;; "thx https://emacs.stackexchange.com/questions/328/how-to-override-keybindings-for-term"
