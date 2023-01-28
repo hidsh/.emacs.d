@@ -4622,6 +4622,10 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 ;; ----------------------------------------------------------------------
 (use-package magit
+  :defer t
+  :custom
+  (magit-auto-revert-mode nil)
+
   :config
   (dolist (f '(magit-diff-our-highlight
                magit-diff-base-highlight
