@@ -707,11 +707,7 @@ This makes use of the fact that by `message' a newline, the window configuration
           (mapcar #'(lambda (b)
                       (cond
                        ((eq (current-buffer) b) b)                          ;; Always include the current buffer.
-                       ((memq (with-current-buffer b major-mode)            ;; popperで表示するのでtabbarでは表示しない
-                              '(
-                                magit
-                                ;; vterm-mode                                  ; x vterm
-                                reb-mode)) nil)                             ; x reb
+                       ((popper-popup-p b) nil)                             ;; popperで表示するのでtabbarでは表示しない
                        ((and (boundp 'org-default-notes-file)               ; hide "notes.org"
                              (string= (buffer-name b) (file-name-nondirectory org-default-notes-file))) nil)
                        ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
