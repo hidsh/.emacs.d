@@ -4519,6 +4519,8 @@ $0`(yas-escape-text yas-selected-text)`
           "Output\\*$"
           "\\*Async Shell Command\\*"
           "\\*quickrun\\*"
+          "\\*arduino-upload\\*"
+          ;; "\\*.+\\*$"    ;; todo *scratch*が引っかかるのでNG
           "^magit:"
           "^/dev/cu\\..+$"
           ;; "\\*scratch\\*"
