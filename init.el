@@ -676,6 +676,7 @@ This makes use of the fact that by `message' a newline, the window configuration
 
 ;; ----------------------------------------------------------------------
 (use-package tabbar
+  :after popper
   :if window-system
   ;; :disabled
   :hook ((after-save   . tabbar-on-saving-buffer)
