@@ -675,8 +675,87 @@ This makes use of the fact that by `message' a newline, the window configuration
                                       (revert-buffer t t))))))
 
 ;; ----------------------------------------------------------------------
+(use-package popper
+  :ensure t ; or :straight t
+  :bind (("M-0"   . popper-toggle-latest)
+         ("M--"   . popper-cycle)
+         ("C-M-0" . popper-toggle-type)
+         :map popper-mode-map
+         ("M-u"   . my-prev-tab)
+         ("M-i"   . my-next-tab))
+  :init
+
+  ;; my-tabbar-buffer-list と popper-reference-buffers でとちらで表示するかを考える
+  ;;                tabbar    popper
+  ;;    -----------------------------
+  ;;    *scratch*      o        -
+  ;;    vterm          o        -
+  ;;    reb            -        o
+  ;;    magit          -        o
+  (setq popper-reference-buffers
+        '("\\*Backtrace\\*"
+          "\\*Apropos\\*"
+          "\\*Messages\\*"
+          "\\*Warnings\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          "\\*quickrun\\*"
+          "\\*arduino-upload\\*"
+          ;; "\\*.+\\*$"    ;; todo *scratch*が引っかかるのでNG
+          "^magit:"
+          "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
+          "^\\*shell.*\\*$"  shell-mode  ;shell as a popup
+          "^/dev/cu\\..+$" "^\\*term.*\\*$"   term-mode   ;term as a popup
+          "^\\*vterm.*\\*$"  vterm-mode  ;vterm as a popup
+          ;; "\\*scratch\\*"
+          ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
+          shortdoc
+          reb-mode
+          help-mode
+          compilation-mode))
+
+  ;; :custom
+  (setq popper-mode-line nil)       ; hide modeline from popper
+  (setq popper-echo-dispatch-keys '())
+  (setq popper-echo-prompt "")
+  (setq popper-echo-prompt-group-format "GG (%%s)")
+  (setq popper-echo-delimiter "|")
+  (popper-mode +1)
+  (popper-echo-mode +1)             ; For echo area hints
+
+  :config
+  (defun my-popper-echo () (interactive) (popper-echo))
+
+  (defun my-adv--before--close-popper (&rest _)
+    "Close popper window prior to execute specified　command.
+For example, `consult-recent-file' try to embed its preview into popper window if popper already opened. This advice can be used to prevent these glitch."
+    (when popper-popup-status
+      ;; (message "close popper")
+      (popper-close-latest)))
+  (advice-add 'consult-recent-file :before #'my-adv--before--close-popper)
+
+  (defun my-next-tab-1 (func)
+    "Move to previous window before call the `tabbar-forward/backward-tab' to prevent tabbar embed buffer content into popper window."
+    (cond ((minibuffer-p) 'nop)
+          (popper-popup-status
+           (with-selected-window (previous-window nil 'no-minibuf)
+             (funcall func)))
+          (t (funcall func)))
+    )
+
+  (defun my-next-tab ()
+    "My customized `tabbar-forward-tab' to consider the popper and flycheck-posframe."
+    (interactive)
+    (my-next-tab-1 #'tabbar-forward-tab))
+
+  (defun my-prev-tab ()
+    "My customized `tabbar-backward-tab' to consider the popper and flycheck-posframe."
+    (interactive)
+    (my-next-tab-1 #'tabbar-backward-tab))
+  )
+
+;; ----------------------------------------------------------------------
 (use-package tabbar
-  :after popper
   :if window-system
   ;; :disabled
   :hook ((after-save   . tabbar-on-saving-buffer)
@@ -2828,6 +2907,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (comment-end "")
 
   :config
+  ;; (serial-process-configure :process "/dev/ttyS0" :speed 1200)
+
   ;; mod with line-mode
   (defun arduino-serial-monitor (port speed)
     "Monitor the `SPEED' on serial connection on `PORT' to the Arduino."
@@ -4849,86 +4930,6 @@ $0`(yas-escape-text yas-selected-text)`
               evil-normal-state-map
               evil-visual-state-map
               evil-insert-state-map))
-  )
-
-;; ----------------------------------------------------------------------
-(use-package popper
-  :ensure t ; or :straight t
-  :bind (("M-0"   . popper-toggle-latest)
-         ("M--"   . popper-cycle)
-         ("C-M-0" . popper-toggle-type)
-         :map popper-mode-map
-         ("M-u"   . my-prev-tab)
-         ("M-i"   . my-next-tab))
-  :init
-
-  ;; my-tabbar-buffer-list と popper-reference-buffers でとちらで表示するかを考える
-  ;;                tabbar    popper
-  ;;    -----------------------------
-  ;;    *scratch*      o        -
-  ;;    vterm          o        -
-  ;;    reb            -        o
-  ;;    magit          -        o
-  (setq popper-reference-buffers
-        '("\\*Backtrace\\*"
-          "\\*Apropos\\*"
-          "\\*Messages\\*"
-          "\\*Warnings\\*"
-          "Output\\*$"
-          "\\*Async Shell Command\\*"
-          "\\*quickrun\\*"
-          "\\*arduino-upload\\*"
-          ;; "\\*.+\\*$"    ;; todo *scratch*が引っかかるのでNG
-          "^magit:"
-          "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
-          "^\\*shell.*\\*$"  shell-mode  ;shell as a popup
-          "^/dev/cu\\..+$" "^\\*term.*\\*$"   term-mode   ;term as a popup
-          "^\\*vterm.*\\*$"  vterm-mode  ;vterm as a popup
-          ;; "\\*scratch\\*"
-          ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
-          shortdoc
-          reb-mode
-          help-mode
-          compilation-mode))
-
-  ;; :custom
-  (setq popper-mode-line nil)       ; hide modeline from popper
-  (setq popper-echo-dispatch-keys '())
-  (setq popper-echo-prompt "")
-  (setq popper-echo-prompt-group-format "GG (%%s)")
-  (setq popper-echo-delimiter "|")
-
-  :config
-  (popper-mode +1)
-  (popper-echo-mode +1)             ; For echo area hints
-  (defun my-popper-echo () (interactive) (popper-echo))
-
-  (defun my-adv--before--close-popper (&rest _)
-    "Close popper window prior to execute specified　command.
-For example, `consult-recent-file' try to embed its preview into popper window if popper already opened. This advice can be used to prevent these glitch."
-    (when popper-popup-status
-      ;; (message "close popper")
-      (popper-close-latest)))
-  (advice-add 'consult-recent-file :before #'my-adv--before--close-popper)
-
-  (defun my-next-tab-1 (func)
-    "Move to previous window before call the `tabbar-forward/backward-tab' to prevent tabbar embed buffer content into popper window."
-    (cond ((minibuffer-p) 'nop)
-          (popper-popup-status
-           (with-selected-window (previous-window nil 'no-minibuf)
-             (funcall func)))
-          (t (funcall func)))
-    )
-
-  (defun my-next-tab ()
-    "My customized `tabbar-forward-tab' to consider the popper and flycheck-posframe."
-    (interactive)
-    (my-next-tab-1 #'tabbar-forward-tab))
-
-  (defun my-prev-tab ()
-    "My customized `tabbar-backward-tab' to consider the popper and flycheck-posframe."
-    (interactive)
-    (my-next-tab-1 #'tabbar-backward-tab))
   )
 
 ;; ----------------------------------------------------------------------
