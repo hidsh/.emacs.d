@@ -4465,6 +4465,9 @@ $0`(yas-escape-text yas-selected-text)`
   )
 ;; ----------------------------------------------------------------------
 (use-package bm
+  :custom
+  (bm-highlight-style 'bm-highlight-only-fringe)
+
   :config
   (set-face-background 'bm-face (face-foreground 'warning))
 
