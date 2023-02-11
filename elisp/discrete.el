@@ -521,6 +521,8 @@ double quotation characters \(\"\) from given string."
            (dolist (name (mapcar #'buffer-name (buffer-list)))
              (funcall bury-or-kill name))
            (delete-other-windows))
+          ((and (boundp 'popper) (popper-popup-p (current-buffer)))
+           (popper-kill-latest-popup))
           (t (funcall bury-or-kill (buffer-name))))))
 
 (global-set-key (kbd "C-x k") 'my-kill-buffer)
