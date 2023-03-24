@@ -1534,7 +1534,6 @@ If COUNT is given, move COUNT - 1 lines downward first."
 ;; ----------------------------------------------------------------------
 (use-package evil-matchit
   :ensure t
-  :after evil
   :hook ((prog-mode . turn-on-evil-matchit-mode))
   :init
   (setq evilmi-shortcut "]")
