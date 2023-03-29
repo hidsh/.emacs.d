@@ -3672,7 +3672,7 @@ See URL `https://github.com/htacg/tidy-html5'."
   ;; ;; my-web-mode-replace-tag
   ;; (defface my-web-mode-replace-tag-highlight-face
   ;;   `((t :foreground "black" :background "yellow"))
-  ;;   "Face to highlight tag name tempolary in my-web-mode-replace-tag")
+  ;;   "Face to highlight tag name temporary in my-web-mode-replace-tag")
   ;;
   ;; (defun my-web-mode-replace-tag (&optional marker len from to)
   ;;   "Replace html-tag at out side near the point in web-mode."
