@@ -2180,7 +2180,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package projectile
-  :defer 61
+  :defer 100
   :config
   (projectile-mode +1)
   ;; Recommended keymap prefix on macOS
@@ -2209,38 +2209,16 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   )
 ;; ----------------------------------------------------------------------
 (use-package recentf
-  :init
-  (recentf-mode 1)
-
-  ;; :commands consult-recent-file
-  ;; :defer t
+  :defer 200
   :config
   (setq recentf-max-saved-items 5000) ;; 履歴保存の数
   ;; (setq recentf-auto-cleanup 'never)  ;; 存在しないファイルは消さない network経由のときに有効にする
   (setq recentf-exclude '("/recentf" ".recentf" ".my-save-frame" "batch-script.el" "notes.org"
                           ".emacs.d/bookmarks" "**/*.el.gz" "/eln-cache/*"
                           "autoloads.el" "compile_commands.json"))
-
-  (defun my-adv--recentf--without-message (orig-fun &rest _)
-    "`recentf-save-list' and `recentf-cleanup' with no message"
-    (let ((inhibit-message t))
-      (apply orig-fun _)))
-
-  (advice-add 'recentf-save-list :around #'my-adv--recentf--without-message)
-  (advice-add 'recentf-cleanup   :around #'my-adv--recentf--without-message)
-
-  ;; (cancel-timer recentf-cleanup)
-  ;; (setq recentf-auto-save-timer (run-with-idle-timer 10 t 'recentf-save-list))
-
-  ;; note:
-  ;; Function `recentf-cleanup' is called periodically and automatically from
-  ;; another function `recentf-auto-cleanup' because custom `recentf-auto-cleanup'
-  ;; was set 60 sec in custom.el.
-  ;;
-  ;; On the other hand, function `recentf-save-list' has no such mechanisms,
-  ;; thus it is needed to prepare `recentf-auto-save-timer' as a dedicated timer
-  ;; and then call it through the function `run-with-idle-timer'.
-
+  ;; (setq recentf-auto-save-timer (run-with-idle-timer 30 t 'recentf-save-list))
+  (let ((inhibit-message t))
+    (recentf-mode 1))
   )
 
 ;; ----------------------------------------------------------------------
