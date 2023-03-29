@@ -542,6 +542,13 @@
 ;;                      (,(length (gethash :warning diags-by-type)) "%d " warning)
 ;;                      (,(length (gethash :note diags-by-type)) "%d" success))))))
 
+;; (defun flymake--transform-mode-line-format (ret)
+;;   "Change the output of `flymake--mode-line-format'."
+;;   (setf (seq-elt (car ret) 1) " FM")
+;;   ret)
+;; (advice-add #'flymake--mode-line-format
+;;             :filter-return #'flymake--transform-mode-line-format)
+
 (defun my-flycheck-mode-line ()
   (let-alist (flycheck-count-errors flycheck-current-errors)
     (let* ((info (or .info 0))
@@ -673,86 +680,6 @@ This makes use of the fact that by `message' a newline, the window configuration
                              (cond ((string-match "undecided-?.*" (format "%s" buffer-file-coding-system))
                                     (let ((coding-system-for-read 'utf-8-unix))
                                       (revert-buffer t t))))))
-
-;; ----------------------------------------------------------------------
-(use-package popper
-  :ensure t ; or :straight t
-  :bind (("M-0"   . popper-toggle-latest)
-         ("M--"   . popper-cycle)
-         ("C-M-0" . popper-toggle-type)
-         :map popper-mode-map
-         ("M-u"   . my-prev-tab)
-         ("M-i"   . my-next-tab))
-  :init
-
-  ;; my-tabbar-buffer-list と popper-reference-buffers でとちらで表示するかを考える
-  ;;                tabbar    popper
-  ;;    -----------------------------
-  ;;    *scratch*      o        -
-  ;;    vterm          o        -
-  ;;    reb            -        o
-  ;;    magit          -        o
-  (setq popper-reference-buffers
-        '("\\*Backtrace\\*"
-          "\\*Apropos\\*"
-          "\\*Messages\\*"
-          "\\*Warnings\\*"
-          "Output\\*$"
-          "\\*Async Shell Command\\*"
-          "\\*quickrun\\*"
-          "\\*arduino-upload\\*"
-          ;; "\\*.+\\*$"    ;; todo *scratch*が引っかかるのでNG
-          "^magit:"
-          "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
-          "^\\*shell.*\\*$"  shell-mode  ;shell as a popup
-          "^/dev/cu\\..+$" "^\\*term.*\\*$"   term-mode   ;term as a popup
-          "^\\*vterm.*\\*$"  vterm-mode  ;vterm as a popup
-          ;; "\\*scratch\\*"
-          ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
-          shortdoc
-          reb-mode
-          help-mode
-          compilation-mode))
-
-  ;; :custom
-  (setq popper-mode-line nil)       ; hide modeline from popper
-  (setq popper-echo-dispatch-keys '())
-  (setq popper-echo-prompt "")
-  (setq popper-echo-prompt-group-format "GG (%%s)")
-  (setq popper-echo-delimiter "|")
-  (popper-mode +1)
-  (popper-echo-mode +1)             ; For echo area hints
-
-  :config
-  (defun my-popper-echo () (interactive) (popper-echo))
-
-  (defun my-adv--before--close-popper (&rest _)
-    "Close popper window prior to execute specified　command.
-For example, `consult-recent-file' try to embed its preview into popper window if popper already opened. This advice can be used to prevent these glitch."
-    (when popper-popup-status
-      ;; (message "close popper")
-      (popper-close-latest)))
-  (advice-add 'consult-recent-file :before #'my-adv--before--close-popper)
-
-  (defun my-next-tab-1 (func)
-    "Move to previous window before call the `tabbar-forward/backward-tab' to prevent tabbar embed buffer content into popper window."
-    (cond ((minibuffer-p) 'nop)
-          (popper-popup-status
-           (with-selected-window (previous-window nil 'no-minibuf)
-             (funcall func)))
-          (t (funcall func)))
-    )
-
-  (defun my-next-tab ()
-    "My customized `tabbar-forward-tab' to consider the popper and flycheck-posframe."
-    (interactive)
-    (my-next-tab-1 #'tabbar-forward-tab))
-
-  (defun my-prev-tab ()
-    "My customized `tabbar-backward-tab' to consider the popper and flycheck-posframe."
-    (interactive)
-    (my-next-tab-1 #'tabbar-backward-tab))
-  )
 
 ;; ----------------------------------------------------------------------
 (use-package tabbar
