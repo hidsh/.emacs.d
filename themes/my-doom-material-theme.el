@@ -152,7 +152,7 @@ Can be an integer to determine the exact padding."
     :background modeline-bg :foreground modeline-fg-alt :overline modeline-fg-alt
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg)))
 
-   (cursor :foreground bg-alt :background teal)
+   (cursor :foreground black :background teal)
 ;; (scroll-bar :background modeline-bg)
    (vertical-border :foreground highlight)
 
