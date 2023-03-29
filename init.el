@@ -714,7 +714,10 @@ This makes use of the fact that by `message' a newline, the window configuration
           (mapcar #'(lambda (b)
                       (cond
                        ((eq (current-buffer) b) b)                          ;; Always include the current buffer.
-                       ((popper-popup-p b) nil)                             ;; popperで表示するのでtabbarでは表示しない
+                       ((memq (with-current-buffer b major-mode)            ;; popperで表示するのでtabbarでは表示しない
+                              '(
+                                ;; vterm-mode                                  ; x vterm
+                                reb-mode)) nil)                             ; x reb
                        ((and (boundp 'org-default-notes-file)               ; hide "notes.org"
                              (string= (buffer-name b) (file-name-nondirectory org-default-notes-file))) nil)
                        ((string-match "^CAPTURE-[0-9]*-*.+\.org$" (buffer-name b)) nil)   ; hide org-capture
@@ -723,7 +726,6 @@ This makes use of the fact that by `message' a newline, the window configuration
                        ((equal "*scratch*" (buffer-name b)) b)              ; *scratch*バッファは表示する
                        ((char-equal ?* (aref (buffer-name b) 0)) nil)       ; それ以外の * で始まるバッファは表示しない
                        ((string-match "^magit" (buffer-name b)) nil)        ; magit が開くバッファは表示しない
-                       ((string-match "^/dev/cu\\..+$" (buffer-name b)) nil); serial port バッファは表示しない
                        ((buffer-live-p b) b)
                        ))
                   (buffer-list))))
