@@ -2914,88 +2914,28 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (push '("^\\(.+\.ino\\):\\([0-9]+\\):\\([0-9]+\\): \\(.+\\)$" 1 2 3 4) flymake-err-line-patterns)
   )
 
-  :custom
-  (arduino-mode-home "~/Dropbox/Arduino")
-  (arduino-executable "/Applications/Arduino.app/Contents/MacOS/Arduino")   ;; Mac
-  (comment-start "//")                   ; コメントを // にする
-  (comment-end "")
+;; ----------------------------------------------------------------------
+(use-package jal-mode
+  :load-path "~/git-clone/jal-mode"
 
   :config
-  ;; (serial-process-configure :process "/dev/ttyS0" :speed 1200)
+  (setq tab-width 4)
 
-  ;; mod with line-mode
-  (defun arduino-serial-monitor (port speed)
-    "Monitor the `SPEED' on serial connection on `PORT' to the Arduino."
-    (interactive (list (serial-read-name) nil))
-    (if (get-buffer-process port)
-	    (switch-to-buffer port)
-      ;; (serial-term port (or speed (serial-read-speed)))))
-      (serial-term port (or speed (serial-read-speed)) 'line-mode)))    ;; mod
+  (setq jal-mode-compiler-path "/Users/g/test/jal/jallib-pack-bee-jalv25r6-20220522/compiler/jalv2-osx")
+  (setq jal-mode-lib-path "/Users/g/test/jal/jallib-pack-bee-jalv25r6-20220522/lib")
 
-  ;; "thx https://emacs.stackexchange.com/questions/328/how-to-override-keybindings-for-term"
-  (defun expose-global-binding-in-term (key)
-    "make a specific key in global-map transparent to term-map"
-    (define-key term-raw-map key
-      (lookup-key (current-global-map) key)))
-
-  (expose-global-binding-in-term (kbd "M-0"))   ;; popper-toggle-latest
-  (expose-global-binding-in-term (kbd "M--"))   ;; popper-cycle
-
-  ;; from my gist  https://gist.github.com/hidsh/9ac57f7fa0deca4dca925fdfdca00a43
-  (defun my-hook--arduino--input-serial-port ()
-    "Input port number as default string."
-    (insert "cu.usbmodem")  ;; Mac
-    (remove-hook 'minibuffer-setup-hook 'my-hook--arduino--input-serial-port))
-
-  (defun my-arduino-serial-monitor ()
-    "Open serial-monitor with specified port number."
-    (interactive)
-    (add-hook 'minibuffer-setup-hook 'my-hook--arduino--input-serial-port)
-    (call-interactively 'arduino-serial-monitor)
-
-    (run-with-timer 0.1 nil #'bury-buffer)
-    (run-with-timer 0.2 nil #'popper-toggle-latest)
-    (run-with-timer 0.3 nil #'(lambda () (other-window -1)))
-    )
+  ;; enable flymake
+  ;; (setq temporary-file-directory "~/tmp")     ;; as you like
+  ;; (add-hook 'jal-mode-hook #'flymake-mode)
+  ;; :init
+  ;; (setq flymake-log-level 3)
 
 
-  ;; (defun flymake-arduino-init ()
-  ;;   (unless arduino-exe-path
-  ;;     (error "Not defined arduino-exe-path"))
-  ;;   (unless (file-exists-p arduino-exe-path)
-  ;;     (error "Not found %s" arduino-exe-path))
-  ;;   (unless (file-executable-p arduino-exe-path)
-  ;;     (error "Not found %s" arduino-exe-path))
-  ;;   (let* ((temp-file   (flymake-proc-init-create-temp-buffer-copy
-  ;;                        ;; 'flymake-create-temp-inplace))
-  ;;                        'flymake-proc-create-temp-with-folder-structure))
-  ;;          (local-dir   (file-name-directory buffer-file-name)))
-  ;;     (list arduino-exe-path (list "compile"
-  ;;                                  (concat "--fqbn=" arduino-fqbn)
-  ;;                                  (substring local-dir 0 -1)))))
-
-  ;; (push '("\\.ino$" flymake-arduino-init) flymake-proc-allowed-file-name-masks)
-  ;; (push '("^\\(.+\.ino\\):\\([0-9]+\\):\\([0-9]+\\): \\(.+\\)$" 1 2 3 4) flymake-err-line-patterns)
-
-  (use-package arduino-cli-mode
-    :disabled
-    :ensure t
-    :after arduino-mode
-    :hook arduino-mode
-    :mode "\\.ino\\'"
-    :bind (:map arduino-mode-map
-                ("C-c C-c" . arduino-cli-compile-and-upload)
-                ;; ("C-c C-v" . arduino-cli-compile)
-                )
+  ;; enable flycheck
+  (use-package flycheck-jal
     :config
-    ;; (push "D:/pgm/" exec-path)        ;; win
-    (push "/opt/homebrew/bin/avrdude" exec-path)        ;; mac, for avrdude, arduino-cli
-
-    :custom
-    (arduino-cli-warnings 'all)
-    (arduino-cli-verify t)
-    )
-  )
+    (add-hook 'jal-mode-hook #'flycheck-mode))
+)
 
 ;; ----------------------------------------------------------------------
 (use-package mql-mode
