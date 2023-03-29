@@ -4890,6 +4890,78 @@ $0`(yas-escape-text yas-selected-text)`
   )
 
 ;; ----------------------------------------------------------------------
+(use-package popper
+  :ensure t ; or :straight t
+  :bind (("M-0"   . popper-toggle-latest)
+         ("M--"   . popper-cycle)
+         ("C-M-0" . popper-toggle-type)
+         :map popper-mode-map
+         ("M-u"   . my-prev-tab)
+         ("M-i"   . my-next-tab))
+  :init
+
+  ;; my-tabbar-buffer-list と popper-reference-buffers でとちらで表示するかを考える
+  ;;                tabbar    popper
+  ;;    -----------------------------
+  ;;    *scratch*      o        -
+  ;;    vterm          o        -
+  ;;    reb            -        o
+  (setq popper-reference-buffers
+        '("\\*Backtrace\\*"
+          "\\*Apropos\\*"
+          "\\*Messages\\*"
+          "\\*Warnings\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          "\\*quickrun\\*"
+          ;; "\\*scratch\\*"
+          ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
+          shortdoc
+          reb-mode
+          help-mode
+          compilation-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1)             ; For echo area hints
+
+  ;; :custom
+  (setq popper-mode-line nil)       ; hide modeline from popper
+  (setq popper-echo-dispatch-keys '())
+  (setq popper-echo-prompt "")
+  (setq popper-echo-prompt-group-format "GG (%%s)")
+  (setq popper-echo-delimiter "|")
+
+  :config
+  (defun my-popper-echo () (interactive) (popper-echo))
+
+  (defun my-adv--before--close-popper (&rest _)
+    "Close popper window prior to execute specified　command.
+For example, `consult-recent-file' try to embed its preview into popper window if popper already opened. This advice can be used to prevent these glitch."
+    (when popper-popup-status
+      ;; (message "close popper")
+      (popper-close-latest)))
+  (advice-add 'consult-recent-file :before #'my-adv--before--close-popper)
+
+  (defun my-next-tab-1 (func)
+    "Move to previous window before call the `tabbar-forward/backward-tab' to prevent tabbar embed buffer content into popper window."
+    (cond ((minibuffer-p) 'nop)
+          (popper-popup-status
+           (with-selected-window (previous-window nil 'no-minibuf)
+             (funcall func)))
+          (t (funcall func)))
+    )
+
+  (defun my-next-tab ()
+    "My customized `tabbar-forward-tab' to consider the popper and flycheck-posframe."
+    (interactive)
+    (my-next-tab-1 #'tabbar-forward-tab))
+
+  (defun my-prev-tab ()
+    "My customized `tabbar-backward-tab' to consider the popper and flycheck-posframe."
+    (interactive)
+    (my-next-tab-1 #'tabbar-backward-tab))
+  )
+
+;; ----------------------------------------------------------------------
 (use-package quickrun
   :config
   ;; (defun my-adv-around--quickrun--with-selected-window (orig-fn &rest plist)
