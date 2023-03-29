@@ -1912,6 +1912,7 @@ using a new file name regardless of the candidates"
           (error "Can not create directory: %s" s))))))
 
   ;--------------
+;; todo
   (defun my-font-list ()
     "List font using ivy"
     (interactive)
@@ -4617,6 +4618,7 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   :custom
   (truncate-lines nil)
   )
+
 ;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
