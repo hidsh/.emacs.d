@@ -4350,6 +4350,13 @@ $0`(yas-escape-text yas-selected-text)`
   (define-key evil-motion-state-map (kbd "g m") #'bm-toggle)
   (define-key evil-motion-state-map (kbd "g SPC") #'bm-next)
   )
+
+;; ----------------------------------------------------------------------
+(use-package intel-hex-mode
+  :config
+  )
+
+
 ;; ----------------------------------------------------------------------
 (use-package add-node-modules-path
   :hook (js-mode js2-mode)
