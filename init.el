@@ -2891,13 +2891,28 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package arduino-mode
+  :hook (arduino-mode . flymake-mode)
   :mode (("\\.pde$" . arduino-mode)
          ("\\.ino$" . arduino-mode))
-  :bind (:map arduino-mode-map
-         ("C-c C-c" . arduino-upload)
-         ;; ("C-c C-v" . arduino-verify)
-         ("C-c C-m" . my-arduino-serial-monitor)
-         ("C-c C-t" . my-arduino-serial-monitor))
+  :config
+  (defun flymake-arduino-init ()
+    (unless arduino-exe-path
+      (error "Not defined arduino-exe-path"))
+    (unless (file-exists-p arduino-exe-path)
+      (error "Not found %s" arduino-exe-path))
+    (unless (file-executable-p arduino-exe-path)
+      (error "Not found %s" arduino-exe-path))
+    (let* ((temp-file   (flymake-proc-init-create-temp-buffer-copy
+                         ;; 'flymake-create-temp-inplace))
+                         'flymake-proc-create-temp-with-folder-structure))
+           (local-dir   (file-name-directory buffer-file-name)))
+      (list arduino-exe-path (list "compile"
+                                   (concat "--fqbn=" arduino-fqbn)
+                                   (substring local-dir 0 -1)))))
+
+  (push '("\\.ino$" flymake-arduino-init) flymake-proc-allowed-file-name-masks)
+  (push '("^\\(.+\.ino\\):\\([0-9]+\\):\\([0-9]+\\): \\(.+\\)$" 1 2 3 4) flymake-err-line-patterns)
+  )
 
   :custom
   (arduino-mode-home "~/Dropbox/Arduino")
