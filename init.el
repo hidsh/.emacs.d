@@ -2637,14 +2637,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :config
   (advice-add 'c-update-modeline :around #'ignore)      ;; C++//l => C++
 
-  (defun my-hook--c-mode-common ()
+  (add-hook 'c-mode-common-hook
             #'(lambda ()
               (local-set-key "\C-m" 'reindent-then-newline-and-indent)
               (local-set-key "\C-i" 'indent-or-insert-tab)
               ;; (local-set-key "(" 'my-insert-paren)
               ;; (local-set-key "{" 'my-insert-brace)
               ;; (setq case-fold-search nil)                 ; case sensitive
-              (setq tab-width 2)
               (c-set-style "stroustrup")
               (c-set-offset 'case-label '+)
               (c-set-offset 'statement-cont 'c-lineup-math)
@@ -2657,21 +2656,18 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
               (cwarn-mode)
               (which-function-mode 1)
               (display-line-numbers-mode)
-              (setq tab-width 2)
               (setq compilation-scroll-output t)
-              ;; (setq compile-command "cd ~/tmp/qmk_firmware; make mcp2301x_test:default")
+              ;; (setq compile-command "cd ~/git-clone/qmk_firmware; make dichotemy:default")
               (setq compilation-auto-jump-to-first-error t)
               (setq compilation-window-height 10)
 
               (setq hide-ifdef-shadow t)
               (hide-ifdef-mode 1)
-              (hide-ifdefs)
 
               (setq flycheck--automatically-enabled-checkers '(c/c++-gcc))
-              ;; (flycheck-disable-checker 'c/c++-clang)
-              ;; (flycheck-mode +1)
+              (flycheck-disable-checker 'c/c++-clang)
+              ;; (flycheck-mode 1)      ;; flycheck will be enabled in prog-mode
               ))
-  (add-hook 'c-mode-common-hook #'my-hook--c-mode-common)
 
 
   (defun my-flycheck-c-setup ()
@@ -2777,7 +2773,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (defun prog-mode-hooks-func ()
     (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
     (electric-pair-mode +1)
-    ;; (c-toggle-auto-newline +1)
+    (c-toggle-auto-newline +1)
     (add-hook 'before-save-hook #'delete-trailing-whitespace nil 'buffer-local)
 
     ;; (set-face-background 'trailing-whitespace (face-foreground 'error))      ;; should be defined by theme
