@@ -2556,8 +2556,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
   :config
   (setq flycheck-display-errors-delay 0.0)
-  (setq flycheck-idle-change-delay 0.0)
-  (setq flycheck-idle-buffer-switch-delay 0.5)
+  (setq flycheck-idle-change-delay 0.1)
+  ;; (setq flycheck-idle-buffer-switch-delay 0.0)
 
   (let ((color (face-foreground 'error)))
     (set-face-underline 'flycheck-error `(:style wave :color ,color)))
@@ -2576,29 +2576,29 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
           #b00110110
           #b00011011))
 
-;; (flycheck-define-error-level 'error
-;;   :severity 100
-;;   :compilation-level 2
-;;   :overlay-category 'flycheck-error-overlay
-;;   :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
-;;   :fringe-face 'flycheck-fringe-error
-;;   :error-list-face 'flycheck-error-list-error)
+(flycheck-define-error-level 'error
+  :severity 100
+  :compilation-level 2
+  :overlay-category 'flycheck-error-overlay
+  :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
+  :fringe-face 'flycheck-fringe-error
+  :error-list-face 'flycheck-error-list-error)
 
-;;   (flycheck-define-error-level 'warning
-;;     :severity 10
-;;     :compilation-level 1
-;;     :overlay-category 'flycheck-warning-overlay
-;;     :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
-;;     :fringe-face 'flycheck-fringe-warning
-;;     :error-list-face 'flycheck-error-list-warning)
+  (flycheck-define-error-level 'warning
+    :severity 10
+    :compilation-level 1
+    :overlay-category 'flycheck-warning-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
+    :fringe-face 'flycheck-fringe-warning
+    :error-list-face 'flycheck-error-list-warning)
 
-;;   (flycheck-define-error-level 'info
-;;     :severity -10
-;;     :compilation-level 0
-;;     :overlay-category 'flycheck-info-overlay
-;;     :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
-;;     :fringe-face 'flycheck-fringe-info
-;;     :error-list-face 'flycheck-error-list-info)
+  (flycheck-define-error-level 'info
+    :severity -10
+    :compilation-level 0
+    :overlay-category 'flycheck-info-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-double-arrow-right
+    :fringe-face 'flycheck-fringe-info
+    :error-list-face 'flycheck-error-list-info)
 
   ;; :config
   ;; (flycheck-define-checker my-c
@@ -3727,9 +3727,10 @@ See URL `https://github.com/htacg/tidy-html5'."
   :ensure t
   :after flycheck
   :config
-  (set-face-attribute 'flycheck-posframe-error-face nil :weight 'light)
-  (set-face-attribute 'flycheck-posframe-warning-face nil :weight 'light)
-  (set-face-attribute 'flycheck-posframe-info-face nil :weight 'light)
+  (setq flycheck-posframe-border-width 4)
+  (set-face-attribute 'flycheck-posframe-error-face nil)
+  (set-face-attribute 'flycheck-posframe-warning-face nil)
+  (set-face-attribute 'flycheck-posframe-info-face nil)
   (setq flycheck-posframe-error-prefix "")
   (setq flycheck-posframe-warning-prefix "")
   (setq flycheck-posframe-info-prefix "")
