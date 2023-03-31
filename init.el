@@ -4625,6 +4625,70 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 
 ;; ----------------------------------------------------------------------
+(use-package go-translate
+  :init
+  (use-package web-api-auth-key
+    :load-path "~/Dropbox")
+
+  :config
+
+  ;; your languages pair used to translate
+  (setq gts-translate-list '(("en" "ja") ("ja" "en")))
+
+  ;; config the default translator, it will be used by command gts-do-translate
+  (setq gts-default-translator
+        (gts-translator
+
+         :picker ; used to pick source text, from, to. choose one.
+
+         ;;(gts-noprompt-picker)
+         ;;(gts-noprompt-picker :texter (gts-whole-buffer-texter))
+         (gts-prompt-picker)
+         ;;(gts-prompt-picker :single t)
+         ;;(gts-prompt-picker :texter (gts-current-or-selection-texter) :single t)
+
+         :engines ; engines, one or more. Provide a parser to give different output.
+
+         (list
+          ;;(gts-bing-cn-engine)
+          ;;(gts-google-engine)
+          ;;(gts-google-rpc-engine)
+          (gts-deepl-engine :auth-key web-api-auth-key-deepl :pro nil)
+          ;;(gts-google-engine :parser (gts-google-summary-parser))
+          ;;(gts-google-engine :parser (gts-google-parser))
+          ;;(gts-google-rpc-engine :parser (gts-google-rpc-summary-parser) :url "https://translate.google.com")
+          ;;(gts-google-rpc-engine :parser (gts-google-rpc-parser) :url "https://translate.google.com")
+          )
+
+         :render ; render, only one, used to consumer the output result. Install posframe yourself when use gts-posframe-xxx
+
+         ;; (gts-buffer-render)
+         ;; (gts-posframe-pop-render)
+         (gts-posframe-pop-render :backcolor "dim gray" :forecolor "#ffffff" :padding 10)
+         ;; (gts-posframe-pin-render)
+         ;;(gts-posframe-pin-render :position (cons 1200 20))
+         ;;(gts-posframe-pin-render :width 80 :height 25 :position (cons 1000 20) :forecolor "#ffffff" :backcolor "#111111")
+         ;;(gts-kill-ring-render)
+         ))
+
+  ;;(setq go-translate-buffer-follow-p t)       ; focus the result window
+  ;;(setq go-translate-buffer-source-fold-p t)  ; fold the source text in the result window
+  ;;(setq go-translate-buffer-window-config ..) ; config the result window as your wish
+
+  (setq gts-posframe-pop-render-timeout 'infinit)
+  (define-key evil-visual-state-map (kbd "t") #'gts-do-translate)
+
+  ;; (defun my-gts-posframe-show-function ()
+  ;;   (posframe-hide-all)
+  ;;   (run-with-timer 0.1 nil #'evil-exit-visual-state))
+
+
+  (add-hook 'gts-after-buffer-render-hook #'(lambda ()
+            (evil-define-key 'motion gts-buffer-local-map [escape] #'posframe-hide-all)
+            (define-key gts-buffer-local-map (kbd "C-g") #'posframe-hide-all)))
+  )
+
+;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
 (load custom-file nil t)
