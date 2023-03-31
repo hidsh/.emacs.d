@@ -4684,7 +4684,7 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 
 
   (add-hook 'gts-after-buffer-render-hook #'(lambda ()
-            (evil-define-key 'motion gts-buffer-local-map [escape] #'posframe-hide-all)
+            (evil-define-key 'normal gts-buffer-local-map [escape] #'posframe-hide-all)
             (define-key gts-buffer-local-map (kbd "C-g") #'posframe-hide-all)))
   )
 
