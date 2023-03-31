@@ -799,6 +799,10 @@ That is, a string used to represent it on the tab bar."
     (evil-normal-state 1))
   (advice-add 'switch-to-buffer :after #'my-adv-switch-to-bufffer--disable-evil-visual-state)
 
+  ;; evil-visual-stateで外部コマンドを表示したり posframe を開いたりしたあとでフォーカスが戻ってきたときに
+  ;; 強制的にevil-normal-stateに戻す workaround
+  (add-function :after after-focus-change-function #'evil-exit-visual-state)
+
   ;; evil keybindings
   (define-key evil-normal-state-map (kbd "M-c") #'ffap)                       ; M-RET
   ;; (define-key evil-insert-state-map (kbd "M-v") #'nop)                        ; prevent paste in Mac
