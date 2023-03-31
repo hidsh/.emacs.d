@@ -2850,6 +2850,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
   :config
   (setq tab-width 4)
+  (setq indent-tabs-mode t)
 
   (setq jal-mode-compiler-path "/Users/g/test/jal/jallib-pack-bee-jalv25r6-20220522/compiler/jalv2-osx")
   (setq jal-mode-lib-path "/Users/g/test/jal/jallib-pack-bee-jalv25r6-20220522/lib")
