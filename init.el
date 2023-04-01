@@ -4629,7 +4629,7 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 (use-package go-translate
   :init
   (use-package web-api-auth-key
-    :load-path "~/Dropbox")
+    :load-path "~/Library/CloudStorage/Dropbox")
 
   :config
 
