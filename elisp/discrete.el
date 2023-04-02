@@ -12,6 +12,16 @@
 
 ;; ----------------------------------------------------------------------
 ;; @@ utility
+(defun pt (s)
+  "`goto-char' to specified position if given argument. otherwise just indicate current value of `(point)'"
+  (interactive "sPosition:")
+  (unless (string= s "")
+    (let ((num (string-to-number s)))
+      (when (> num -1)
+        (goto-char num))))
+  (message "%d" (point)))
+
+
 (defun nop ()
   "often use to disable parent key-bindings"
   (interactive)
