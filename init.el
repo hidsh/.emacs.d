@@ -4690,6 +4690,14 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 
 ;; ----------------------------------------------------------------------
+;; auto scroll for *message* buffer
+(defun my-adv-message-auto-scroll (&rest _)
+  (save-current-buffer
+    (set-buffer "*Messages*")
+    (goto-char (point-max))))
+(advice-add 'message :after #'my-adv-message-auto-scroll)
+
+;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
 (load custom-file nil t)
