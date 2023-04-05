@@ -1562,12 +1562,13 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
     (consult-line (thing-at-point 'symbol)))
 
   :bind (("M-r" . consult-recent-file)
+         ("M-l" . my-consult-line-symbol-at-point)
          ("M-o" . my-consult-ripgrep)
          ("M-e" . embark-act)
          ("C-x C-g" . consult-find)
          ("C-x C-b" . (lambda () (interactive) (consult-buffer '(consult--source-hidden-buffer consult--source-buffer))))
          :map evil-normal-state-map
-         ("g ;" . my-consult-line-symbol-at-point)
+         ;; ("g ;" . my-consult-line-symbol-at-point)
          )
  )
 
