@@ -981,7 +981,9 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-visual-state-map (kbd "a") #'my-evil-visual-align-region)
   (define-key evil-visual-state-map (kbd ";") #'my-evil-visual-comment-region)
   (define-key evil-visual-state-map (kbd "i") #'my-evil-visual-indent-region)
-  (define-key evil-visual-state-map (kbd "g g") #'beginning-of-buffer)
+  (define-key evil-visual-state-map (kbd "g g") #'my-evil-beginning/end-of-buffer)
+
+  ;; (add-to-list 'evil-emacs-state-modes 'macrostep-mode)
 
   ;; ;; not work, fixme
   ;; (add-hook 'macrostep-mode-hook #'(lambda ()
