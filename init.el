@@ -380,10 +380,11 @@
 ;; ----------------------------------------------------------------------
 ; host independent
 (require
- (cond ((eq system-type 'windows-nt) '_windows)
-       ((eq system-type 'gnu/linux)  '_linux)
-       ((eq system-type 'darwin)     '_mac)
-       (t (error "Unknown system-type: %s" system-type))))
+ (pcase system-type
+   ('windows-nt '_windows)
+   ('gnu/linux  '_linux)
+   ('darwin     '_mac)
+   (_ (user-error "Unknown system-type: %s" system-type))))
 
 ;; (my-load-frame)
 
