@@ -282,7 +282,6 @@
 ;; ----------------------------------------------------------------------
 ;; command aliases
 (defalias 'reb 're-builder)
-(defalias 'a 'consult-apropos)
 
 (defalias 'dm 'describe-mode)
 (defalias 'dv 'describe-variable)
@@ -1561,14 +1560,41 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
     (interactive)
     (consult-line (thing-at-point 'symbol)))
 
+  (defun my-consult-apropos-symbol-at-point ()
+    (interactive)
+    (consult-apropos (thing-at-point 'symbol)))
+
+  ;; from consult.el
+  (defun my-consult-apropos-at-point ()
+  "Select pattern and call `apropos'.
+
+The default value of the completion is the symbol at point. As a better
+alternative, you can run `embark-export' from commands like `M-x' and
+`describe-symbol'."
+  (interactive)
+  (let ((pattern
+         (consult--read
+          obarray
+          :prompt "Apropos: "
+          :predicate (lambda (x) (or (fboundp x) (boundp x) (facep x) (symbol-plist x)))
+          :history 'consult--apropos-history
+          :category 'symbol
+          ;; :default (thing-at-point 'symbol))))       ;; mod
+          :initial (thing-at-point 'symbol))))          ;; mod
+    ;; (when (string= pattern "")                       ;; mod
+    ;;   (user-error "No pattern given"))               ;; mod
+    (apropos pattern)))
+
   :bind (("M-r" . consult-recent-file)
          ("M-l" . my-consult-line-symbol-at-point)
+         ("M-a" . my-consult-apropos-symbol-at-point)
          ("M-o" . my-consult-ripgrep)
+         ("M-a" . my-consult-apropos-at-point)
          ("M-e" . embark-act)
          ("C-x C-g" . consult-find)
          ("C-x C-b" . (lambda () (interactive) (consult-buffer '(consult--source-hidden-buffer consult--source-buffer))))
          :map evil-normal-state-map
-         ;; ("g ;" . my-consult-line-symbol-at-point)
+         ;; ("g ;" . my-consult-line-at-point)
          )
  )
 
