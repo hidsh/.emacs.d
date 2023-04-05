@@ -1555,8 +1555,7 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
                      (read-directory-name "Ripgrep Dir: ")))))
     (consult-ripgrep dir initial))
 
-  ;; https://tam5917.hatenablog.com/entry/2022/02/05/202816
-  (defun my-consult-line-symbol-at-point ()
+  (defun my-consult-line-at-point ()
     (interactive)
     (consult-line (thing-at-point 'symbol)))
 
@@ -1586,10 +1585,9 @@ alternative, you can run `embark-export' from commands like `M-x' and
     (apropos pattern)))
 
   :bind (("M-r" . consult-recent-file)
-         ("M-l" . my-consult-line-symbol-at-point)
-         ("M-a" . my-consult-apropos-symbol-at-point)
-         ("M-o" . my-consult-ripgrep)
+         ("M-l" . my-consult-line-at-point)
          ("M-a" . my-consult-apropos-at-point)
+         ("M-o" . my-consult-ripgrep)
          ("M-e" . embark-act)
          ("C-x C-g" . consult-find)
          ("C-x C-b" . (lambda () (interactive) (consult-buffer '(consult--source-hidden-buffer consult--source-buffer))))
