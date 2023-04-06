@@ -1572,6 +1572,11 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
     (interactive)
     (consult-apropos (thing-at-point 'symbol)))
 
+  (defun my-consult-buffer ()
+    (interactive)
+    (consult-buffer '(consult--source-hidden-buffer consult--source-buffer)))
+
+  ;; mod
   ;; from consult.el
   (defun my-consult-apropos-at-point ()
   "Select pattern and call `apropos'.
@@ -1623,8 +1628,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
          ("M-o" . my-consult-ripgrep-command)
          ("C-x C-g" . my-consult-find-command)
          ("M-e" . embark-act)
-         ("C-x C-b" . (lambda () (interactive) (consult-buffer '(consult--source-hidden-buffer consult--source-buffer))))
-         )
+         ("C-x C-b" . my-consult-buffer))
  )
 
 (use-package embark-consult)
