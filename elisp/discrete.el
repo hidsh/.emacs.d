@@ -12,15 +12,21 @@
 
 ;; ----------------------------------------------------------------------
 ;; @@ utility
-(defun pt (s)
-  "`goto-char' to specified position if given argument. otherwise just indicate current value of `(point)'"
+(defun p-1 ()
+  "Indicate info at the `point' in the echo area"
+  (let* ((pt (point))
+         (c (char-after pt))
+         (stx (char-syntax c)))
+    (message "point=%d ch=\'%c\' indent=%d syntax=\'%c\' face=\'%s\'" pt c (current-indentation) stx (face-at-point))))
+
+(defun p (s)
+  "`goto-char' to specified position if given argument. otherwise just indicate info at the `point'"
   (interactive "sPosition:")
   (unless (string= s "")
     (let ((num (string-to-number s)))
       (when (> num -1)
         (goto-char num))))
-  (message "%d" (point)))
-
+  (p-1))
 
 (defun nop ()
   "often use to disable parent key-bindings"
