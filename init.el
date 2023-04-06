@@ -961,6 +961,12 @@ That is, a string used to represent it on the tab bar."
   ;; (define-key evil-normal-state-map (kbd "M-p") #'counsel-yank-pop)
   ;; (define-key evil-normal-state-map (kbd "SPC") #'evil-force-normal-state)
   (define-key evil-normal-state-map (kbd "g f") #'my-beginning-of-defun)
+  (define-key evil-normal-state-map (kbd "g r") #'git-gutter:revert-hunk)       ;; git unstage
+  (define-key evil-normal-state-map (kbd "g u") #'git-gutter:revert-hunk)       ;; git unstage
+  (define-key evil-normal-state-map (kbd "g a") #'git-gutter:stage-hunk)        ;; git add
+  (define-key evil-normal-state-map (kbd "g p") #'what-cursor-position)         ;; g a --> g p
+  (define-key evil-normal-state-map (kbd "g j") #'git-gutter:next-hunk)
+  (define-key evil-normal-state-map (kbd "g k") #'git-gutter:previous-hunk)
   (define-key evil-normal-state-map (kbd "A") #'nop)                 ; unmap A
   (define-key evil-normal-state-map (kbd "a") #'evil-append-line)    ; works as A
   (define-key evil-normal-state-map (kbd "1 1") #'show-overlay-and-prop-and-face-at)
@@ -2478,9 +2484,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
       "X..XX..X"
       "..XXXX.."
       "..XXXX.."))
-
-  :bind (("M-j" . git-gutter:next-hunk)
-         ("M-k" . git-gutter:previous-hunk))
   )
 
 ;; ----------------------------------------------------------------------
@@ -2594,8 +2597,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (let ((color (face-foreground 'error)))
     (set-face-underline 'flycheck-error `(:style wave :color ,color)))
 
-  (define-key evil-motion-state-map (kbd "g j") 'flycheck-next-error)
-  (define-key evil-motion-state-map (kbd "g k") 'flycheck-previous-error)
+  (define-key evil-motion-state-map (kbd "M-j") 'flycheck-next-error)
+  (define-key evil-motion-state-map (kbd "M-k") 'flycheck-previous-error)
 
   (setq flycheck-indication-mode 'right-fringe)
 
