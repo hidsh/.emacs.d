@@ -168,6 +168,10 @@ Can be an integer to determine the exact padding."
 
    (isearch :inherit 'lazy-highlight :foreground nil :background highlight-dark)
 
+   ;; font-lock
+   (font-lock-keyword-face :foreground yellow)
+   (font-lock-variable-name-face :foreground cyan)
+
    ;; --- major-mode faces ------------------------
    ;; man-mode
    (Man-overstrike :inherit 'bold :foreground magenta)
