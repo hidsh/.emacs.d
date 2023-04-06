@@ -12,6 +12,11 @@
 
 ;; ----------------------------------------------------------------------
 ;; @@ utility
+(defun nop ()
+  "often use to disable parent key-bindings"
+  (interactive)
+  (message "no operation"))
+
 (defun p-1 ()
   "Indicate info at the `point' in the echo area"
   (let* ((pt (point))
@@ -27,11 +32,6 @@
       (when (> num -1)
         (goto-char num))))
   (p-1))
-
-(defun nop ()
-  "often use to disable parent key-bindings"
-  (interactive)
-  (message "no operation"))
 
 ;; https://qiita.com/itiut@github/items/d917eafd6ab255629346
 ;; note: signal や error 関数には効かない
