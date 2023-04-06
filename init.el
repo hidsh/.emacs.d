@@ -1593,15 +1593,37 @@ alternative, you can run `embark-export' from commands like `M-x' and
     ;;   (user-error "No pattern given"))               ;; mod
     (apropos pattern)))
 
+  ;; fdコマンドを使ってconsult-findを利用する
+  (setq consult-find-command "fd --color=never --full-path ARG OPTS")
+
+  ;; affe (affe-grep, affe-find)
+  ;; https://blog.tomoya.dev/posts/a-new-wave-has-arrived-at-emacs/#affe%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E3%83%95%E3%82%A1%E3%82%B8%E3%83%BC%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0
+  (setq
+   ;; Orderlessを利用する
+   affe-highlight-function 'orderless-highlight-matches
+   affe-regexp-function 'orderless-pattern-compiler
+   ;; findのかわりにfdを利用する
+   affe-find-command "fd --color=never --full-path")
+
+  (defun my-consult-ripgrep-command (parg)
+    (interactive "P")
+    (if parg
+        (affe-grep)
+      (my-consult-ripgrep)))
+
+  (defun my-consult-find-command (parg)
+    (interactive "P")
+    (if parg
+        (affe-find)
+      (consult-find)))
+
   :bind (("M-r" . consult-recent-file)
          ("M-l" . my-consult-line-at-point)
          ("M-a" . my-consult-apropos-at-point)
-         ("M-o" . my-consult-ripgrep)
+         ("M-o" . my-consult-ripgrep-command)
+         ("C-x C-g" . my-consult-find-command)
          ("M-e" . embark-act)
-         ("C-x C-g" . consult-find)
          ("C-x C-b" . (lambda () (interactive) (consult-buffer '(consult--source-hidden-buffer consult--source-buffer))))
-         :map evil-normal-state-map
-         ;; ("g ;" . my-consult-line-at-point)
          )
  )
 
