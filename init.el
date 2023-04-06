@@ -4747,6 +4747,22 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 
 ;; ----------------------------------------------------------------------
+;; emacs lisp reference manual (Japanese)
+;;
+;; todo does not work!
+;;
+;; (let ((dir "~/.emacs.d/emacs-25.1-doc-lispref-master/"))
+;;   (setq Info-default-directory-list
+;;         (append Info-default-directory-list (list (expand-file-name dir))))
+;;   (defun Info-find-node--elisp-ja (orig-fn filename &rest args)
+;;     (apply orig-fn
+;;            (pcase filename
+;;              ("elisp" "elisp-ja")
+;;              (_ filename))
+;;            args))
+;;   (advice-add 'Info-find-node :around 'Info-find-node--elisp-ja))
+
+;; ----------------------------------------------------------------------
 ;; auto scroll for *message* buffer
 (defun my-adv-message-auto-scroll (&rest _)
   (save-current-buffer
