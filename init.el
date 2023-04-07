@@ -2270,7 +2270,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
   (defface swap-buffers-label-face  `((t (:height 4.0 :foreground "red"))) "Face that is used as window indicators by swap-buffers.")
 
-  :bind (("S-C-o" . swap-buffers))
+  :bind (("M-C-o" . swap-buffers))
   )
 ;; ----------------------------------------------------------------------
 (use-package recentf
