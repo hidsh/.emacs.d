@@ -1,11 +1,9 @@
 ;;; -*- coding:utf-8; mode:emacs-lisp -*-
 ;;;
-;;; discrete elisp
+;;; my discrete elisp
 ;;;
 ;;;	Filename: discrete.el
-;;;	Last modified: Mon Mar 04 2013 15:45:58 JST
-;;;
-;;;	based: $Id: discrete.el,v 1.51 2006/02/16 05:13:34 gnrr Exp gnrr $
+;;;	based:    $Id: discrete.el,v 1.51 2006/02/16 05:13:34 gnrr Exp gnrr $
 ;;;
 
 ;; fixme cleanup unused (commented out) code
