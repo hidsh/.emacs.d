@@ -2360,10 +2360,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; ----------------------------------------------------------------------
 (use-package symbol-overlay
   :ensure t
-  :hook ((prog-mode . symbol-overlay-mode))
+  :hook (prog-mode . symbol-overlay-mode)
   :config
   (setq symbol-overlay-idle-time 0.2)
-  (set-face-attribute 'highlight nil :background "#555555" :foreground "#eeeeee" :bold nil)
+  (set-face-attribute 'highlight nil :background "#606060" :foreground "#ffffff" :bold nil)
 
   (let ((color (mycolor 'red)))
     (set-face-attribute 'symbol-overlay-face-1 nil :background color :bold nil)
