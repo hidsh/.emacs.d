@@ -171,6 +171,7 @@
 ;; ミニバッファの履歴を保存する
 (savehist-mode 1)
 (setq history-length 1000)
+(setq history-delete-duplicates t)
 
 (global-auto-revert-mode -1)                            ; disable auto-revert-mode
 (setq indent-line-function 'indent-relative-maybe)
@@ -315,6 +316,47 @@
 ;; (set-face-foreground 'vertical-border "red") ;; by theme
 (setq window-divider-default-right-width 1)
 (window-divider-mode 1)
+
+;; ----------------------------------------------------------------------
+;; (use-package messages-buffer-mode
+;;   :config
+
+  ;; Can not use `use-package' "Error (use-package): Cannot load messages-buffer-mode"
+
+  ;; font lock
+  (defvar message-buffer-font-lock-defaults
+    `((( "\"\\.\\*\\?"                                  . font-lock-string-face)
+       ( "^Quit"   . font-lock-constant-face))))      ;; case insensitive
+  (defun my-hook--message-buffer-font-lock ()
+    (message "my-hook--message-buffer-font-lock")
+    (setq font-lock-defaults message-buffer-font-lock-defaults))
+
+  (add-hook 'messages-buffer-mode-hook #'my-hook--message-buffer-font-lock)
+
+  ;; auto scroll for *message* buffer
+  ;; https://stackoverflow.com/questions/4682033/in-emacs-can-i-set-up-the-messages-buffer-so-that-it-tails
+  (defun modi/messages-auto-tail (&rest _)
+    "Make *Messages* buffer auto-scroll to the end after each message."
+    (let* ((buf-name "*Messages*")
+           ;; Create *Messages* buffer if it does not exist
+           (buf (get-buffer-create buf-name)))
+      ;; Activate this advice only if the point is _not_ in the *Messages* buffer
+      ;; to begin with. This condition is required; otherwise you will not be
+      ;; able to use `isearch' and other stuff within the *Messages* buffer as
+      ;; the point will keep moving to the end of buffer :P
+      (when (not (string= buf-name (buffer-name)))
+        ;; Go to the end of buffer in all *Messages* buffer windows that are
+        ;; *live* (`get-buffer-window-list' returns a list of only live windows).
+        (dolist (win (get-buffer-window-list buf-name nil :all-frames))
+          (with-selected-window win
+            (goto-char (point-max))))
+        ;; Go to the end of the *Messages* buffer even if it is not in one of
+        ;; the live windows.
+        (with-current-buffer buf
+          (goto-char (point-max))))))
+
+  (advice-add 'message :after #'modi/messages-auto-tail)
+;; )
 
 
 ;; ----------------------------------------------------------------------
@@ -4761,31 +4803,6 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 ;;              (_ filename))
 ;;            args))
 ;;   (advice-add 'Info-find-node :around 'Info-find-node--elisp-ja))
-
-;; ----------------------------------------------------------------------
-;; auto scroll for *message* buffer
-;; https://stackoverflow.com/questions/4682033/in-emacs-can-i-set-up-the-messages-buffer-so-that-it-tails
-(defun modi/messages-auto-tail (&rest _)
-  "Make *Messages* buffer auto-scroll to the end after each message."
-  (let* ((buf-name "*Messages*")
-         ;; Create *Messages* buffer if it does not exist
-         (buf (get-buffer-create buf-name)))
-    ;; Activate this advice only if the point is _not_ in the *Messages* buffer
-    ;; to begin with. This condition is required; otherwise you will not be
-    ;; able to use `isearch' and other stuff within the *Messages* buffer as
-    ;; the point will keep moving to the end of buffer :P
-    (when (not (string= buf-name (buffer-name)))
-      ;; Go to the end of buffer in all *Messages* buffer windows that are
-      ;; *live* (`get-buffer-window-list' returns a list of only live windows).
-      (dolist (win (get-buffer-window-list buf-name nil :all-frames))
-        (with-selected-window win
-          (goto-char (point-max))))
-      ;; Go to the end of the *Messages* buffer even if it is not in one of
-      ;; the live windows.
-      (with-current-buffer buf
-        (goto-char (point-max))))))
-
-(advice-add 'message :after #'modi/messages-auto-tail)
 
 ;; ----------------------------------------------------------------------
 ;; customize setting
