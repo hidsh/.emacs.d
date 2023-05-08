@@ -1698,7 +1698,6 @@ alternative, you can run `embark-export' from commands like `M-x' and
   )
 
 (use-package vertico
-  ;; :disabled
   :config
   (setq vertico-count 20)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)   ;; for vertico-repeat (M-z)
@@ -1708,20 +1707,23 @@ alternative, you can run `embark-export' from commands like `M-x' and
                                   #(" %s " 0 4 (face vertico-group-title))
                                   #(" " 0 1 (face vertico-group-separator display (space :align-to right))))))
 
-    ;; 補完候補以外を選びづらい問題 https://misohena.jp/blog/2022-08-15-transition-ivy-to-vertico.html
-    (defun my-vertico--recompute (original-fun &rest args)
-      "vertico--update-candidatesの最後の処理を置き換える。"
-      (let ((result (apply original-fun args)))
-        (when result
-          (let ((lock         (alist-get 'vertico--lock-candidate result))
-                (allow-prompt (alist-get 'vertico--allow-prompt result))
-                (index        (alist-get 'vertico--index result)))
-            (when (and (not lock)
-                       allow-prompt)
-              ;; lockされておらず, require-matchじゃない場合は現在入力中の文字列を選択する。
-              (setf (alist-get 'vertico--index result) -1))))
-        result))
-    (advice-add 'vertico--recompute :around #'my-vertico--recompute)
+  ;; 補完候補以外を選びづらい問題(updated) https://misohena.jp/blog/2022-08-15-transition-ivy-to-vertico.html
+  ;; 候補更新時に最初の候補を選択しない
+  (setq vertico-preselect 'prompt)
+  ;; ただし、require-matchがt(やそれに類するもの)で入力が空ではなくマッ
+  ;; チする候補がある場合は、その候補の先頭を選択する。
+  (defun my-vertico--recompute (orig-fun pt content &rest args)
+    (let ((result (apply orig-fun pt content args)))
+      (if (and (not (equal content "")) ;;入力が空の時は(require-matchであっても)defaultまたはnilを返すことになっている。
+               (> (alist-get 'vertico--total result) 0)
+               ;; completing-readの説明によれば
+               ;; nil,confirm,confirm-after-completion以外はtのように
+               ;; 振る舞うべき。
+               (not (memq minibuffer--require-match
+                          '(nil confirm confirm-after-completion))))
+          (setf (alist-get 'vertico--index result) 0))
+      result))
+  (advice-add #'vertico--recompute :around #'my-vertico--recompute)
 
   (use-package vertico-directory
     :config

@@ -7,6 +7,8 @@
    [default bold shadow italic underline bold bold-italic bold])
  '(custom-safe-themes
    '("9efb2d10bfb38fe7cd4586afb3e644d082cbcdb7435f3d1e8dd9413cbe5e61fc" "c83c095dd01cde64b631fb0fe5980587deec3834dc55144a6e78ff91ebc80b19" "8042fe67484449b0315a39732a08002bb6d8e9196ed5c1e8a60d9c05107bfb28" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "78496062ff095da640c6bb59711973c7c66f392e3ac0127e611221d541850de2" default))
+ '(desktop-auto-save-timeout nil)
+ '(desktop-save-mode t)
  '(edebug-print-length 550)
  '(edebug-print-level 550)
  '(hl-sexp-background-color "#1c1f26")
