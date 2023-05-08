@@ -2965,7 +2965,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (use-package flycheck-jal
     :config
     (add-hook 'jal-mode-hook #'flycheck-mode))
-)
+
+  ;; use rp2pic programmer
+  (setq jal-mode-prog-func #'jal-mode-prog-func--rp2pic)
+  )
 
 ;; ----------------------------------------------------------------------
 (use-package mql-mode
