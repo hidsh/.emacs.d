@@ -2648,6 +2648,9 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
     ;; (setq flycheck-check-syntax-automatically '(mode-enabled save)) ;; new-line also possible
     )
 
+  (defun flycheck-python-mode-hook-func ()
+    (flycheck-mode 1))
+
   (defun flycheck-ruby-mode-hook-func ()
     (setq flycheck-checker 'ruby-rubocop))
 
@@ -2656,6 +2659,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
          ;; (nim-mode  . flycheck-nim-mode-hook-func)
          ;; (js-mode   . flycheck-js-mode-hook-func)
          ;; (web-mode  . flycheck-js-mode-hook-func)
+         (ruby-mode . flycheck-python-mode-hook-func)
          (ruby-mode . flycheck-ruby-mode-hook-func))
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
