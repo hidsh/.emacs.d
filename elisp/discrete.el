@@ -1,4 +1,4 @@
-;;; -*- coding:utf-8; mode:emacs-lisp -*-
+;;; discrete.el --- My trivial elisp functions  -*- coding:utf-8; mode:emacs-lisp -*-
 ;;;
 ;;; my discrete elisp
 ;;;
@@ -15,12 +15,19 @@
   (interactive)
   (message "no operation"))
 
-(defun p-1 ()
-  "Indicate info at the `point' in the echo area"
+(defun p-2 ()
+  "Return string of info at the `point' in the echo area"
   (let* ((pt (point))
          (c (char-after pt))
-         (stx (char-syntax c)))
-    (message "point=%d ch=\'%c\' indent=%d syntax=\'%c\' face=\'%s\'" pt c (current-indentation) stx (face-at-point))))
+         (ind (current-indentation))
+         (stx (char-syntax c))
+         (face (face-at-point 'multi)))
+    (format "point=%d indent=%d ch=\'%c\' syntax=\'%c\' face=%S"
+            pt ind c stx face)))
+
+(defun p-1 ()
+  "Indicate info at the `point' in the echo area"
+    (message (p-2)))
 
 (defun p (s)
   "`goto-char' to specified position if given argument. otherwise just indicate info at the `point'"

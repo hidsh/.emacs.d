@@ -817,6 +817,7 @@ That is, a string used to represent it on the tab bar."
   :config
   (evil-mode 1)
   (evil-set-initial-state 'help-mode 'emacs)
+  (evil-set-initial-state 'Info-mode 'emacs)
   (evil-set-initial-state 'slime-editing-mode 'emacs)
 
   (setq evil-emacs-state-message nil)
@@ -1923,7 +1924,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
     (let ((my-ivy-immediate-flag nil))
       (dired dir)))
 
-  ;; re-defun rom counsel.el
+  ;; re-defun from counsel.el
   ;; Usage: C-x C-f M-x m
   (defun counsel-find-file-move (x)
     "Move or rename file X."
@@ -2952,6 +2953,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; ----------------------------------------------------------------------
 (use-package jal-mode
   :load-path "~/git-clone/jal-mode"
+  ;; :load-path "~/tmp/jal-mode"
 
   :config
   (setq tab-width 4)

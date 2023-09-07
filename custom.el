@@ -35,7 +35,8 @@
      ((flymake flymake\.el))
      ((flymake flymake\.el))))
  '(warning-suppress-types
-   '(((flymake flymake\.el))
+   '((emacs)
+     ((flymake flymake\.el))
      ((flymake flymake\.el))
      ((flymake flymake\.el))
      ((flymake flymake\.el))
