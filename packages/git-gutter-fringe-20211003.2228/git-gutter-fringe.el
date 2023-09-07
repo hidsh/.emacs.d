@@ -5,8 +5,6 @@
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; Maintainer: Neil Okamoto <neil.okamoto+melpa@gmail.com>
 ;; URL: https://github.com/emacsorphanage/git-gutter-fringe
-;; Package-Version: 20211003.2228
-;; Package-Commit: 648cb5b57faec55711803cdc9434e55a733c3eba
 ;; Version: 0.23
 ;; Package-Requires: ((git-gutter "0.88") (fringe-helper "0.1.1") (cl-lib "0.5") (emacs "24"))
 

@@ -78,6 +78,17 @@
 ;; e.g. (myfont 'default) => "Source Han Code JP N"
 
 ;; ----------------------------------------------------------------------
+; host independent
+(require
+ (pcase system-type
+   ('windows-nt '_windows)
+   ('gnu/linux  '_linux)
+   ('darwin     '_mac)
+   (_ (user-error "Unknown system-type: %s" system-type))))
+
+;; (my-load-frame)
+
+;; ----------------------------------------------------------------------
 ;; defaults
 (setq-default
  inhibit-startup-screen t                         ; Disable start-up screen
@@ -127,14 +138,14 @@
  ;; http://yohshiy.blog.fc2.com/blog-entry-319.html
  ;;
  ;; backup to `hoge.txt~'
- backup-directory-alist '((".*" . "~/.Trash"))
+ backup-directory-alist '((".*" . "~/.Trash"))      ;; todo windows
  version-control     t  ;; 番号付けによる複数保存 存実行の有無
  kept-new-versions   5  ;;                   最新の保持数
  kept-old-versions   1  ;;                   最古の保持数
  delete-old-versions t  ;;                   範囲外を削除
 
  ;; backup to `#hoge.txt#'
- auto-save-file-name-transforms '(("~/\\([^/]*/\\)*\\([^/]*\\)$" "~/.Trash/\\2" t))
+ auto-save-file-name-transforms '(("~/\\([^/]*/\\)*\\([^/]*\\)$" "~/.Trash/\\2" t))         ;; todo windows
                                         ;             '((".*" "~/.Trash" t))
 
  auto-save-default nil                  ; disabled
@@ -296,12 +307,12 @@
 (defalias 'package-uninstall 'package-delete)
 
 ;; ----------------------------------------------------------------------
-(defvar my-face-adj-line-number-height 1.0)     ;; set by _mac.el or _windows.el or ...
+;; (defvar my-face-adj-line-number-height 1.0)     ;; set by _mac.el or _windows.el or ...
 
 (defun my-adv-load-theme--font-change (&rest _)
  (let ((font (myfont 'ui)))
    (when font
-     (set-face-attribute 'mode-line          nil :family font :height 1.1)
+     (set-face-attribute 'mode-line          nil :family font :height my-face-adj-mode-line-height)     ;; defined at _mac.el or _windows.el
      (set-face-attribute 'mode-line-inactive nil :inherit 'mode-line)
      (set-face-attribute 'minibuffer-prompt  nil :family font)
 
@@ -419,16 +430,6 @@
   (save-place-mode t)                                     ; Enable save-place
   )
 
-;; ----------------------------------------------------------------------
-; host independent
-(require
- (pcase system-type
-   ('windows-nt '_windows)
-   ('gnu/linux  '_linux)
-   ('darwin     '_mac)
-   (_ (user-error "Unknown system-type: %s" system-type))))
-
-;; (my-load-frame)
 
 ;; ----------------------------------------------------------------------
 ;; im-ctl
@@ -733,7 +734,7 @@ This makes use of the fact that by `message' a newline, the window configuration
   (tabbar-mode 1)
 
   (set-face-attribute 'tabbar-default nil
-                      :height 1.1
+                      :height my-face-adj-tabbar-height        ;; defined at _mac.el or _windows.el
                       :family (myfont 'ui))
 
   (global-set-key (kbd "M-u") 'tabbar-backward-tab)
@@ -2660,7 +2661,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
          ;; (nim-mode  . flycheck-nim-mode-hook-func)
          ;; (js-mode   . flycheck-js-mode-hook-func)
          ;; (web-mode  . flycheck-js-mode-hook-func)
-         (ruby-mode . flycheck-python-mode-hook-func)
+         (python-mode . flycheck-python-mode-hook-func)
          (ruby-mode . flycheck-ruby-mode-hook-func))
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
@@ -2952,6 +2953,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package jal-mode
+  :disabled     ;; temporary
   :load-path "~/git-clone/jal-mode"
   ;; :load-path "~/tmp/jal-mode"
 
@@ -4497,7 +4499,8 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package vterm
-  :if window-system
+  ;; Vterm はWindowsでは非推奨っぽいので使わない
+  :if (not (string= window-system "w32"))
   :ensure t
   :custom
   (vterm-buffer-name-string ">%s")
@@ -4716,6 +4719,7 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 ;; ----------------------------------------------------------------------
 (use-package magit
+  :disabled     ;; temporary
   :defer t
   :custom
   (magit-auto-revert-mode nil)
@@ -4739,7 +4743,7 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 (use-package go-translate
   :init
   (use-package web-api-auth-key
-    :load-path "~/Library/CloudStorage/Dropbox")
+    :load-path dropbox-dir)   ;; defined at _mac.el or _windows.el
 
   :config
 

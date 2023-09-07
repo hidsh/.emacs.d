@@ -4,37 +4,75 @@
 ;;;
 (message "--> loading \"_windows.el\"...")
 
-;;;
-;;; window size and position
-;;;
-(setq initial-frame-alist '(
-				    (top    . 0)
-				    (left   . 2358)     ;; for 4K display
-				    ;; (left   . 71)
-				    (height . 68)
-				    (width  . 95)))
-(setq default-frame-alist initial-frame-alist)
+;; Windowsの環境変数HOMEに"D:\_docu"を設定しておくこと！
+;; でないとthemeがロードされない→my-evil-normal-tag-faceが未定義とか言われるので注意
 
-;;;
-;;; default font
-;;;
 
-(let ((font (myfont 'default3)))
-;; (let ((font (myfont 'posframe)))
-  (when font
-    (set-frame-font font)))
+(add-to-list 'exec-path (expand-file-name "~/bin"))
+(add-to-list 'exec-path (expand-file-name "~/bin/PortableGit/bin"))
+(setq my-counsel-rg-exe (expand-file-name "~/bin/rg"))
 
-(set-face-attribute 'default nil :height 150)
-(set-face-attribute 'mode-line nil :height 150)
-(set-face-attribute 'minibuffer-prompt nil :height 150)
+(set-language-environment 'utf-8)
+(prefer-coding-system 'utf-8-unix)
+(setq default-buffer-file-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-clipboard-coding-system 'utf-8)
 
-;;;
-;;; external program
-;;;
-;; (add-to-list 'exec-path (expand-file-name "~/bin"))
-;; (setq my-counsel-rg-exe (expand-file-name "~/bin/rg"))
+;; (setq coding-system-for-read 'utf-8-unix)
+;; (setq coding-system-for-write 'utf-8-unix)
 
-;; migemo
+;; http://sakito.jp/emacs/emacsshell.html#id7
+
+;; mac os x の hfs+ ファイルフォーマットではファイル名は nfd (の様な物)で扱うため以下の設定をする必要がある
+;(require 'ucs-normalize)
+;(setq file-name-coding-system 'utf-8-hfs)
+;(setq locale-coding-system 'utf-8-hfs)
+
+;;
+;; for emacs mac port
+;;
+
+;; 以降はGUIのときのみ
+(when window-system
+  ;; server 起動
+  ;; ターミナルからは `$ emacsclient -nw hogefile` で使う
+  ;; (require 'server)
+  ;; (unless (server-running-p)
+  ;;   (server-start))
+
+  ;; window size and position
+  (let ((wleft (if (= (cl-fourth (car (frame-monitor-attributes))) 3840)
+                   1209          ; EIZO EV3237 (1920x1080)
+                 nil)))          ; others (temporary)
+
+    (setq initial-frame-alist `(
+                              (top    . 0)
+                              (left   . ,wleft)
+                              (height . 63)
+                              (width  . 110))))
+  (setq default-frame-alist initial-frame-alist)
+
+  ;; font
+  ;(set-default-font (myfont 'default)) ;; ~26.3
+  (set-frame-font (myfont 'default))	;; 27.2~
+
+  ;; for im-on/off in init.el
+  (defun im-ctl (on)
+    ;; (mac-input-source)
+;    (mac-select-input-source
+;     (if on
+         ;; google 日本語入力
+;         "com.google.inputmethod.Japanese.base"
+;       "com.apple.keylayout.US")))
+)
+
+  (defun im-on-p ()
+;    (not (string-match "\\.US$" (mac-input-source))))
+)
+
+  ;; migemo
   ;; fixme not work
   ;; (setq migemo-command "/usr/local/bin/cmigemo")
   ;; (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict")
@@ -42,185 +80,71 @@
 ;;;
 ;;; appearance adjust
 ;;;
-(setq my-face-adj-line-number-height 1.0)
+  (setq my-face-adj-line-number-height 1.2)
+  (setq my-face-adj-tabbar-height 1.2)
+  (setq my-face-adj-mode-line-height 1.2)
+  ;; (add-hook 'after-init-hook 'mac-change-language-to-us)          ;; emacs 起動時は英数モードから始める
+  ;; (add-hook 'minibuffer-setup-hook 'mac-change-language-to-us)    ;; minibuffer 内は英数モードにする
+  ;; (add-hook 'isearch-mode-hook 'mac-change-language-to-us)        ;; [migemo]isearch のとき IME を英数モードにする
 
-;;;
-;;; IME settings
-;;;
-(require 'wdired)
-
-;; IMEの初期化
-(w32-ime-initialize)
-
-;; 標準IMEの設定
-(setq default-input-method "W32-IME")
-
-;; IME状態のモードライン表示の設定
-(setq-default w32-ime-mode-line-state-indicator "")
-(setq w32-ime-mode-line-state-indicator-list '("" "" ""))
-
-;; IME ON/OFF時のカーソルカラーの設定
-;; （wrap-function-to-control-ime コマンド内等で、ime-force-on や ime-force-off が単独で
-;; 　呼ばれた際もカーソルカラーの変更が機能するように hook ではなく advice に変更した）
-(defvar my-cursor-color-bak nil)
-(advice-add 'ime-force-on :before (lambda (&rest args)
-                      (unless my-cursor-color-bak
-                        (setq my-cursor-color-bak (face-background 'cursor)))
-                      (set-cursor-color (mycolor 'red))))
-(advice-add 'ime-force-off :before (lambda (&rest args)
-                      (set-cursor-color
-                       (or my-cursor-color-bak (mycolor 'blue)))))
-
-;; バッファ切り替え時に IME の状態を引き継がない
-(setq w32-ime-buffer-switch-p t)
-
-;; minibuffer に入った時、IME を OFF にする
-(add-hook 'minibuffer-setup-hook (lambda () (deactivate-input-method)))
-(add-hook 'helm-minibuffer-set-up-hook (lambda () (deactivate-input-method)))
-
-;; IMEの制御付きにラップする
-;;（上記の minibuffer の設定が機能しない関数について設定する）
-;; http://sanrinsha.lolipop.jp/blog/2010/07/emacs-1.html#i-4
-(wrap-function-to-control-ime 'y-or-n-p nil nil)
-(wrap-function-to-control-ime 'map-y-or-n-p nil nil)
-(wrap-function-to-control-ime 'read-char nil nil)
-
-;; for im-on/off
-;; todo
-;; (defun im-ctl (on)
-;;   (let ((code (if on 104 102)))
-;;     (start-process "im-ctl" nil "osascript" "-e"
-;;                    (format "tell application \"System Events\" to key code %d" code))))
-
-;; isearch の設定
-;; http://d.hatena.ne.jp/ksugita0510/20110103/p1
-;; http://highmt.wordpress.com/2010/10/25/isearch%E3%81%A7%E6%97%A5%E6%9C%AC%E8%AA%9E%E5%85%A5%E5%8A%9B%E3%82%92%E3%82%84%E3%82%8A%E3%82%84%E3%81%99%E3%81%8F%E3%81%99%E3%82%8B%E3%83%91%E3%83%83%E3%83%81/
-(defun w32-isearch-update ()
-  (interactive)
-  (isearch-update))
-
-(add-hook 'isearch-mode-hook
-          (lambda ()
-            (setq ime-state (ime-get-mode))
-            (when ime-state
-              (w32-ime-state-switch nil))
-            (setq w32-ime-composition-window (minibuffer-window))))
-
-(add-hook 'isearch-mode-end-hook
-          (lambda ()
-            (unless (eq ime-state (ime-get-mode))
-              (if ime-state
-                  (w32-ime-state-switch t)
-                (w32-ime-state-switch nil)))
-            (setq w32-ime-composition-window nil)))
-
-(defun enable-input-method (&optional arg interactive)
-  (interactive "P\np")
-  (if (not current-input-method)
-      (toggle-input-method arg interactive)))
-
-(defun disable-input-method (&optional arg interactive)
-  (interactive "P\np")
-  (if current-input-method
-      (toggle-input-method arg interactive)))
-
-(defun isearch-enable-input-method ()
-  (interactive)
-  (if (not current-input-method)
-      (isearch-toggle-input-method)
-    (cl-letf (((symbol-function 'toggle-input-method)
-               (symbol-function 'ignore)))
-      (isearch-toggle-input-method))))
-
-(defun isearch-disable-input-method ()
-  (interactive)
-  (if current-input-method
-      (isearch-toggle-input-method)
-    (cl-letf (((symbol-function 'toggle-input-method)
-               (symbol-function 'ignore)))
-      (isearch-toggle-input-method))))
-
-;; (define-key isearch-mode-map (kbd "<compend>") 'w32-isearch-update)
-(define-key isearch-mode-map (kbd "<kanji>") 'isearch-toggle-input-method)
-
-;; IME をトグルするキー設定
-(global-set-key (kbd "<kanji>") 'toggle-input-method)
-(define-key isearch-mode-map (kbd "<kanji>") 'isearch-toggle-input-method)
-(define-key wdired-mode-map (kbd "<kanji>") 'toggle-input-method)
-
-;; IME を無効にするキー設定
-;; (global-set-key (kbd "<non-convert>") 'disable-input-method) ; 無変換キー
-;; (define-key isearch-mode-map (kbd "<non-convert>") 'isearch-disable-input-method)
-;; (define-key wdired-mode-map (kbd "<non-convert>") 'disable-input-method)
-
-;; (global-set-key (kbd "C-j") 'disable-input-method)
-;; (define-key isearch-mode-map (kbd "C-j") 'isearch-disable-input-method)
-;; (define-key wdired-mode-map (kbd "C-j") 'disable-input-method)
-
-;; IME を有効にするキー設定
-;; (global-set-key (kbd "<convert>") 'enable-input-method) ; 変換キー
-;; (define-key isearch-mode-map (kbd "<convert>") 'isearch-enable-input-method)
-;; (define-key wdired-mode-map (kbd "<convert>") 'enable-input-method)
-
-;; (global-set-key (kbd "C-o") 'enable-input-method)
-;; (define-key isearch-mode-map (kbd "C-o") 'isearch-enable-input-method)
-;; (define-key wdired-mode-map (kbd "C-o") 'enable-input-method)
-
-;; wdired 終了時に IME が ON になっていたら OFF にする
-(advice-add 'wdired-finish-edit
-            :after (lambda (&rest args)
-                     (deactivate-input-method)))
+  ;; ;; アイコンやdockから起動したemacsのpathやexec-pathが正しく設定されてないのをなんとかする
+  ;; ;; http://yukihr.github.com/blog/2012/03/02/emacs-path-settings/
+  ;; ;; when opened from desktep entry, path won't be set to shell's value.
+  ;; (let ((path-str
+  ;;        (replace-regexp-in-string "\n+$" "" (shell-command-to-string "echo $path"))))
+  ;;     (setenv "path" path-str)
+  ;;     (setq exec-path (nconc (split-string path-str ":") exec-path)))
 
 
-;;
-;; fullscreen
-;;
-(global-set-key (kbd "C-M-f") 'toggle-frame-fullscreen)
+  ;; 日本語環境設定 for mac
+  ;; http://maro.air-nifty.com/maro/2009/02/carbon-emacs-sh.html
+  ;; (set-language-environment "japanese")
 
-;; path
-;; (add-to-list 'load-path "c:/Users/g/AppData/Roaming/.emacs.d/elisp/zerodark-theme")
-(add-to-list 'exec-path "c:/Users/g/.emacs.d/bin-windows")
+  ;; 入力モードが日本語の時はカーソルの色を変える
+  (defvar my-cursor-color-bak nil)
+  (defun my-mac-selected-keyboard-input-source-change ()
+    (unless my-cursor-color-bak
+      (setq my-cursor-color-bak (face-background 'cursor)))
+      )
+;    (set-cursor-color (if (string-match "\\.US$" (mac-input-source))
+;                          my-cursor-color-bak
+;                        (mycolor 'red))))
 
-;;
-;; my-counsel-rg
-;;
-(setq my-counsel-rg-exe "c:/Users/g/.emacs.d/bin-windows/rg.exe")
-(setq my-counsel-rg-dot-ignore-path "~/.ignore")
-(setq my-counsel-rg-dot-ignore-list '("*bak*" "#*#"))
+;  (add-hook 'mac-selected-keyboard-input-source-change-hook 'my-mac-selected-keyboard-input-source-change)
 
-;; org-mode
-(setq org-directory "D:/Dropbox/org")
+  ;; ;; ミニバッファで入力する際に自動的にASCIIにする
+  ;; (when (fboundp 'mac-auto-ascii-mode)
+  ;;   (mac-auto-ascii-mode 1))
 
-;; lsp / ccls
-(setq ccls-executable "C:/Users/g/git-clone/ccls/Release/ccls.exe")
+  ;; fullscreen
+  (global-set-key (kbd "C-M-f") 'toggle-frame-fullscreen)
+
+  ;; org-mode
+  (setq org-directory "~/Dropbox/org")
+
+  ;; check-emacs-setting
+  ;; (setq check-emacs-setting-diff-pgm "/Applications/Meld.app/Contents/MacOS/Meld")
+  ;; (setq check-emacs-setting-cmp-pgm "cmp")
+
+  ;; slime
+  (setq ros-exe "/usr/local/bin/ros")
+  (setq my-slime-helper "~/.roswell/helper.el")
+
+  ;; nim-mode
+  (let ((bin-path (expand-file-name "~/.nimble/bin")))
+   (add-to-list 'exec-path bin-path)
+   (setenv "PATH" (concat bin-path ":" (getenv "PATH")))
+
+   )
+  )
+
+;; go-translate
+(setq dropbox-dir "D:/Dropbox")
 
 
-;; cc-mode
-(push "D:/pgm/mingw-w64/mingw32/bin" exec-path)
-
-;; (setenv "PATH" (concat "d:\\pgm\\mingw-w64\\mingw32\\bin;" (getenv "PATH")))
-
-;; slime
-(setq ros-exe "D:/pgm/roswell/ros.exe")
-(setq my-slime-helper "C:/Users/g/.roswell/helper.el")
-
-;; slime with cl-sdl2
-;; (let ((paths '("C:\\msys64\\usr\\bin")))
-;;   (dolist (p paths)
-;;     (push p exec-path)
-;;     (setenv "PATH" (concat p ";" (getenv "PATH")))))
-
-;; arduino-mode
-(setq arduino-exe-path "C:/Program Files (x86)/Arduino/arduino-cli.exe")
-(setq arduino-fqbn "arduino:avr:leonardo")
-
-;;
-;; check-emacs-setting
-;;
-(setq check-emacs-setting-diff-pgm "C:/Program Files/WinMerge/WinMergeU.exe")
-(setq check-emacs-setting-cmp-pgm "c:/GnuWin32/bin/cmp.exe")
 
 (message "<-- done    \"_windows.el\"")
+
 
 (provide '_windows)
 ;; _windows.el ends here

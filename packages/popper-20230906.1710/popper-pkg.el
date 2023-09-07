@@ -1,6 +1,8 @@
-(define-package "popper" "20230107.2344" "Summon and dismiss buffers as popups"
+(define-package "popper" "20230906.1710" "Summon and dismiss buffers as popups"
   '((emacs "26.1"))
-  :commit "50568b8af2ee4c43d4a5b55241fac7ef11e2f9db" :authors
+  :commit "031e4d093c1e52337a3ca137740933a185f3d61d" :authors
+  '(("Karthik Chikmagalur" . "karthik.chikmagalur@gmail.com"))
+  :maintainers
   '(("Karthik Chikmagalur" . "karthik.chikmagalur@gmail.com"))
   :maintainer
   '("Karthik Chikmagalur" . "karthik.chikmagalur@gmail.com")
