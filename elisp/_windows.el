@@ -2,15 +2,32 @@
 ;;;
 ;;; _windows.el
 ;;;
+;;; Windowsの環境変数HOMEに"D:\_docu"を設定しておくこと！
+;;; でないとthemeがロードされない→my-evil-normal-tag-faceが未定義とか言われるので注意
+
 (message "--> loading \"_windows.el\"...")
 
-;; Windowsの環境変数HOMEに"D:\_docu"を設定しておくこと！
-;; でないとthemeがロードされない→my-evil-normal-tag-faceが未定義とか言われるので注意
+;; 外部コマンドはmsys2/mingwを使う
+;;D:\pgm\msys64\usr\bin
+(setenv "PATH" (concat "D:\\pgm\\msys64\\mingw64\\bin;"
+                       ;; "D:\\pgm\\msys64\\mingw64\\usr\\bin;"
+                       (getenv "PATH")))
+;; (setenv "PATH" (concat "D:\\pgm\\msys64\\usr\\bin;" (getenv "PATH")))
 
+(add-to-list 'exec-path "D:/pgm/msys64/mingw64/bin")
 
-(add-to-list 'exec-path (expand-file-name "~/bin"))
-(add-to-list 'exec-path (expand-file-name "~/bin/PortableGit/bin"))
-(setq my-counsel-rg-exe (expand-file-name "~/bin/rg"))
+;; ;;
+;; ;; native compile for windows (copy from MSYS2)
+;; (custom-set-variables
+;;  '(native-comp-driver-options '("-B" "D:/pgm/Emacs/for_native_comp"))
+;;  )
+;; 事前にやっておく
+;; $ cp /d/pgm/Emacs/for_native_comp/libgccjit-0.dll /d/pgm/Emacs/emacs-29.1/bin/
+
+;; (setq bin-windows-path (expand-file-name (path-join (file-name-directory user-init-file) "bin-windows")))
+;; (add-to-list 'exec-path bin-windows-path)
+;; (add-to-list 'exec-path (path-join bin-windows-path "PortableGit/bin"))
+;; (setq my-counsel-rg-exe (path-join bin-windows-path "rg.exe"))
 
 (set-language-environment 'utf-8)
 (prefer-coding-system 'utf-8-unix)
@@ -96,6 +113,7 @@
   ;;     (setq exec-path (nconc (split-string path-str ":") exec-path)))
 
 
+
   ;; 日本語環境設定 for mac
   ;; http://maro.air-nifty.com/maro/2009/02/carbon-emacs-sh.html
   ;; (set-language-environment "japanese")
@@ -130,12 +148,11 @@
   (setq ros-exe "/usr/local/bin/ros")
   (setq my-slime-helper "~/.roswell/helper.el")
 
-  ;; nim-mode
-  (let ((bin-path (expand-file-name "~/.nimble/bin")))
-   (add-to-list 'exec-path bin-path)
-   (setenv "PATH" (concat bin-path ":" (getenv "PATH")))
-
-   )
+  ;; ;; nim-mode
+  ;; (let ((bin-path (expand-file-name "~/.nimble/bin")))
+  ;;  (add-to-list 'exec-path bin-path)
+  ;;  (setenv "PATH" (concat bin-path ":" (getenv "PATH")))
+  ;;  )
   )
 
 ;; go-translate
