@@ -408,8 +408,8 @@
      (&dark  :foreground (doom-darken fg 0.12))
      (&light :foreground (doom-lighten fg 0.12)))
     (diff-removed :foreground red :background base3)
-    (diff-header  :foreground cyan :background nil)
-    (diff-file-header :foreground blue :background nil)
+    (diff-header  :foreground cyan :background 'unspecified)
+    (diff-file-header :foreground blue :background 'unspecified)
     (diff-hunk-header :foreground violet)
     (diff-refine-added   :inherit 'diff-added :inverse-video t)
     (diff-refine-changed :inherit 'diff-changed :inverse-video t)
@@ -727,7 +727,7 @@
      :inherit 'ivy-minibuffer-match-face-1
      :foreground magenta :background base1 :weight 'semi-bold)
     (ivy-minibuffer-match-face-3
-     :inherit 'ivy-minibuffer-match-face-2
+     :inherit 'ivy-minibuffer-match-face-2kkkkkkkkkkkkk
      :foreground green :weight 'semi-bold)
     (ivy-minibuffer-match-face-4
      :inherit 'ivy-minibuffer-match-face-2
