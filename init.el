@@ -954,6 +954,8 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd ")") #'nop)                            ; unmap
   (define-key evil-motion-state-map (kbd "3") #'my-evil-search-word-backward)      ; works as #
   (define-key evil-motion-state-map (kbd "8") #'my-evil-search-word-forward)       ; works as *
+  (define-key evil-motion-state-map (kbd "H") #'evil-backward-little-word-begin)
+  (define-key evil-motion-state-map (kbd "L") #'evil-forward-little-word-begin)
 
   (define-key evil-motion-state-map (kbd "i")   #'nop)                          ; unmap
   ;; (define-key evil-motion-state-map (kbd "V")   #'nop)                          ; unmap
@@ -2409,17 +2411,17 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :hook (prog-mode . symbol-overlay-mode)
   :config
   (setq symbol-overlay-idle-time 0.2)
-  (set-face-attribute 'highlight nil :background "#606060" :foreground "#ffffff" :bold nil)
+  (set-face-attribute 'highlight nil :background "#606060" :foreground "#ffffff" :bold 'unspecified)
 
   (let ((color (mycolor 'red)))
-    (set-face-attribute 'symbol-overlay-face-1 nil :background color :bold nil)
-    (set-face-attribute 'symbol-overlay-face-2 nil :background color :bold nil)
-    (set-face-attribute 'symbol-overlay-face-3 nil :background color :bold nil)
-    (set-face-attribute 'symbol-overlay-face-4 nil :background color :bold nil)
-    (set-face-attribute 'symbol-overlay-face-5 nil :background color :bold nil)
-    (set-face-attribute 'symbol-overlay-face-6 nil :background color :bold nil)
-    (set-face-attribute 'symbol-overlay-face-7 nil :background color :bold nil)
-    (set-face-attribute 'symbol-overlay-face-8 nil :background color :bold nil))
+    (set-face-attribute 'symbol-overlay-face-1 nil :background color :bold 'unspecified)
+    (set-face-attribute 'symbol-overlay-face-2 nil :background color :bold 'unspecified)
+    (set-face-attribute 'symbol-overlay-face-3 nil :background color :bold 'unspecified)
+    (set-face-attribute 'symbol-overlay-face-4 nil :background color :bold 'unspecified)
+    (set-face-attribute 'symbol-overlay-face-5 nil :background color :bold 'unspecified)
+    (set-face-attribute 'symbol-overlay-face-6 nil :background color :bold 'unspecified)
+    (set-face-attribute 'symbol-overlay-face-7 nil :background color :bold 'unspecified)
+    (set-face-attribute 'symbol-overlay-face-8 nil :background color :bold 'unspecified))
 
   (defvar my-symbol-overlay-marker (make-marker))
 
@@ -2982,14 +2984,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package mql-mode
-  :disabled
   :mode (("\\.mq4$" . mql-mode)
          ("\\.mqh$" . mql-mode))
   :bind (:map mql-mode-map
          ([S-down] . flymake-goto-next-error)
          ([S-up]   . flymake-goto-prev-error))
   :config
-  (setq mq4-compiler "C:/Users/g/AppData/Roaming/MetaQuotes/WebInstall/mt4clw/metaeditor.exe")
+  (setq mq4-compiler "C:/Program Files (x86)/XMTrading MT4/metaeditor.exe")
   (add-hook 'mql-mode-hook #'(lambda ()
                              (flycheck-mode -1)
                              (flymake-mode t)
@@ -4615,11 +4616,12 @@ $0`(yas-escape-text yas-selected-text)`
   ;;    vterm          o        -
   ;;    reb            -        o
   (setq popper-reference-buffers
-        '("\\*Backtrace\\*"
+        '(
+          "\\*Backtrace\\*"
           "\\*Apropos\\*"
           "\\*Messages\\*"
           "\\*Warnings\\*"
-          "Output\\*$"
+          "Output\\*"
           "\\*Async Shell Command\\*"
           "\\*quickrun\\*"
           ;; "\\*scratch\\*"

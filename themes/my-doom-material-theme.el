@@ -130,7 +130,7 @@ Can be an integer to determine the exact padding."
 
   ;; --- base faces ------------------------
   ;; (((lazy-highlight &override) :background base4 :foreground fg :distant-foreground fg :bold bold)
-  ((lazy-highlight :background base6 :foreground nil :distant-foreground nil :bold nil)
+  ((lazy-highlight :background base6 :foreground 'unspecified :distant-foreground 'unspecified :bold 'unspecified)
    (doom-modeline-buffer-path       :foreground green :weight 'bold)
    (doom-modeline-buffer-major-mode :inherit 'doom-modeline-buffer-path)
 
@@ -164,9 +164,9 @@ Can be an integer to determine the exact padding."
    (fringe :foreground base7 :background base3)
 
    ;; selection (region)
-   (region :foreground nil :background nil :underline highlight-red)
+   (region :foreground 'unspecified :background 'unspecified :underline highlight-red)
 
-   (isearch :inherit 'lazy-highlight :foreground nil :background highlight-dark)
+   (isearch :inherit 'lazy-highlight :foreground 'unspecified :background highlight-dark)
 
    ;; font-lock
    (font-lock-keyword-face :foreground yellow)
@@ -199,9 +199,9 @@ Can be an integer to determine the exact padding."
    (my-evil-operator-tag-face :inherit 'my-evil-normal-tag-face :background violet)
 
    ;; git-gutter
-   (git-gutter:modified :background yellow :foreground nil)
-   (git-gutter:added    :background teal   :foreground nil)
-   (git-gutter:deleted  :background red    :foreground nil)
+   (git-gutter:modified :background yellow :foreground 'unspecified)
+   (git-gutter:added    :background teal   :foreground 'unspecified)
+   (git-gutter:deleted  :background red    :foreground 'unspecified)
 
    (git-gutter-fr:modified :foreground yellow :background "#A28915" )
    (git-gutter-fr:added    :foreground teal   :background "#408C83" )
@@ -216,9 +216,9 @@ Can be an integer to determine the exact padding."
    (lsp-ui-peek-highlight :foreground black :background orange)
 
    ;; flycheck (fringe)
-   (flycheck-fringe-info    :background nil :foreground teal)
-   (flycheck-fringe-warning :background nil :foreground yellow)
-   (flycheck-fringe-error   :background nil :foreground red)
+   (flycheck-fringe-info    :background 'unspecified :foreground teal)
+   (flycheck-fringe-warning :background 'unspecified :foreground yellow)
+   (flycheck-fringe-error   :background 'unspecified :foreground red)
 
    ;; css-mode / scss-mode
    (css-proprietary-property :foreground yellow)
@@ -312,7 +312,7 @@ Can be an integer to determine the exact padding."
 
    ;; paren
    ;; (paren-face-match :foreground nil :background base0)
-   (paren-face-match :foreground nil :background black)
+   (paren-face-match :foreground 'unspecified :background black)
    (sp-show-pair-match-face :background highlight-dark)
 
    ;; company
@@ -335,6 +335,9 @@ Can be an integer to determine the exact padding."
 
    ;; hide-ifdef-mode
    (hide-ifdef-shadow :foreground comments)
+
+   ;;
+
    ))
 
 
