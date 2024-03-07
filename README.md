@@ -29,7 +29,7 @@ sudo update-alternatives --install /usr/bin/emacs emacs /usr/local/bin/emacs-29.
 ### check
 ```
 `which emacs` --version
-→ `GNU Emacs 29.2.50`
+→ GNU Emacs 29.2.50
 
 emacs --batch --eval="(print system-configuration-features)"|grep NATIVE_COMP
 →"CAIRO DBUS FREETYPE GIF GLIB GMP GNUTLS GSETTINGS HARFBUZZ JPEG LIBSELINUX LIBXML2 MODULES NATIVE_COMP NOTIFY INOTIFY PDUMPER PNG SECCOMP SOUND THREADS TIFF TOOLKIT_SCROLL_BARS X11 XDBE XIM XINPUT2 XPM GTK3 ZLIB"
