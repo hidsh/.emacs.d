@@ -17,6 +17,8 @@
 
 ;; ignore `(require 'cl)'
 (setq byte-compile-warnings '(not cl-functions obsolete))
+
+
 ;; ----------------------------------------------------------------------
 ;; my-elisp
 (require 'discrete)
@@ -28,6 +30,12 @@
 ;;                                   "~/.emacs.d/elisp/_mac.el"
 ;;                                   "~/.emacs.d/elisp/_ubuntu.el"
 ;;                                   "~/.emacs.d/elisp/_windows.el"))
+
+;; ----------------------------------------------------------------------
+;; save sessions
+(setq desktop-auto-save-timeout nil)
+(with-no-message
+  (desktop-save-mode 1))
 
 ;; ----------------------------------------------------------------------
 (defun mycolor (name)
@@ -57,7 +65,7 @@
   (let* ((fonts '((default  . "Source Han Code JP N")
                   (default2 . "Consolas")
                   (default3 . "Cica")
-                  (default4 . "Hack")
+                  (nerdfont . "ShureTechMono Nerd Font Mono")
                   (ui       . "x14y24pxHeadUpDaisy")
                   (ui2      . "Krungthep")
                   (ui3      . "Squarea")
@@ -540,8 +548,9 @@
              (type (car l))
              (branch (cdr l)))
         (concat (pcase type
-                  ("Git" "\ue725")
+                  ("Git" (propertize "\ue725" 'face `(:family ,(myfont 'nerdfont))))    ;; branch icon
                   (_ "?"))
+                (propertize " " 'face `(:family ,(myfont 'ui) :height 30))    ;; gap
                 (cond ((string= branch "") "")
                       ((or (string= branch "master") (string= branch "main"))
                        (propertize branch 'face (mode-line-choose-face 'my-mode-line-accent-face)))
@@ -1007,6 +1016,7 @@ That is, a string used to represent it on the tab bar."
   ;; (define-key evil-normal-state-map (kbd "M-p") #'counsel-yank-pop)
   ;; (define-key evil-normal-state-map (kbd "SPC") #'evil-force-normal-state)
   (define-key evil-normal-state-map (kbd "g f") #'my-beginning-of-defun)
+  (define-key evil-normal-state-map (kbd "g s") #'git-gutter:popup-hunk)        ;; git diff
   (define-key evil-normal-state-map (kbd "g r") #'git-gutter:revert-hunk)       ;; git unstage
   (define-key evil-normal-state-map (kbd "g u") #'git-gutter:revert-hunk)       ;; git unstage
   (define-key evil-normal-state-map (kbd "g a") #'git-gutter:stage-hunk)        ;; git add
@@ -2258,6 +2268,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; ----------------------------------------------------------------------
 (use-package undo-tree
   :config
+  (global-undo-tree-mode 1)
   (define-key undo-tree-map (kbd "C-?") 'nil)
   (define-key undo-tree-map (kbd "C-r") 'nil)    ;; undo-tree-redo      FIXME: not work
   )
@@ -4501,7 +4512,7 @@ $0`(yas-escape-text yas-selected-text)`
 ;; ----------------------------------------------------------------------
 (use-package vterm
   ;; Vterm はWindowsでは非推奨っぽいので使わない
-  :if (not (string= window-system "w32"))
+  :if (string= window-system "ns")
   :ensure t
   :custom
   (vterm-buffer-name-string ">%s")
@@ -4600,6 +4611,7 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package popper
+;;  :disabled
   :ensure t ; or :straight t
   :bind (("M-0"   . popper-toggle-latest)
          ("M--"   . popper-cycle)
@@ -4626,7 +4638,7 @@ $0`(yas-escape-text yas-selected-text)`
           "\\*quickrun\\*"
           ;; "\\*scratch\\*"
           ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
-          shortdoc
+          ;; shortdoc
           reb-mode
           help-mode
           compilation-mode))

@@ -40,7 +40,7 @@
 
 ;; https://qiita.com/itiut@github/items/d917eafd6ab255629346
 ;; note: signal や error 関数には効かない
-(defmacro with-suppressed-message (&rest body)
+(defmacro with-no-message (&rest body)
   "Suppress new messages temporarily in the echo area and the `*Messages*' buffer while BODY is evaluated."
   (declare (indent 0))
   (let ((message-log-max nil))
@@ -347,17 +347,17 @@ double quotation characters \(\"\) from given string."
 
 ;; ----------------------------------------------------------------------
 ;; @@ `my-beginning-of-defun'
-(defvar my-beginning-of-defun-pos nil)
+;; (defvar my-beginning-of-defun-pos nil)
 
-(defun my-beginning-of-defun ()
-  (interactive)
-  (if (and (eq last-command this-command) my-beginning-of-defun-pos)
-      (progn
-        (goto-char my-beginning-of-defun-pos)
-        (setq my-beginning-of-defun-pos nil))
-    (setq my-beginning-of-defun-pos (point))
-    (beginning-of-defun)
-    ))
+;; (defun my-beginning-of-defun ()
+;;   (interactive)
+;;   (if (and (eq last-command this-command) my-beginning-of-defun-pos)
+;;       (progn
+;;         (goto-char my-beginning-of-defun-pos)
+;;         (setq my-beginning-of-defun-pos nil))
+;;     (setq my-beginning-of-defun-pos (point))
+;;     (beginning-of-defun)
+;;     ))
 
 ;(define-key evil-normal-state-map (kbd "g f") 'my-beginning-of-defun)
 
@@ -566,11 +566,11 @@ double quotation characters \(\"\) from given string."
 
 ;; ----------------------------------------------------------------------
 ;; @@ `message-buffer'
-(defun message-buffer ()
-  "Open `*Messages*' buffer."
-  (interactive)
-  (let ((buf "*Messages*"))
-    (switch-to-buffer-other-window buf t)))
+;; (defun message-buffer ()
+;;   "Open `*Messages*' buffer."
+;;   (interactive)
+;;   (let ((buf "*Messages*"))
+;;     (switch-to-buffer-other-window buf t)))
 
 ;; ----------------------------------------------------------------------
 ;; @@ `my-eval-depth-increase'
@@ -609,9 +609,9 @@ double quotation characters \(\"\) from given string."
 
 ;; ----------------------------------------------------------------------
 ;; @@ `insert-tab-character'
-(defun insert-tab-character ()
-  (interactive)
-  (insert "\t"))
+;; (defun insert-tab-character ()
+;;   (interactive)
+;;   (insert "\t"))
 
 ;; bind to C-tab
 ;; (global-set-key (quote [C-tab]) 'insert-tab-character)
@@ -619,63 +619,63 @@ double quotation characters \(\"\) from given string."
 
 ;; ----------------------------------------------------------------------
 ;; @@ `insert-*-string'
-(defun get-key-string (key)
-  (let* ((str (describe-key-briefly key))
-	 (end (string-match " runs " str)))
-    (unless end
-      (setq end (string-match " is " str)))
-    (substring str 0 end)))
+;; (defun get-key-string (key)
+;;   (let* ((str (describe-key-briefly key))
+;; 	 (end (string-match " runs " str)))
+;;     (unless end
+;;       (setq end (string-match " is " str)))
+;;     (substring str 0 end)))
 
-(defvar insert-key-string (list "" " "))
-(defun insert-key-string (key)
-  (interactive "kkey:")
-  (insert (car insert-key-string)
-	  (get-key-string key)
-	  (car (cdr insert-key-string))))
+;; (defvar insert-key-string (list "" " "))
+;; (defun insert-key-string (key)
+;;   (interactive "kkey:")
+;;   (insert (car insert-key-string)
+;; 	  (get-key-string key)
+;; 	  (car (cdr insert-key-string))))
 
-(defun get-command-string (key)
-  (let* ((str (describe-key-briefly key)))
-    (string-match " command " str)
-    (setq beg (match-end 0))
-    (if beg
-	(substring str beg)
-      (""))))
+;; (defun get-command-string (key)
+;;   (let* ((str (describe-key-briefly key)))
+;;     (string-match " command " str)
+;;     (setq beg (match-end 0))
+;;     (if beg
+;; 	(substring str beg)
+;;       (""))))
 
-(defvar insert-command-string (list "" ""))
-(defun insert-command-string (key)
-  (interactive "kkey:")
-  (insert (car insert-command-string)
-	  (get-command-string key)
-	  (car (cdr insert-command-string))))
+;; (defvar insert-command-string (list "" ""))
+;; (defun insert-command-string (key)
+;;   (interactive "kkey:")
+;;   (insert (car insert-command-string)
+;; 	  (get-command-string key)
+;; 	  (car (cdr insert-command-string))))
 
-(defvar insert-key-command-string (list "" "\t\t" "\n"))
-(defun insert-key-command-string (key)
-  (interactive "kkey:")
-  (insert (car insert-key-command-string)
-	  (get-key-string key)
-	  (nth 1 insert-key-command-string)
-	  (get-command-string key)
-	  (nth 2 insert-key-command-string)))
+;; (defvar insert-key-command-string (list "" "\t\t" "\n"))
+;; (defun insert-key-command-string (key)
+;;   (interactive "kkey:")
+;;   (insert (car insert-key-command-string)
+;; 	  (get-key-string key)
+;; 	  (nth 1 insert-key-command-string)
+;; 	  (get-command-string key)
+;; 	  (nth 2 insert-key-command-string)))
 ;; key-bind
 ;; (global-set-key "\C-x\C-y" 'insert-key-string)
 
 ;; ----------------------------------------------------------------------
 ;; @@ `enum-buffer-names'
-(defun enum-buffer-names ()
-  "存在するバッファ名をすべて列挙し、scratchバッファに表示する。"
-  (interactive)
-  (setq buff-list (buffer-list))
-  (set-buffer "*scratch*")
-  (end-of-buffer)
-  (insert "\n")
-  (insert "---- enum-buffer-names start --------------------------\n")
-  (while buff-list
-    (insert "\"")
-    (insert (buffer-name (car buff-list)))
-    (insert "\"\n")
-    (setq buff-list (cdr buff-list)))
-  (insert "---- enum-buffer-names end ----------------------------\n")
-)
+;; (defun enum-buffer-names ()
+;;   "存在するバッファ名をすべて列挙し、scratchバッファに表示する。"
+;;   (interactive)
+;;   (setq buff-list (buffer-list))
+;;   (set-buffer "*scratch*")
+;;   (end-of-buffer)
+;;   (insert "\n")
+;;   (insert "---- enum-buffer-names start --------------------------\n")
+;;   (while buff-list
+;;     (insert "\"")
+;;     (insert (buffer-name (car buff-list)))
+;;     (insert "\"\n")
+;;     (setq buff-list (cdr buff-list)))
+;;   (insert "---- enum-buffer-names end ----------------------------\n")
+;; )
 
 ;; ----------------------------------------------------------------------
 ;; @@ `visible-whole-buffer'
@@ -714,49 +714,49 @@ double quotation characters \(\"\) from given string."
 
 ;; ----------------------------------------------------------------------
 ;; @@ `my-copy-word'
-(defvar my-copy-word-thing-n 0)
-(make-variable-buffer-local 'my-copy-word-thing-n)
-(defvar my-copy-word-prev-str "")
-(make-variable-buffer-local 'my-copy-word-prev-str)
-(defvar my-copy-word-ini-str "")
-(make-variable-buffer-local 'my-copy-word-ini-str)
+;; (defvar my-copy-word-thing-n 0)
+;; (make-variable-buffer-local 'my-copy-word-thing-n)
+;; (defvar my-copy-word-prev-str "")
+;; (make-variable-buffer-local 'my-copy-word-prev-str)
+;; (defvar my-copy-word-ini-str "")
+;; (make-variable-buffer-local 'my-copy-word-ini-str)
 
-(defun my-copy-word ()
-  (interactive)
-  (let ((sel '(word symbol filename))
-	(n my-copy-word-thing-n)
-	(str nil)
-	beg end ol)
-    (if (eq last-command 'my-copy-word)
-	(if (< n (1- (length sel)))
-	    (setq n (1+ n))
-	  (setq n 0))
-      (setq n 0))
-    (while (or (null (prog1
-			 (setq str (thing-at-point (nth n sel)))
-		       (set-text-properties 0 (length str) nil str)))
-	       (and (string= str my-copy-word-prev-str)
-		    (not (string= str my-copy-word-ini-str))))
-      (if (< n (1- (length sel)))
-	  (setq n (1+ n))
-	(setq n 0)))
-    (kill-new str)			;copy to kill-ring
-    (setq my-copy-word-thing-n n)
-    (setq my-copy-word-prev-str str)
-    (setq my-copy-word-ini-str (when (= n 0) str))
-    (message "copied: %s" str)
-    (save-excursion			;get beg, end
-      (let ((len (length str)))
-	(while (null (progn
-		       (setq beg (point))
-		       (setq end (+ beg len))
-		       (string= str
-				(buffer-substring-no-properties beg end))))
-	  (backward-char))))
-    (setq ol (make-overlay beg end))	;hilight word
-    (overlay-put ol 'face 'highlight)
-    (sit-for 5)
-    (delete-overlay ol)))
+;; (defun my-copy-word ()
+;;   (interactive)
+;;   (let ((sel '(word symbol filename))
+;; 	(n my-copy-word-thing-n)
+;; 	(str nil)
+;; 	beg end ol)
+;;     (if (eq last-command 'my-copy-word)
+;; 	(if (< n (1- (length sel)))
+;; 	    (setq n (1+ n))
+;; 	  (setq n 0))
+;;       (setq n 0))
+;;     (while (or (null (prog1
+;; 			 (setq str (thing-at-point (nth n sel)))
+;; 		       (set-text-properties 0 (length str) nil str)))
+;; 	       (and (string= str my-copy-word-prev-str)
+;; 		    (not (string= str my-copy-word-ini-str))))
+;;       (if (< n (1- (length sel)))
+;; 	  (setq n (1+ n))
+;; 	(setq n 0)))
+;;     (kill-new str)			;copy to kill-ring
+;;     (setq my-copy-word-thing-n n)
+;;     (setq my-copy-word-prev-str str)
+;;     (setq my-copy-word-ini-str (when (= n 0) str))
+;;     (message "copied: %s" str)
+;;     (save-excursion			;get beg, end
+;;       (let ((len (length str)))
+;; 	(while (null (progn
+;; 		       (setq beg (point))
+;; 		       (setq end (+ beg len))
+;; 		       (string= str
+;; 				(buffer-substring-no-properties beg end))))
+;; 	  (backward-char))))
+;;     (setq ol (make-overlay beg end))	;hilight word
+;;     (overlay-put ol 'face 'highlight)
+;;     (sit-for 5)
+;;     (delete-overlay ol)))
 
 ; key-bind
 ;; (global-set-key [?\C-=] 'my-copy-word)
@@ -833,41 +833,41 @@ double quotation characters \(\"\) from given string."
 ;; ----------------------------------------------------------------------
 ;; @@ `my-find-file'
 ;; thank somebody at 2ch.
-(defvar my-find-file-interactive-arg-active-p nil)
-(defun my-find-file-interactive-arg (str &optional initial)
-  (let* ((my-find-file-interactive-arg-active-p t)
-	 (insert-default-directory (null initial))
-	 (name (read-file-name str nil nil nil initial))
-	 (wild-p current-prefix-arg)
-	 (file (if wild-p name (expand-file-name name))))
-    (cond ((if wild-p (file-expand-wildcards name)
-			 (file-exists-p file))
-		   (list file wild-p))
-		  ((y-or-n-p (format "%s not exists, New file? " (file-name-nondirectory file)))
-		   (list file wild-p))
-		  (t (my-find-file-interactive-arg "Find file: " name)))))
+;; (defvar my-find-file-interactive-arg-active-p nil)
+;; (defun my-find-file-interactive-arg (str &optional initial)
+;;   (let* ((my-find-file-interactive-arg-active-p t)
+;; 	 (insert-default-directory (null initial))
+;; 	 (name (read-file-name str nil nil nil initial))
+;; 	 (wild-p current-prefix-arg)
+;; 	 (file (if wild-p name (expand-file-name name))))
+;;     (cond ((if wild-p (file-expand-wildcards name)
+;; 			 (file-exists-p file))
+;; 		   (list file wild-p))
+;; 		  ((y-or-n-p (format "%s not exists, New file? " (file-name-nondirectory file)))
+;; 		   (list file wild-p))
+;; 		  (t (my-find-file-interactive-arg "Find file: " name)))))
 
-(defun my-find-file-minibuffer-setup-hook ()
-  (when my-find-file-interactive-arg-active-p
-    (end-of-line)))
+;; (defun my-find-file-minibuffer-setup-hook ()
+;;   (when my-find-file-interactive-arg-active-p
+;;     (end-of-line)))
 
-(add-hook 'minibuffer-setup-hook
-	  'my-find-file-minibuffer-setup-hook)
+;; (add-hook 'minibuffer-setup-hook
+;; 	  'my-find-file-minibuffer-setup-hook)
 
-(defun my-find-file (filename &optional wildcards)
-  (interactive (my-find-file-interactive-arg "Find file: "))
-  (find-file filename wildcards))
+;; (defun my-find-file (filename &optional wildcards)
+;;   (interactive (my-find-file-interactive-arg "Find file: "))
+;;   (find-file filename wildcards))
 
-(defun my-find-alternate-file (filename &optional wildcards)
-  (interactive (my-find-file-interactive-arg "Find alternate file: "))
-  (find-alternate-file filename wildcards))
+;; (defun my-find-alternate-file (filename &optional wildcards)
+;;   (interactive (my-find-file-interactive-arg "Find alternate file: "))
+;;   (find-alternate-file filename wildcards))
 
-(defun my-find-file-pre-process (arg)
-  "switch `my-find-file' or `my-find-alternate-file' by arg."
-  (interactive "P")
-  (call-interactively (if arg
-			  'my-find-alternate-file
-			'my-find-file)))
+;; (defun my-find-file-pre-process (arg)
+;;   "switch `my-find-file' or `my-find-alternate-file' by arg."
+;;   (interactive "P")
+;;   (call-interactively (if arg
+;; 			  'my-find-alternate-file
+;; 			'my-find-file)))
 
 ;; (global-set-key "\C-x\C-f" 'my-find-file-pre-process)
 ;; (global-unset-key "\C-x\C-v")		; find-alternate-file
@@ -875,36 +875,36 @@ double quotation characters \(\"\) from given string."
 
 ;; ----------------------------------------------------------------------
 ;; @@ `my-insert-filename'
-(defvar my-insert-filename-start "Filename:"
-  "*The filename string is inserted following this string.")
-(defvar my-insert-filename-lines 10
-  "*Its applied upto this line number from head of file.")
+;; (defvar my-insert-filename-start "Filename:"
+;;   "*The filename string is inserted following this string.")
+;; (defvar my-insert-filename-lines 10
+;;   "*Its applied upto this line number from head of file.")
 
-(defun my-insert-filename ()
-  "Insert filename like as time-stamp."
-  (interactive)
-  (save-excursion
-    (save-restriction
-      (narrow-to-region (point-min) (progn
-				      (goto-char (point-min))
-				      (end-of-line)
-				      (let ((lines my-insert-filename-lines))
-					(while (and (not (eobp)) (> lines 1))
-					  (next-line 1)
-					  (end-of-line)
-					  (setq lines (1- lines))))
-				      (point)))
-      (goto-char (point-min))
-      (let ((cs case-fold-search))
-	;;case insesitive
-	(setq case-fold-search nil)
-	(when (search-forward my-insert-filename-start nil t)
-	  (while (not (eolp))
-	    (delete-char 1))
-	  (insert " ")
-	  (insert (file-name-nondirectory buffer-file-name)))
-	(setq case-fold-search cs))))
-  nil)
+;; (defun my-insert-filename ()
+;;   "Insert filename like as time-stamp."
+;;   (interactive)
+;;   (save-excursion
+;;     (save-restriction
+;;       (narrow-to-region (point-min) (progn
+;; 				      (goto-char (point-min))
+;; 				      (end-of-line)
+;; 				      (let ((lines my-insert-filename-lines))
+;; 					(while (and (not (eobp)) (> lines 1))
+;; 					  (next-line 1)
+;; 					  (end-of-line)
+;; 					  (setq lines (1- lines))))
+;; 				      (point)))
+;;       (goto-char (point-min))
+;;       (let ((cs case-fold-search))
+;; 	;;case insesitive
+;; 	(setq case-fold-search nil)
+;; 	(when (search-forward my-insert-filename-start nil t)
+;; 	  (while (not (eolp))
+;; 	    (delete-char 1))
+;; 	  (insert " ")
+;; 	  (insert (file-name-nondirectory buffer-file-name)))
+;; 	(setq case-fold-search cs))))
+;;   nil)
 
 ;; (add-hook 'write-file-hooks 'my-insert-filename)
 
@@ -958,7 +958,7 @@ double quotation characters \(\"\) from given string."
 (defun open-terminal ()
   (interactive)
   (let ((cmd (cond ((eq system-type 'windows-nt) (setq cmd "cmd.exe %s ."))
-                   ((eq system-type 'gnu/linux)  (setq cmd "gnome-terminal %s"))
+                   ((eq system-type 'gnu/linux)  (setq cmd "wezterm %s"))
                    (t                            (setq cmd "ttab -w -a iterm2 -d .")))))
     (shell-command cmd)))
 
@@ -1003,45 +1003,45 @@ is already narrowed."
 ;; ----------------------------------------------------------------------
 ;;@@ `my-save-frame'
 ;; http://d.hatena.ne.jp/Tan90909090/20121124/1353757368
-(defconst my-save-frame-file
-  "~/.emacs.d/.my-save-frame"
-  "フレームの位置、大きさを保存するファイルのパス")
+;; (defconst my-save-frame-file
+;;   "~/.emacs.d/.my-save-frame"
+;;   "フレームの位置、大きさを保存するファイルのパス")
 
-(defun my-save-frame()
-  "現在のフレームの位置、大きさを`my-save-frame-file'に保存します"
-  (interactive)
-  (let* ((param (frame-parameters (selected-frame)))
-         (current-height (frame-height))
-         (current-width (frame-width))
-         (current-top-margin (if (integerp (cdr (assoc 'top param)))
-                                 (cdr (assoc 'top param))
-                                 0))
-         (current-left-margin (if (integerp (cdr (assoc 'left param)))
-                                  (cdr (assoc 'left param))
-                                  0))
-         (buf nil)
-         (file my-save-frame-file)
-         )
-    ;; ファイルと関連付けられたバッファ作成
-    (unless (setq buf (get-file-buffer (expand-file-name file)))
-      (setq buf (find-file-noselect (expand-file-name file))))
-    (set-buffer buf)
-    (erase-buffer)
-    ;; ファイル読み込み時に直接評価させる内容を記述
-    (insert
-     (concat
-      "(set-frame-size (selected-frame) "(int-to-string current-width)" "(int-to-string current-height)")\n"
-      "(set-frame-position (selected-frame) "(int-to-string current-left-margin)" "(int-to-string current-top-margin)")\n"
-      ))
-    (save-buffer)
-    (kill-buffer)))
+;; (defun my-save-frame()
+;;   "現在のフレームの位置、大きさを`my-save-frame-file'に保存します"
+;;   (interactive)
+;;   (let* ((param (frame-parameters (selected-frame)))
+;;          (current-height (frame-height))
+;;          (current-width (frame-width))
+;;          (current-top-margin (if (integerp (cdr (assoc 'top param)))
+;;                                  (cdr (assoc 'top param))
+;;                                  0))
+;;          (current-left-margin (if (integerp (cdr (assoc 'left param)))
+;;                                   (cdr (assoc 'left param))
+;;                                   0))
+;;          (buf nil)
+;;          (file my-save-frame-file)
+;;          )
+;;     ;; ファイルと関連付けられたバッファ作成
+;;     (unless (setq buf (get-file-buffer (expand-file-name file)))
+;;       (setq buf (find-file-noselect (expand-file-name file))))
+;;     (set-buffer buf)
+;;     (erase-buffer)
+;;     ;; ファイル読み込み時に直接評価させる内容を記述
+;;     (insert
+;;      (concat
+;;       "(set-frame-size (selected-frame) "(int-to-string current-width)" "(int-to-string current-height)")\n"
+;;       "(set-frame-position (selected-frame) "(int-to-string current-left-margin)" "(int-to-string current-top-margin)")\n"
+;;       ))
+;;     (save-buffer)
+;;     (kill-buffer)))
 
-(defun my-load-frame()
-  "`my-save-frame-file'に保存されたフレームの位置、大きさを復元します"
-  (interactive)
-  (let ((file my-save-frame-file))
-    (when (file-exists-p file)
-        (load file t t))))
+;; (defun my-load-frame()
+;;   "`my-save-frame-file'に保存されたフレームの位置、大きさを復元します"
+;;   (interactive)
+;;   (let ((file my-save-frame-file))
+;;     (when (file-exists-p file)
+;;         (load file t t))))
 
 ;; (add-hook 'emacs-startup-hook 'my-load-frame)
 ;; (add-hook 'kill-emacs-hook 'my-save-frame) ; セーブは手動でやりたいのであえてフックしない
@@ -1080,76 +1080,76 @@ is already narrowed."
 
 ;; ----------------------------------------------------------------------
 ;;@@ `my-insert-pair-*'  ;  (), {}, [], <>, "", ''
-(defun my-insert-pair (lst)
-  "args lst is formatted as '(flag open-char close-char)"
-  (if (or (not (featurep 'evil))
-          (and (featurep 'evil) (memq evil-state '(insert emacs))))
-    (cond ((not (eq last-command this-command))
-           (setf (car lst) t)
-           (insert-char (second lst))) ; insert open character
-          ((and (eq last-command this-command) (not (car lst)))
-           (setf (car lst) t)
-           (delete-char 1))            ; delete close character
-          ((and (eq last-command this-command) (car lst))
-           (setf (car lst) nil)
-           (insert-char (third lst))   ; insert close character
-           (forward-char -1)))
-    (self-insert-command 1)))
+;; (defun my-insert-pair (lst)
+;;   "args lst is formatted as '(flag open-char close-char)"
+;;   (if (or (not (featurep 'evil))
+;;           (and (featurep 'evil) (memq evil-state '(insert emacs))))
+;;     (cond ((not (eq last-command this-command))
+;;            (setf (car lst) t)
+;;            (insert-char (second lst))) ; insert open character
+;;           ((and (eq last-command this-command) (not (car lst)))
+;;            (setf (car lst) t)
+;;            (delete-char 1))            ; delete close character
+;;           ((and (eq last-command this-command) (car lst))
+;;            (setf (car lst) nil)
+;;            (insert-char (third lst))   ; insert close character
+;;            (forward-char -1)))
+;;     (self-insert-command 1)))
 
 ;; ()
-(defvar my-insert-paren-arg '(nil ?\( ?\)))
-(defun my-insert-paren ()
-  (interactive)
-  (my-insert-pair my-insert-paren-arg))
+;; (defvar my-insert-paren-arg '(nil ?\( ?\)))
+;; (defun my-insert-paren ()
+;;   (interactive)
+;;   (my-insert-pair my-insert-paren-arg))
 
-;; {}
-(defvar my-insert-brace-arg '(nil ?\{ ?\}))
-(defun my-insert-brace ()
-  (interactive)
-  (my-insert-pair my-insert-brace-arg))
+;; ;; {}
+;; (defvar my-insert-brace-arg '(nil ?\{ ?\}))
+;; (defun my-insert-brace ()
+;;   (interactive)
+;;   (my-insert-pair my-insert-brace-arg))
 
-;; []
-(defvar my-insert-bracket-arg '(nil ?\[ ?\]))
-(defun my-insert-bracket ()
-  (interactive)
-  (my-insert-pair my-insert-bracket-arg))
+;; ;; []
+;; (defvar my-insert-bracket-arg '(nil ?\[ ?\]))
+;; (defun my-insert-bracket ()
+;;   (interactive)
+;;   (my-insert-pair my-insert-bracket-arg))
 
-;; <>
-(defvar my-insert-angle-arg '(nil ?\< ?\>))
-(defun my-insert-angle ()
-  (interactive)
-  (my-insert-pair my-insert-angle-arg))
+;; ;; <>
+;; (defvar my-insert-angle-arg '(nil ?\< ?\>))
+;; (defun my-insert-angle ()
+;;   (interactive)
+;;   (my-insert-pair my-insert-angle-arg))
 
-;; ""
-(defvar my-insert-dquote-arg '(nil ?\" ?\"))
-(defun my-insert-dquote ()
-  (interactive)
-  (my-insert-pair my-insert-dquote-arg))
+;; ;; ""
+;; (defvar my-insert-dquote-arg '(nil ?\" ?\"))
+;; (defun my-insert-dquote ()
+;;   (interactive)
+;;   (my-insert-pair my-insert-dquote-arg))
 
-;; ''
-(defvar my-insert-squote-arg '(nil ?\' ?\'))
-(defun my-insert-squote ()
-  (interactive)
-  (my-insert-pair my-insert-squote-arg))
+;; ;; ''
+;; (defvar my-insert-squote-arg '(nil ?\' ?\'))
+;; (defun my-insert-squote ()
+;;   (interactive)
+;;   (my-insert-pair my-insert-squote-arg))
 
-;; another {}
-(defun my-insert-brace2 ()
-  (interactive)
-  (insert-pair nil ?\{ ?\}))
+;; ;; another {}
+;; (defun my-insert-brace2 ()
+;;   (interactive)
+;;   (insert-pair nil ?\{ ?\}))
 
 ;; ----------------------------------------------------------------------
 ;;@@ `beginning-of-buffer-without-marking'
-(defun beginning-of-buffer-without-marking ()
-  "more simple beginning-of-buffer without marking."
-  (interactive)
-  (goto-char (point-min)))
+;; (defun beginning-of-buffer-without-marking ()
+;;   "more simple beginning-of-buffer without marking."
+;;   (interactive)
+;;   (goto-char (point-min)))
 
 ;; ----------------------------------------------------------------------
 ;;@@ `end-of-buffer-without-marking'
-(defun end-of-buffer-without-marking ()
-  "more simple end-of-buffer without marking."
-  (interactive)
-  (goto-char (point-max)))
+;; (defun end-of-buffer-without-marking ()
+;;   "more simple end-of-buffer without marking."
+;;   (interactive)
+;;   (goto-char (point-max)))
 
 ;; ----------------------------------------------------------------------
 ;;@@ `my-forward-word'
@@ -1191,57 +1191,57 @@ is already narrowed."
 ;; ----------------------------------------------------------------------
 ;;@@ `my-backward-kill-word-minibuffer'
 ;;  and some fix for me
-(defun my-backward-kill-word-minibuffer-sub (delimiter)
-  "for path delimiter"
-  (let (buf)
-    (when (> (point) (minibuffer-prompt-end))
-      (setq buf (concat (string (char-before)) buf))
-      (backward-delete-char 1))
-    (while (and (not (= delimiter (char-before)))
-		(> (point) (minibuffer-prompt-end)))
-      (setq buf (concat (string (char-before)) buf))
-      (backward-delete-char 1))
-    (setq dir-list (cons buf dir-list))))
+;; (defun my-backward-kill-word-minibuffer-sub (delimiter)
+;;   "for path delimiter"
+;;   (let (buf)
+;;     (when (> (point) (minibuffer-prompt-end))
+;;       (setq buf (concat (string (char-before)) buf))
+;;       (backward-delete-char 1))
+;;     (while (and (not (= delimiter (char-before)))
+;; 		(> (point) (minibuffer-prompt-end)))
+;;       (setq buf (concat (string (char-before)) buf))
+;;       (backward-delete-char 1))
+;;     (setq dir-list (cons buf dir-list))))
 
-(defun my-backward-kill-word-minibuffer ()
-  "replace for path delimiter, word delimiter, white space "
-  (interactive)
-  (let ((ch (cond
-	     ;; elisp functions --> "-"
-	     ((and minibuffer-completion-table
-		   (sequencep minibuffer-completion-table))
-	      ?-)
-	     ;; path string --> "/"
-	     ((eq minibuffer-completion-table 'read-file-name-internal)
-	      ?/)
-	     ;; others --> " "
-	     (t ?\ ))))
-    (my-backward-kill-word-minibuffer-sub ch)))
+;; (defun my-backward-kill-word-minibuffer ()
+;;   "replace for path delimiter, word delimiter, white space "
+;;   (interactive)
+;;   (let ((ch (cond
+;; 	     ;; elisp functions --> "-"
+;; 	     ((and minibuffer-completion-table
+;; 		   (sequencep minibuffer-completion-table))
+;; 	      ?-)
+;; 	     ;; path string --> "/"
+;; 	     ((eq minibuffer-completion-table 'read-file-name-internal)
+;; 	      ?/)
+;; 	     ;; others --> " "
+;; 	     (t ?\ ))))
+;;     (my-backward-kill-word-minibuffer-sub ch)))
 
-(defun my-forward-word-minibuffer ()
-  "undo path string"
-  (interactive)
-  (unless (null dir-list)
-    (insert (car dir-list))
-    (setq dir-list (cdr dir-list))))
+;; (defun my-forward-word-minibuffer ()
+;;   "undo path string"
+;;   (interactive)
+;;   (unless (null dir-list)
+;;     (insert (car dir-list))
+;;     (setq dir-list (cdr dir-list))))
 
-(defun my-backward-delete-char-minibuffer ()
-  "replace backward-delete-char-minibuffer"
-  (interactive)
-  (when (> (point) (minibuffer-prompt-end))
-    (backward-delete-char 1)))
+;; (defun my-backward-delete-char-minibuffer ()
+;;   "replace backward-delete-char-minibuffer"
+;;   (interactive)
+;;   (when (> (point) (minibuffer-prompt-end))
+;;     (backward-delete-char 1)))
 
-(defun my-backward-char-minibuffer ()
-  "replace backward-char-minibuffer"
-  (interactive)
-  (when (> (point) (minibuffer-prompt-end))
-    (backward-char 1)))
+;; (defun my-backward-char-minibuffer ()
+;;   "replace backward-char-minibuffer"
+;;   (interactive)
+;;   (when (> (point) (minibuffer-prompt-end))
+;;     (backward-char 1)))
 
-(defun my-forward-char-minibuffer ()
-  "replace forward-char-minibuffer"
-  (interactive)
-  (when (< (point) (point-max))
-    (forward-char 1)))
+;; (defun my-forward-char-minibuffer ()
+;;   "replace forward-char-minibuffer"
+;;   (interactive)
+;;   (when (< (point) (point-max))
+;;     (forward-char 1)))
 
 
 ;; (add-hook 'minibuffer-setup-hook
@@ -1283,25 +1283,25 @@ is already narrowed."
 
 ;; ----------------------------------------------------------------------
 ;;@@ `duplicate-line.'
-(defun duplicate-line (&optional ARG)
-  "Multiply current line."
-  (interactive"*p")
-  (let ((cnt 0)
-	(pt (point)))
-    (save-excursion
-	(end-of-line)
-	(setq str
-	      (buffer-substring-no-properties (point) (progn
-							(beginning-of-line)
-							(point))))
-	(if (null ARG)
-	    (setq ARG 1))
-	(while (< cnt ARG)
-	  (insert str)
-	  (newline)
-	  (setq cnt (1+ cnt))))
-    (goto-char pt)
-    (next-line 1)))
+;; (defun duplicate-line (&optional ARG)
+;;   "Multiply current line."
+;;   (interactive"*p")
+;;   (let ((cnt 0)
+;; 	(pt (point)))
+;;     (save-excursion
+;; 	(end-of-line)
+;; 	(setq str
+;; 	      (buffer-substring-no-properties (point) (progn
+;; 							(beginning-of-line)
+;; 							(point))))
+;; 	(if (null ARG)
+;; 	    (setq ARG 1))
+;; 	(while (< cnt ARG)
+;; 	  (insert str)
+;; 	  (newline)
+;; 	  (setq cnt (1+ cnt))))
+;;     (goto-char pt)
+;;     (next-line 1)))
 
 ;; (global-set-key [?\M-=] 'duplicate-line)
 
@@ -1327,13 +1327,13 @@ is already narrowed."
 (global-set-key (kbd "C-x C-e") #'my-eval-last-sexp)
 
 ;; ----------------------------------------------------------------------
-(defun my-windows-path-region  (beg end)
-  (interactive "r")
-  (replace-string "\\" "\\\\" nil beg end))
+;; (defun my-windows-path-region  (beg end)
+;;   (interactive "r")
+;;   (replace-string "\\" "\\\\" nil beg end))
 
-(defun my-windows-path-region2  (beg end)
-  (interactive "r")
-  (replace-string "\\" "/" nil beg end))
+;; (defun my-windows-path-region2  (beg end)
+;;   (interactive "r")
+;;   (replace-string "\\" "/" nil beg end))
 
 
 ;; ----------------------------------------------------------------------
