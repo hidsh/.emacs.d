@@ -965,6 +965,9 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd "8") #'my-evil-search-word-forward)       ; works as *
   (define-key evil-motion-state-map (kbd "H") #'evil-backward-little-word-begin)
   (define-key evil-motion-state-map (kbd "L") #'evil-forward-little-word-begin)
+  (define-key evil-motion-state-map (kbd "c") #'nop)                            ; unmap evil-goto-error
+  (define-key evil-motion-state-map (kbd "g e")   #'evil-goto-error)
+  (define-key evil-motion-state-map (kbd "g -")   #'evil-jump-backward)
 
   (define-key evil-motion-state-map (kbd "i")   #'nop)                          ; unmap
   ;; (define-key evil-motion-state-map (kbd "V")   #'nop)                          ; unmap
@@ -2269,8 +2272,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package undo-tree
   :config
   (global-undo-tree-mode 1)
-  (define-key undo-tree-map (kbd "C-?") 'nil)
-  (define-key undo-tree-map (kbd "C-r") 'nil)    ;; undo-tree-redo      FIXME: not work
+  (setq undo-tree-auto-save-history nil)            ;; do not create xxx.~undo-tree~
+
+  ;; (define-key undo-tree-map (kbd "C-?") 'nil)
+  ;; (define-key undo-tree-map (kbd "C-r") 'nil)    ;; undo-tree-redo      FIXME: not work
   )
 
 ;; ----------------------------------------------------------------------
