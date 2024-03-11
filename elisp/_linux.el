@@ -41,7 +41,8 @@
   ;; font
   (setq frame-resize-pixelwise t)       ;; for X tiling window manager
   ;(set-default-font (myfont 'default)) ;; ~26.3
-  (set-frame-font (myfont 'default))	;; 27.2~
+  ;; (set-frame-font (myfont 'default))	;; 27.2~
+  (set-frame-font "Cica-12")	;; 27.2~
 
   ;; emacs-mozc
   (add-to-list 'load-path "/usr/share/emacs/site-lisp/emacs-mozc")
