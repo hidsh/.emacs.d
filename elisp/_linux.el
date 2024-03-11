@@ -39,6 +39,7 @@
   (fringe-scale-setup)
 
   ;; font
+  (setq frame-resize-pixelwise t)       ;; for X tiling window manager
   ;(set-default-font (myfont 'default)) ;; ~26.3
   (set-frame-font (myfont 'default))	;; 27.2~
 
