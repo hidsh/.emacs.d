@@ -75,9 +75,9 @@
 ;;;
 ;;; appearance adjust
 ;;;
-  (setq my-face-adj-line-number-height 1.1)
-  (setq my-face-adj-tabbar-height 1.1)
-  (setq my-face-adj-mode-line-height 1.1)
+  (setq my-face-adj-line-number-height 1.0)
+  (setq my-face-adj-tabbar-height 1.0)
+  (setq my-face-adj-mode-line-height 1.0)
   ;; (add-hook 'after-init-hook 'mac-change-language-to-us)          ;; emacs 起動時は英数モードから始める
   ;; (add-hook 'minibuffer-setup-hook 'mac-change-language-to-us)    ;; minibuffer 内は英数モードにする
   ;; (add-hook 'isearch-mode-hook 'mac-change-language-to-us)        ;; [migemo]isearch のとき IME を英数モードにする
