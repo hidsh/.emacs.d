@@ -215,6 +215,10 @@ Can be an integer to determine the exact padding."
    ;; lsp-ui
    (lsp-ui-peek-highlight :foreground black :background orange)
 
+   ;; eglot
+   (eglot-diagnostic-tag-deprecated-face :underline orange)
+   (eglot-diagnostic-tag-unnecessary-face :underline yellow)
+
    ;; flycheck (fringe)
    (flycheck-fringe-info    :background 'unspecified :foreground teal)
    (flycheck-fringe-warning :background 'unspecified :foreground yellow)
