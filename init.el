@@ -997,7 +997,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd "M-w") #'my-forward-word)
   ;; (define-key evil-motion-state-map (kbd "g g") #'my-evil-beginning-of-buffer)
   ;; (define-key evil-motion-state-map (kbd "g e") #'my-evil-end-of-buffer)
-  ;; (define-key evil-motion-state-map (kbd "g h") 'evil-jump-backward)
+  (define-key evil-motion-state-map (kbd "g h") 'evil-jump-backward)
   ;; (define-key evil-motion-state-map (kbd "Y") #'my-evil-yank-whole-buffer)
   (define-key evil-motion-state-map (kbd "TAB") #'evil-indent-line)
   (define-key evil-motion-state-map "/" #'evil-search-forward)
@@ -4282,9 +4282,11 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package eglot
-  :disabled
+;;  :disabled t
   :ensure t
+  :hook (prog-mode . eglot-ensure)
   :config
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
   )
 ;; ----------------------------------------------------------------------
 (use-package lsp-mode
