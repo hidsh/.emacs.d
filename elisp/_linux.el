@@ -32,6 +32,12 @@
   ;; (unless (server-running-p)
   ;;   (server-start))
 
+  ;; fix fringe width when `export GDK_DPI_SCALE=1.0'
+  ;; https://github.com/blahgeek/emacs-fringe-scale
+  (set-fringe-mode 16)
+  (require 'fringe-scale)
+  (fringe-scale-setup)
+
   ;; font
   ;(set-default-font (myfont 'default)) ;; ~26.3
   (set-frame-font (myfont 'default))	;; 27.2~
