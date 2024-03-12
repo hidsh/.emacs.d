@@ -62,6 +62,16 @@
 
 ;; (define-key evil-normal-state-map (kbd "1 1") #'show-overlay-and-prop-and-face-at)
 
+(defun show-title-bar (&optional sw)
+  "Show/hide title bar of emacs.
+Toggle title bar when called interactively.
+Otherwise arg `sw' works as a switch, thus show it when `sw' is non-nil, otherwise hide it."
+  (interactive)
+  (when (interactive-p)
+    (setq sw (not (frame-parameter nil 'undecorated))))
+
+  (modify-frame-parameters nil `((undecorated . ,sw))))
+
 (defun my-get-cursor-color ()
   (car (cl-loop for ($k . $v) in (frame-parameters)
                 if (eq $k 'cursor-color)

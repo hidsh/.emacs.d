@@ -44,6 +44,8 @@
   ;; (set-frame-font (myfont 'default))	;; 27.2~
   (set-frame-font "Cica-12")	;; 27.2~
 
+  (setq default-frame-alist '((undecorated . t)))       ;; hide title bar
+
   ;; emacs-mozc
   (add-to-list 'load-path "/usr/share/emacs/site-lisp/emacs-mozc")
   (require 'mozc)
