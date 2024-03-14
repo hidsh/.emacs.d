@@ -985,7 +985,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd "M-w") #'my-forward-word)
   ;; (define-key evil-motion-state-map (kbd "g g") #'my-evil-beginning-of-buffer)
   ;; (define-key evil-motion-state-map (kbd "g e") #'my-evil-end-of-buffer)
-  ;; (define-key evil-motion-state-map (kbd "g h") 'evil-jump-backward)
+  (define-key evil-motion-state-map (kbd "g h") 'evil-jump-backward)
   ;; (define-key evil-motion-state-map (kbd "Y") #'my-evil-yank-whole-buffer)
   (define-key evil-motion-state-map (kbd "TAB") #'evil-indent-line)
   (define-key evil-motion-state-map "/" #'evil-search-forward)
@@ -2258,6 +2258,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; ----------------------------------------------------------------------
 (use-package undo-tree
   :config
+  (global-undo-tree-mode +1)
   (define-key undo-tree-map (kbd "C-?") 'nil)
   (define-key undo-tree-map (kbd "C-r") 'nil)    ;; undo-tree-redo      FIXME: not work
   )
@@ -2642,6 +2643,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package flycheck
+  :disabled t
   :if window-system
   :init
   (defun flycheck-c-mode-hook-func ()
@@ -2894,6 +2896,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
     (setq show-trailing-whitespace t)
 
     ;; (flycheck-mode +1)
+    (flymake-mode +1)
     )
 
   (add-hook 'prog-mode-hook #'prog-mode-hooks-func)
@@ -2955,7 +2958,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package jal-mode
-  :disabled     ;; temporary
+  :disabled t    ;; temporary
   :load-path "~/git-clone/jal-mode"
   ;; :load-path "~/tmp/jal-mode"
 
@@ -2984,6 +2987,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package mql-mode
+  :disabled t
   :mode (("\\.mq4$" . mql-mode)
          ("\\.mqh$" . mql-mode))
   :bind (:map mql-mode-map
@@ -4126,8 +4130,52 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   )
 
 ;; ----------------------------------------------------------------------
+(use-package corfu
+  :ensure t
+  :hook ((prog-mode . corfu-mode))
+  :bind (:map corfu-map
+              ("C-j"        . corfu-next)
+              ("C-k"        . corfu-previous)
+              ("TAB"        . corfu-insert)
+              ("<tab>"      . corfu-insert)
+              ("<escape>"   . corfu-quit)
+              ("ESC"   . corfu-quit)
+              ("<return>"   . nil)
+              ("RET"        . nil))
+  :custom ((corfu-auto t)
+           (corfu-auto-delay 0)
+           (corfu-auto-prefix 1)
+           (corfu-cycle t))
+  :init
+  :config
+  (corfu-popupinfo-mode)
+  ;; (copy-face 'cursor 'corfu-current)
+  ;; (set-face-attribute 'corfu-current nil :foreground "black")
+  ;; (set-face-attribute 'corfu-popupinfo nil :background "#666")
+  ;; (set-face-attribute 'corfu-deprecated nil :background "#600" :foreground "orange")
+  )
+
+;; ----------------------------------------------------------------------
+(use-package cape
+  :ensure t
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  ;; (add-to-list 'completion-at-point-functions #'cape-history)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+  ;; (add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;; (add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;; (add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  ;; (add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;; (add-to-list 'completion-at-point-functions #'cape-line)
+  )
+
+;; ----------------------------------------------------------------------
 (use-package company-posframe
-  ;; :disabled
+  :disabled t
   ;; :after company
   :custom
   (company-tooltip-minimum-width 40)
@@ -4141,7 +4189,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package company-quickhelp
-  :disabled
+  :disabled t
   :ensure t
   :config
   (setq company-quickhelp-color-background (face-background 'default))
@@ -4149,6 +4197,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   )
 ;; ----------------------------------------------------------------------
 (use-package company
+  :disabled t
   :ensure t
   :hook ((prog-mode . company-mode))
   :config
@@ -4266,13 +4315,21 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package eglot
-  :disabled
+   :ensure t
+  :hook (prog-mode . eglot-ensure)
+  :config
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  )
+
+;; ----------------------------------------------------------------------
+(use-package consult-eglot
   :ensure t
   :config
   )
+
 ;; ----------------------------------------------------------------------
 (use-package lsp-mode
-  :disabled
+  :disabled t
   :ensure t
   :commands (lsp lsp-deferred)
   :hook
@@ -4336,7 +4393,7 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package lsp-ui
-  ;; :disabled
+  :disabled
   :commands lsp-ui-mode
   :after lsp-mode
   :custom
@@ -4626,7 +4683,7 @@ $0`(yas-escape-text yas-selected-text)`
           "\\*quickrun\\*"
           ;; "\\*scratch\\*"
           ;; "^>.*$"  vterm-mode  ; see `vterm-buffer-name-string'
-          shortdoc
+          ;; shortdoc
           reb-mode
           help-mode
           compilation-mode))
@@ -4741,8 +4798,26 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   (truncate-lines nil)
   )
 
+(use-package markdown-preview-mode
+  :config
+  ;; for github
+  (setq markdown-preview-stylesheets
+        (list "https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css"))
+  )
+
+;; ----------------------------------------------------------------------
+(use-package dts-mode
+  :mode ("\\.overlay$"
+         "\\.dts$"
+         "\\.dtsi$"
+         "\\.overlay$"
+         "\\.keymap$")
+  :config
+  )
+
 ;; ----------------------------------------------------------------------
 (use-package go-translate
+  :disabled t
   :init
   (use-package web-api-auth-key
     :load-path dropbox-dir)   ;; defined at _mac.el or _windows.el

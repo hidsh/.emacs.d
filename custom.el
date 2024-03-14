@@ -16,31 +16,32 @@
  '(org-startup-folded nil)
  '(org-startup-indented t)
  '(package-selected-packages
-   '(bind-key go-translate flycheck langdoc consult-flycheck evil-smartparens evil-collection evil-cleverparens evil quickrun rust-mode cp5022x popper commenter epc paredit company-posframe disable-mouse flycheck-nim nim-mode add-node-modules-path flycheck-indicator cmake-ide eglot consult-lsp lsp-ui lsp-mode affe embark-consult embark marginalia consult orderless vertico cmake-mode fontawesome json-mode web-beautify nodejs-repl bm auto-rename-tag expand-region web-mode swap-buffers projectile ah vterm flycheck-posframe smartparens company-quickhelp company yasnippet org-tree-slide default-text-scale migemo dimmer zone-rainbow super-save hide-mode-line doom-themes doom-modeline git-gutter symbol-overlay slime clojure-mode wgrep-ag tabbar common-header-mode-line use-package org-bullets arduino-mode beacon anzu google-translate guide-key-tip rainbow-delimiters fringe-helper git-gutter-fringe counsel-etags counsel-gtags neotree gist hiwin rainbow-mode telephone-line scratch-log markdown-mode dashboard ag ido-yes-or-no atom-one-dark-theme))
+   '(consult-eglot cape corfu dts-mode markdown-preview-mode go-translate flycheck langdoc consult-flycheck evil-smartparens evil-collection evil-cleverparens evil quickrun rust-mode cp5022x popper commenter epc paredit company-posframe disable-mouse flycheck-nim nim-mode add-node-modules-path flycheck-indicator cmake-ide eglot consult-lsp lsp-ui lsp-mode affe embark-consult embark marginalia consult orderless vertico cmake-mode fontawesome json-mode web-beautify nodejs-repl bm auto-rename-tag expand-region web-mode swap-buffers projectile ah vterm flycheck-posframe smartparens company-quickhelp company yasnippet org-tree-slide default-text-scale migemo dimmer zone-rainbow super-save hide-mode-line doom-themes doom-modeline git-gutter symbol-overlay slime clojure-mode wgrep-ag tabbar common-header-mode-line use-package org-bullets arduino-mode beacon anzu google-translate guide-key-tip rainbow-delimiters fringe-helper git-gutter-fringe counsel-etags counsel-gtags neotree gist hiwin rainbow-mode telephone-line scratch-log markdown-mode dashboard ag ido-yes-or-no atom-one-dark-theme))
  '(recentf-auto-cleanup 'never)
  '(vertico-group-format
    (concat
     #(" %s " 0 4
       (face vertico-group-title))
     #(" " 0 1
-      (face vertico-group-separator display
-            (space :align-to right)))))
+      (display
+       (space :align-to right)
+       face vertico-group-separator))))
  '(warning-suppress-log-types
-   '(((flymake flymake.el))
-     ((flymake flymake.el))
-     ((flymake flymake.el))
-     ((flymake flymake.el))
-     ((flymake flymake.el))
-     ((flymake flymake.el))
-     ((flymake flymake.el))))
+   '(((flymake flymake\.el))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el))))
  '(warning-suppress-types
    '((emacs)
-     ((flymake flymake.el))
-     ((flymake flymake.el))
-     ((flymake flymake.el))
-     ((flymake flymake.el))
-     ((flymake flymake.el))
-     ((flymake flymake.el)))))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el))
+     ((flymake flymake\.el)))))
 
 (put 'narrow-to-region 'disabled nil)
 (custom-set-faces

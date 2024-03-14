@@ -315,10 +315,15 @@ Can be an integer to determine the exact padding."
    (paren-face-match :foreground 'unspecified :background black)
    (sp-show-pair-match-face :background highlight-dark)
 
+   ;; corfu
+  (corfu-default  :background base5)
+  (corfu-popupinfo  :background base5)
+  (corfu-deprecated :background "#600" :foreground orange)
+
    ;; company
-   (company-tooltip-selection :foreground modeline-bg :background highlight)
-   (company-tooltip :foreground "#e4e4e4":background modeline-bg)
-   (company-scrollbar-bg :background modeline-bg)
+   ;; (company-tooltip-selection :foreground modeline-bg :background highlight)
+   ;; (company-tooltip :foreground "#e4e4e4":background modeline-bg)
+   ;; (company-scrollbar-bg :background modeline-bg)
 
    ;; popper
    (popper-echo-area :foreground modeline-bg :background teal )
