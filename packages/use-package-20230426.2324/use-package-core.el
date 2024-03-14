@@ -963,10 +963,18 @@ If RECURSED is non-nil, recurse into sublists."
 
 (defun use-package-autoloads-mode (_name _keyword args)
   (mapcar
-   #'(lambda (x) (cons (cdr x) 'command))
+   #'(lambda (x)
+       (cond
+        ((consp (cdr x))
+         (cons (cddr x) 'command))
+        ((consp x)
+         (cons (cdr x) 'command))))
    (cl-remove-if-not #'(lambda (x)
-                         (and (consp x)
-                              (use-package-non-nil-symbolp (cdr x))))
+                         (or (and (consp x)
+                                  (use-package-non-nil-symbolp (cdr x)))
+                             (and (consp x)
+                                  (consp (cdr x))
+                                  (use-package-non-nil-symbolp (cddr x)))))
                      args)))
 
 (defun use-package-handle-mode (name alist args rest state)
@@ -1297,10 +1305,7 @@ meaning:
                               (setq every nil)))
                           every))))
          #'use-package-recognize-function
-         (if (string-suffix-p "-mode" (symbol-name name))
-             name
-           (intern (concat (symbol-name name) "-mode")))
-         label arg))))
+         name label arg))))
 
 (defalias 'use-package-autoloads/:hook 'use-package-autoloads-mode)
 
