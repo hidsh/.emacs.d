@@ -2589,15 +2589,11 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package beacon
-  :if window-system
-  ;; :disabled
-  :diminish beacon-mode
+(use-package pulsar
+  :ensure t
   :config
-  (setq beacon-blink-when-focused t)
-  ;; (setq beacon-color "SteelBlue3")
-  (setq beacon-blink-delay 0.2)
-  (beacon-mode t)
+  (setq pulsar-face 'cursor)
+  (pulsar-global-mode +1)
   )
 
 ;; ----------------------------------------------------------------------
