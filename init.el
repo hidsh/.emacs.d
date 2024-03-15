@@ -2215,7 +2215,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (diminish-minor-mode "eldoc" 'eldoc-mode)
   (diminish-minor-mode "abbrev" 'abbrev-mode)
   (diminish-minor-mode "cwarn" 'cwarn-mode)
-  (diminish-minor-mode "company" 'company-mode)
   (diminish-minor-mode "super-save" 'super-save-mode)
   (diminish-minor-mode "git-gutter" 'git-gutter-mode)
   (diminish-minor-mode "ivy" 'ivy-mode)
@@ -4138,111 +4137,41 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   )
 
 ;; ----------------------------------------------------------------------
-(use-package company-posframe
-  ;; :disabled
-  ;; :after company
-  :custom
-  (company-tooltip-minimum-width 40)
+(use-package corfu
+  :ensure t
+  :hook ((prog-mode . corfu-mode))
+  :bind (:map corfu-map
+              ("C-j"        . corfu-next)
+              ("C-k"        . corfu-previous)
+              ("TAB"        . corfu-insert)
+              ("<tab>"      . corfu-insert)
+              ("<escape>"   . corfu-quit)
+              ("ESC"   . corfu-quit))
+  :custom ((corfu-auto t)
+           (corfu-auto-delay 0)
+           (corfu-auto-prefix 1)
+           (corfu-cycle t))
 
+  :config
+  (corfu-popupinfo-mode)
+  )
+
+;; ----------------------------------------------------------------------
+(use-package cape
+  :ensure t
   :init
-  (company-posframe-mode +1)
-  ;; :config
-  ;; (with-eval-after-load 'desktop
-  ;;   (push '(company-posframe-mode . nil) desktop-minor-mode-table))
-  )
-
-;; ----------------------------------------------------------------------
-(use-package company-quickhelp
-  :disabled
-  :ensure t
-  :config
-  (setq company-quickhelp-color-background (face-background 'default))
-  (setq company-quickhelp-color-foreground (face-foreground 'default))
-  )
-;; ----------------------------------------------------------------------
-(use-package company
-  :ensure t
-  :hook ((prog-mode . company-mode))
-  :config
-  (setq company-idle-delay 0.1)
-  (setq company-minimum-prefix-length 2)
-  (setq company-selection-wrap-around t)
-  (setq completion-ignore-case nil)
-  (setq company-dabbrev-downcase nil)
-  ;; (setq company-dabbrev-ignore-case nil)
-  ;; (add-to-list 'company-backends 'company-yasnippet)
-  ;; (company-quickhelp-mode +1)
-
-  ;; backend
-  (setq company-backends
-        '((company-dabbrev-code company-gtags company-etags company-keywords)
-          company-bbdb company-semantic company-cmake company-capf company-clang company-files
-          company-oddmuse company-dabbrev))
-
-  ;; sort order
-  (setq company-transformers '(company-sort-by-backend-importance))
-
-  ;; 候補から数字を外す
-  (push (apply-partially #'cl-remove-if
-                         #'(lambda (c)
-                           (or (string-match-p "[^\x00-\x7F]+" c)
-                               (string-match-p "[0-9]+" c)
-                               (if (equal major-mode "org")
-                                   (>= (length c) 15)))))
-        company-transformers)
-
-  ; YASnippet のスニペットを company の候補に表示するための設定
-  (defvar company-mode/enable-yas t
-    "Enable yasnippet for all backends.")
-
-  (defun company-mode/backend-with-yas (backend)
-    (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-        backend
-      (append (if (consp backend) backend (list backend))
-              '(:with company-yasnippet))))
-
-  (defun set-yas-as-company-backend ()
-    (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends)))
-
-  (add-hook 'company-mode-hook 'set-yas-as-company-backend)
-
-  (defvar company--insert-candidate2-old-cand nil)
-  (defun company--insert-candidate2 (candidate)
-    (when (> (length candidate) 0)
-      (setq candidate (substring-no-properties candidate))
-      (if (eq (company-call-backend 'ignore-case) 'keep-prefix)
-          (insert (company-strip-prefix candidate))
-        (message "%s    %s" company-prefix candidate)
-        ;; (if (equal company-prefix candidate)
-        ;;     (company-select-next)
-        ;;   (delete-region (- (point) (length company-prefix)) (point))
-        ;;   (insert candidate))
-        (cond ((equal company-prefix candidate)
-               (delete-region (- (point) (length company-prefix)) (point))
-               (insert candidate))
-              (t
-               ()))
-        )))
-
-  (defun company-complete-common2 ()
-    (interactive)
-    (when (company-manual-begin)
-      (if (and (not (cdr company-candidates))
-               (equal company-common (car company-candidates)))
-          (company-complete-selection)
-        (company--insert-candidate2 company-common))))
-
-  (define-key company-active-map [tab] 'company-complete-common2)
-  ;; (define-key company-active-map [backtab] 'company-select-previous) ; おまけ
-
-  (define-key company-active-map (kbd "M-n") nil)
-  (define-key company-active-map (kbd "M-p") nil)
-  (define-key company-active-map [tab] 'company-complete-common)
-  (define-key company-active-map (kbd "C-e") 'company-complete)
-  (define-key company-active-map (kbd "C-n") 'company-select-next)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (define-key company-active-map (kbd "C-j") 'company-select-next)
-  (define-key company-active-map (kbd "C-k") 'company-select-previous)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  ;; (add-to-list 'completion-at-point-functions #'cape-history)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+  ;; (add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;; (add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;; (add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  ;; (add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;; (add-to-list 'completion-at-point-functions #'cape-line)
   )
 
 ;; ----------------------------------------------------------------------
