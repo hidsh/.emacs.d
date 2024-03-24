@@ -71,6 +71,7 @@ Otherwise arg `sw' works as a switch, thus show it when `sw' is non-nil, otherwi
     (setq sw (not (frame-parameter nil 'undecorated))))
 
   (modify-frame-parameters nil `((undecorated . ,sw))))
+(defalias 'show-title-bar 'toggle-title-bar)
 
 (defun my-get-cursor-color ()
   (car (cl-loop for ($k . $v) in (frame-parameters)
