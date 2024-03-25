@@ -4210,7 +4210,7 @@ $0`(yas-escape-text yas-selected-text)`
 (use-package eglot
 ;;  :disabled t
   :ensure t
-  :hook (prog-mode . eglot-ensure)
+  :hook ((c-mode-common . eglot-ensure))    ;; C/C++
   :config
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
   )
