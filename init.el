@@ -2269,6 +2269,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; ----------------------------------------------------------------------
 (use-package undo-tree
+  :load-path "local-fix/undo-tree"
   :config
   (global-undo-tree-mode 1)
   (setq undo-tree-auto-save-history nil)            ;; do not create xxx.~undo-tree~

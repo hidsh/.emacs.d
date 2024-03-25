@@ -47,7 +47,7 @@
   (setq default-frame-alist '((undecorated . t)))       ;; hide title bar
 
   ;; emacs-mozc
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/emacs-mozc")
+  (add-to-list 'load-path "~/.emacs.d/local-fix/emacs-mozc")
   (require 'mozc)
   (set-language-environment "Japanese")
   (setq default-input-method "japanese-mozc")

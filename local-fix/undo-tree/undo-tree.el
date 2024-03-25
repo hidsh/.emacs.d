@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2009-2021  Free Software Foundation, Inc
 
-;; Author: Toby Cubitt <toby-undo-tree@dr-qubit.org>
+;; Author: Toby Cubitt <toby+undo-tree@dr-qubit.org>
 ;; Maintainer: Toby Cubitt <toby-undo-tree@dr-qubit.org>
 ;; Version: 0.8.2
 ;; Keywords: convenience, files, undo, redo, history, tree
@@ -2766,9 +2766,9 @@ Within the undo-tree visualizer, the following keys are available:
 
   \\{undo-tree-visualizer-mode-map}"
 
-  nil                       ; init value
-  undo-tree-mode-lighter    ; lighter
-  undo-tree-map             ; keymap
+  :init-value nil                       ; init value
+  :lighter undo-tree-mode-lighter       ; lighter
+  :keymap undo-tree-map                 ; keymap
 
   (cond
    (undo-tree-mode  ; enabling `undo-tree-mode'

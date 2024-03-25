@@ -309,6 +309,7 @@ Can be an integer to determine the exact padding."
    (tabbar-unselected        :inherit 'tabbar-default)
    (tabbar-selected-modified :inherit 'tabbar-selected)
    (tabbar-modified          :inherit 'tabbar-default)
+   (tabbar-highlight         :inherit 'tabbar-default)
    (tabbar-separator         :background teal)
 
    ;; ivy, counsel
@@ -346,7 +347,9 @@ Can be an integer to determine the exact padding."
    ;; hide-ifdef-mode
    (hide-ifdef-shadow :foreground comments)
 
-   ;;
+   ;; ediff
+   (ediff-current-diff-A :background 'unspecified)
+   (ediff-fine-diff-A :background 'unspecified)
 
    ))
 
