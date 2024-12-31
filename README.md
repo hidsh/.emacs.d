@@ -2,7 +2,7 @@
 
 ![screenshot](./img/ss_2022-11-23.png)
 
-This branch is for:
+This repo is for:
 
 - PC: AskHand Mini PC (Ryzen 5500U 6C/12T 4.0GHz 16GB/512GB)
 - OS: EndeavorOS / Sway
