@@ -1,0 +1,13 @@
+diff --git a/undo-tree.el b/undo-tree.el
+index bd36e39..8879800 100644
+--- a/undo-tree.el
++++ b/undo-tree.el
+@@ -2768,5 +2768,5 @@ Within the undo-tree visualizer, the following keys are available:
+ 
+-  nil                       ; init value
+-  undo-tree-mode-lighter    ; lighter
+-  undo-tree-map             ; keymap
++  :init-value nil                       ; init value
++  :lighter undo-tree-mode-lighter       ; lighter
++  :keymap undo-tree-map                 ; keymap
+ 

@@ -1,0 +1,7 @@
+ [submodule "libvterm"]
+	path = packages/vterm-20211226.817/build/libvterm-prefix/src/libvterm
+	url = /tmp/libvterm
+	ignore = dirty
+[submodule "elisp/mood-line"]
+	path = elisp/mood-line
+	url = https://gitlab.com/jessieh/mood-line.git

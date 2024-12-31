@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: assert
+# key: assert
+# --
+assert ${1:False}, '${2:常時発動する}'
