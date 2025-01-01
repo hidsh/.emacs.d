@@ -212,10 +212,9 @@ Can be an integer to determine the exact padding."
    ;; paren
    ;; (show-paren-match :background black)
    ;; (show-paren-match :background "#3A537E")
-   (show-paren-match :background dark-teal :weight 'bold)
-   ;; (paren-face-match :foreground nil :background base0)
-   (paren-face-match :foreground 'unspecified :background dark-teal)
-   (sp-show-pair-match-face :background dark-teal)
+   (show-paren-match :background dark-yellow :weight 'bold)
+   (paren-face-match :foreground 'unspecified :background dark-yellow)
+   (sp-show-pair-match-face :background dark-yellow)
 
    ;; --- plugin faces -------------------
    ;; emacs
