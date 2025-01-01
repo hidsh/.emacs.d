@@ -323,6 +323,7 @@
 (defalias 'hl 'hl-line-mode)
 (defalias 'calc 'quick-calc)
 (defalias 'package-uninstall 'package-delete)
+(defalias 'package-list-update 'package-refresh-contents)
 
 ;; ----------------------------------------------------------------------
 ;; (defvar my-face-adj-line-number-height 1.0)     ;; set by _mac.el or _windows.el or ...
@@ -5093,8 +5094,8 @@ $0`(yas-escape-text yas-selected-text)`
 
   (evil-define-key 'motion vterm-mode-map (kbd "C-g") #'my-vterm-return-to-emacs-state)
 
-  (define-key vterm-mode-map (kbd "C-S-j") #'(lambda () (interactive) (funcall #'scroll-up 1)))
-  (define-key vterm-mode-map (kbd "C-S-k") #'(lambda () (interactive) (funcall #'scroll-down 1)))
+  (define-key vterm-mode-map (kbd "C-S-j") #'(lambda () (interactive) (funcall #'scroll-up 5)))
+  (define-key vterm-mode-map (kbd "C-S-k") #'(lambda () (interactive) (funcall #'scroll-down 5)))
 
   (defvar open-vterm-buffer-name-prefix (substring vterm-buffer-name-string 0 2))
   (defun open-vterm ()
@@ -5107,7 +5108,7 @@ $0`(yas-escape-text yas-selected-text)`
           (switch-to-buffer (car vterm-buf))
         (vterm))))
 
-  (defalias 'v 'open-vterm)
+  (define-key evil-normal-state-map (kbd "M-t") 'open-vterm)
   )
 
 ;; ----------------------------------------------------------------------
