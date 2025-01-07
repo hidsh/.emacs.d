@@ -4967,6 +4967,7 @@ $0`(yas-escape-text yas-selected-text)`
          (lambda () (require 'ccls) (lsp))))
 ;; ----------------------------------------------------------------------
 (use-package dumb-jump
+  :disabled t
   :ensure t
   :config
   ;; (setq dumb-jump-default-project "")
