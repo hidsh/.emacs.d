@@ -1853,7 +1853,6 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 (use-package consult
   ;; :disabled
-  :after vertico
   :config
   (defun my-consult-after-init-hook ()
     (vertico-mode)
@@ -1895,7 +1894,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
       (my-consult-ripgrep-exclude-add))
   ;; )
 
-  (define-key vertico-map (kbd "") #'my-consult-ripgrep-exclude-add-via-vertico)
+  ;; (define-key vertico-map (kbd "") #'my-consult-ripgrep-exclude-add-via-vertico)
 
   (setq consult-ripgrep-args-orig
     "--null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --line-number")
