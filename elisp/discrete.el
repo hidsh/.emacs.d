@@ -978,7 +978,7 @@ end-of-buffer signals; pass the rest to the default handler."
            (setq path (if path (replace-regexp-in-string "/" "\\" path nil t)
                         "%HOME%")))
           ((eq system-type 'gnu/linux)
-           (setq cmd "nautilus %s")
+           (setq cmd "thunar %s 2> /dev/null")
            (setq opt "")
            (setq path (or path "~")))
           (t
