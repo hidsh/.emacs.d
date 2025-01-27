@@ -2098,7 +2098,6 @@ alternative, you can run `embark-export' from commands like `M-x' and
 
   :bind (:map vertico-map
          ("TAB" . minibuffer-complete)
-         ;; ("TAB" . my-vertico-tab)
          ("C-j" . vertico-next)
          ("C-k" . vertico-previous)
          ("M-y" . vertico-save)
@@ -2108,6 +2107,8 @@ alternative, you can run `embark-export' from commands like `M-x' and
   )
 
 (use-package vertico-directory
+  :after vertico
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
   :config
   (setq vertico-directory-up ())
   (defun my-vertico-directory-up ()
@@ -2119,10 +2120,30 @@ alternative, you can run `embark-export' from commands like `M-x' and
             (backward-kill-word 2)))                     ;; do this if it does not move the point
       (backward-kill-word 1)))
 
+  (defun my-vertico-directory-insert-current-candidate ()
+    (interactive)
+    (let ((delim "/"))      ;; todo system types
+      (pcase vertico--total
+        (0 (nop t))
+        (1 (message "---\n%s\n%s\n%s\n"
+                     (car (last (split-string (minibuffer-contents) delim)))
+                     (car vertico--candidates)
+                     (string= (car (split-string (minibuffer-contents) delim))
+                              (car vertico--candidates)))
+            (if (string= (car (last (split-string (minibuffer-contents) delim)))
+                         (car vertico--candidates))
+                (vertico-exit)
+              (vertico-first)
+              (vertico-insert)))
+        (_ (if (< vertico--index 0)
+               (vertico-first)    ;; goto first cand unless selected yet
+             (vertico-insert))))))
+
   :bind (:map vertico-map
+         ("TAB" . my-vertico-directory-insert-current-candidate)
          ;; ("M-h" . my-vertico-directory-up)
          ("M-h" . vertico-directory-up)
-         ("M-l" . vertico-directory-enter)  ;; enter dired
+         ;; ("M-l" . vertico-directory-enter)  ;; enter dired
          ("M-d" . vertico-directory-delete-char))
   )
 
