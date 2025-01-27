@@ -311,6 +311,7 @@
 
 ;; ----------------------------------------------------------------------
 ;; command aliases
+(defalias 'a 'my-consult-apropos-symbol-at-point)
 (defalias 'reb 're-builder)
 
 (defalias 'dm 'describe-mode)
