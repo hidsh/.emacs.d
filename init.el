@@ -393,17 +393,15 @@
 ;; ----------------------------------------------------------------------
 ;; package setting
 ;; ----------------------------------------------------------------------
-(require 'package)
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;; (add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/") t)
-(setq package-user-dir "~/.emacs.d/packages")
-(package-initialize)
-
-(eval-when-compile
-  (require 'use-package))
-(require 'diminish)                ;; if you use :diminish
-(require 'bind-key)                ;; if you use any :bind variant
+(eval-and-compile
+  (setq package-user-dir "~/.emacs.d/packages")
+  (customize-set-variable
+   'package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                       ("melpa" . "https://melpa.org/packages/")))
+  (package-initialize)
+  (require 'diminish)                ;; if you use :diminish
+  (require 'bind-key)                ;; if you use any :bind variant
+  )
 
 ;; ----------------------------------------------------------------------
 ;; ここから use-package
