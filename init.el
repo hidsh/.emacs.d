@@ -2124,16 +2124,11 @@ alternative, you can run `embark-export' from commands like `M-x' and
     (let ((delim "/"))      ;; todo system types
       (pcase vertico--total
         (0 (nop t))
-        (1 (message "---\n%s\n%s\n%s\n"
-                     (car (last (split-string (minibuffer-contents) delim)))
-                     (car vertico--candidates)
-                     (string= (car (split-string (minibuffer-contents) delim))
-                              (car vertico--candidates)))
-            (if (string= (car (last (split-string (minibuffer-contents) delim)))
-                         (car vertico--candidates))
-                (vertico-exit)
-              (vertico-first)
-              (vertico-insert)))
+        (1 (if (string= (car (last (split-string (minibuffer-contents) delim)))
+                        (car vertico--candidates))
+               (vertico-exit)
+             (vertico-first)
+             (vertico-insert)))
         (_ (if (< vertico--index 0)
                (vertico-first)    ;; goto first cand unless selected yet
              (vertico-insert))))))
