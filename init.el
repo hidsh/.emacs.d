@@ -1984,7 +1984,10 @@ alternative, you can run `embark-export' from commands like `M-x' and
          ("C-x C-b" . my-consult-buffer))
  )
 
-(use-package embark-consult)
+(use-package embark-consult
+  :ensure t
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package embark
   :bind (:map embark-general-map
@@ -4050,10 +4053,12 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :ensure t
   :hook ((prog-mode . corfu-mode))
   :bind (:map corfu-map
+         ("TAB"        . corfu-next)
+         ("<tab>"      . corfu-next)
          ("C-j"        . corfu-next)
          ("C-k"        . corfu-previous)
-         ("TAB"        . corfu-insert)
-         ("<tab>"      . corfu-insert)
+         ("RET"        . corfu-insert)
+         ("<return>"   . corfu-insert)
          ("C-c"   . my-corfu-quit)
          ("C-g"   . my-corfu-quit))
 
@@ -4061,7 +4066,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
            (corfu-auto-delay 0)
            (corfu-auto-prefix 1)
            (corfu-cycle t)
-           (corfu-bar-width 0)
+           ;; (corfu-on-exact-match nil)
+           (corfu-bar-width 1)
            (corfu-right-margin-width 2.5))
 
   :config
