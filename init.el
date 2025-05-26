@@ -4711,7 +4711,7 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 
 ;; ----------------------------------------------------------------------
 (use-package kconfig-mode
-  :mode "\\Kconfig.\\(defconfig\\|\\shield\\)\\'"
+  :mode "\\^Kconfig.\\(defconfig\\|shield\\)\\'"
   :load-path "elisp/kconfig-mode"      ;; https://github.com/delaanthonio/kconfig-mode
   )
 
