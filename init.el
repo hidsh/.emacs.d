@@ -4609,15 +4609,21 @@ For example, `consult-recent-file' try to embed its preview into popper window i
           (t (funcall func)))
     )
 
+  (defun my-next-tab--echo-path-or-buf-name ()
+    (message "%s" (let ((buf (window-buffer (selected-window))))
+                    (or (buffer-file-name buf) (buffer-name buf)))))
+
   (defun my-next-tab ()
     "My customized `tabbar-forward-tab' to consider the popper and flycheck-posframe."
     (interactive)
-    (my-next-tab-1 #'tabbar-forward-tab))
+    (my-next-tab-1 #'tabbar-forward-tab)
+    (my-next-tab--echo-path-or-buf-name))
 
   (defun my-prev-tab ()
     "My customized `tabbar-backward-tab' to consider the popper and flycheck-posframe."
     (interactive)
-    (my-next-tab-1 #'tabbar-backward-tab))
+    (my-next-tab-1 #'tabbar-backward-tab)
+    (my-next-tab--echo-path-or-buf-name))
   )
 
 ;; ----------------------------------------------------------------------
