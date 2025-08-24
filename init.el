@@ -3143,6 +3143,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
 
 ;; ----------------------------------------------------------------------
 (use-package flycheck
+  :disabled t
   :if window-system
   :init
   (defun flycheck-c-mode-hook-func ()
@@ -3169,8 +3170,8 @@ alternative, you can run `embark-export' from commands like `M-x' and
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
   :config
-  (setq flycheck-display-errors-delay 0.0)
-  (setq flycheck-idle-change-delay 0.1)
+  ;; (setq flycheck-display-errors-delay 0.3)
+  (setq flycheck-idle-change-delay 0.3)
   ;; (setq flycheck-idle-buffer-switch-delay 0.0)
 
   (let ((color (face-foreground 'error)))
@@ -3279,27 +3280,27 @@ alternative, you can run `embark-export' from commands like `M-x' and
               (setq hide-ifdef-shadow t)
               (hide-ifdef-mode 1)
 
-              (setq flycheck--automatically-enabled-checkers '(c/c++-gcc))
-              (flycheck-disable-checker 'c/c++-clang)
+              ;; (setq flycheck--automatically-enabled-checkers '(c/c++-gcc))
+              ;; (flycheck-disable-checker 'c/c++-clang)
               ;; (flycheck-mode 1)      ;; flycheck will be enabled in prog-mode
               ))
 
 
-  (defun my-flycheck-c-setup ()
-    (setq flycheck-c/c++-gcc-executable "gcc")
-    (setq flycheck-clang-language-standard "gnu99"))
-  (add-hook 'c-mode-hook #'my-flycheck-c-setup)
+  ;; (defun my-flycheck-c-setup ()
+  ;;   (setq flycheck-c/c++-gcc-executable "gcc")
+  ;;   (setq flycheck-clang-language-standard "gnu99"))
+  ;; (add-hook 'c-mode-hook #'my-flycheck-c-setup)
 
-  (defun my-flycheck-c++-setup ()
-    (setq flycheck-c/c++-gcc-executable "g++")
-    (setq flycheck-clang-language-standard "c++11"))
-  (add-hook 'c++-mode-hook #'my-flycheck-c++-setup)
+  ;; (defun my-flycheck-c++-setup ()
+  ;;   (setq flycheck-c/c++-gcc-executable "g++")
+  ;;   (setq flycheck-clang-language-standard "c++11"))
+  ;; (add-hook 'c++-mode-hook #'my-flycheck-c++-setup)
 
-  ;; never show *compilation* buffer
-  (defadvice compilation-start (around inhidbit-display (command &optional mode name-function highlight-regexp))
-    (flet ((display-buffer))
-      (fset 'display-buffer 'ignore) ad-do-it))
-  (ad-activate 'compilation-start)
+  ;; ;; never show *compilation* buffer
+  ;; (defadvice compilation-start (around inhidbit-display (command &optional mode name-function highlight-regexp))
+  ;;   (flet ((display-buffer))
+  ;;     (fset 'display-buffer 'ignore) ad-do-it))
+  ;; (ad-activate 'compilation-start)
 
   ;; enable ANSI color in *compilation* buffer
   ;; (require 'ansi-color)
@@ -3861,7 +3862,7 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flymake
-  :disabled t
+  ;; :disabled t
   :config
 
   ;; fringe indicator for HiDPI
@@ -3913,7 +3914,7 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flymake-posframe
-  :disabled t
+  ;; :disabled t
   :if window-system
   :load-path "elisp/flymake-posframe"
   :hook (flymake-mode . flymake-posframe-mode)
