@@ -1880,7 +1880,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (add-hook 'after-init-hook #'my-consult-after-init-hook)
 
   ;; (setq consult-preview-key (kbd "C-l"))
-  (setq consult-preview-key '(:debounce 0.8 any))
+  (setq consult-preview-key '(:debounce 0.1 any))
 
   (setq my-consult-ripgrep-exclude-list-orig
     '("#*#"
@@ -1915,7 +1915,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; (define-key vertico-map (kbd "") #'my-consult-ripgrep-exclude-add-via-vertico)
 
   (setq consult-ripgrep-args-orig
-    "--null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --line-number")
+    "--no-ignore --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --line-number")
 
   (setq consult-ripgrep-args
         (concat "rg "
@@ -2052,6 +2052,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
     "B" nil                   ;; byte-compile-file)
     ;; ("R" byte-recompile-directory)
     "v" nil                   ;; 'embark-vc-file-map)
+    "C-l" #'consult-preview-at-point
     )
 
   ;; re-define keymap for embark-act(M-e)
@@ -2072,6 +2073,11 @@ alternative, you can run `embark-export' from commands like `M-x' and
   (define-key embark-file-map "R" nil)  ;; byte-recompile-directory)
   (define-key embark-file-map "v" nil)  ;; 'embark-vc-file-map)
   (define-key embark-file-map "x" nil)  ;; #'consult-file-externally)
+  )
+
+(use-package embark-consult
+  :ensure t
+  :hook (embark-collect-mode . consult-preview-at-point-mode)
   )
 
 (use-package vertico
