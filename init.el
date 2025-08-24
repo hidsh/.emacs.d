@@ -2752,6 +2752,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
 
 ;; ----------------------------------------------------------------------
 (use-package projectile
+  :disabled t
   :defer 100
   :config
   (projectile-mode +1)
@@ -3926,13 +3927,13 @@ See URL `https://github.com/htacg/tidy-html5'."
   (setq flymake-posframe-warning-prefix (propertize "" 'face '(foreground-color . "orange")))
   (setq flymake-posframe-note-prefix (propertize "" 'face `(foreground-color . "yellow green")))
 
-  (defun my-flymake-posframe-display-adv-delay (orig-fun)
-    (unless (company--active-p)
-      (when (sit-for 0)
-        (funcall orig-fun))))
+  ;; (defun my-flymake-posframe-display-adv-delay (orig-fun)
+  ;;   (unless (company--active-p)
+  ;;     (when (sit-for 0)
+  ;;       (funcall orig-fun))))
 
-  (advice-add 'flymake-posframe-display :around #'my-flymake-posframe-display-adv-delay)
-  (add-hook 'find-file-hook #'flymake-posframe-hide)
+  ;; (advice-add 'flymake-posframe-display :around #'my-flymake-posframe-display-adv-delay)
+  ;; (add-hook 'find-file-hook #'flymake-posframe-hide)
   ;; (advice-add 'switch-to-buffer :after #'flymake-posframe-hide)
   )
 
