@@ -4171,7 +4171,7 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package treesit-auto
-  :disabled t
+  ;; :disabled t
   :config
   (setq treesit-auto-install t)
   (global-treesit-auto-mode)
