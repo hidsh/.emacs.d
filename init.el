@@ -4182,6 +4182,8 @@ $0`(yas-escape-text yas-selected-text)`
          ;; (dts-mode      . eglot-ensure)    ;; device tree source
          (rust-mode     . eglot-ensure))
   :config
+  ;; (setq eglot-eldoc-strategy 'none)
+  (setq eglot-ignored-server-capabilities '(:hoverProvider))        ;; disable eldoc from eglot
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
   (add-to-list 'eglot-server-programs '((rust-mode) "rust-analyzer"))
 
