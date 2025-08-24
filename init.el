@@ -242,6 +242,7 @@
 (global-unset-key (kbd "M-i"))                          ; tab-to-tab-stop
 (global-unset-key [f11])                                ; toggle-frame-fullscreen
 (global-unset-key [f12])                                ; "M-c"
+(global-unset-key (kbd "C-M-e"))                        ; end-of-defun
 
 ;; (global-set-key "(" 'my-insert-paren)                   ; ()
 ;; (global-set-key "{" 'my-insert-brace)                   ; {}
