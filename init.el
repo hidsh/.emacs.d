@@ -279,8 +279,10 @@
 (setq-default truncate-lines t)
 
 ;; kill-ringに同じ内容を重複して入れない
-(defadvice kill-new (before ys:no-kill-new-duplication activate)
-  (setq kill-ring (delete (ad-get-arg 0) kill-ring)))
+;; (defadvice kill-new (before ys:no-kill-new-duplication activate)
+;;   (setq kill-ring (delete (ad-get-arg 0) kill-ring)))
+(advice-add #'kill-new :before
+            (lambda (&rest args) (setq kill-ring (delete (car args) kill-ring))))
 
 ;; prevent annoying message "Text is read only" at mimibuffer
 (plist-put minibuffer-prompt-properties
