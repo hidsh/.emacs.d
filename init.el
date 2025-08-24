@@ -3261,7 +3261,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
               ;; (setq compilation-read-command nil)         ; make のオプションの確認は不要
               (setq compilation-ask-about-save nil)       ; make するとき save する
               ;; (setq compile-command "make")               ; make時のデフォルトコマンド
-              ;; (c-toggle-hungry-state 1)                   ; backspace時にカーソルの左の空白をすべて削除
+              (c-toggle-hungry-state 0)                   ; backspace時にカーソルの左の空白をすべて削除
               (cwarn-mode)
               ;; (which-function-mode 1)
               (display-line-numbers-mode)
@@ -3386,7 +3386,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
     (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
     (electric-pair-mode +1)
     ;; (c-toggle-auto-newline +1)
-    (add-hook 'before-save-hook #'delete-trailing-whitespace nil 'buffer-local)
+    ;; (add-hook 'before-save-hook #'delete-trailing-whitespace nil 'buffer-local)
 
     ;; (set-face-background 'trailing-whitespace (face-foreground 'error))      ;; should be defined by theme
     (setq show-trailing-whitespace t)
