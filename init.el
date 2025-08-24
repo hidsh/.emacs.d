@@ -1323,13 +1323,17 @@ That is, a string used to represent it on the tab bar."
   ;; (define-key evil-normal-state-map (kbd "M-p") #'counsel-yank-pop)
   ;; (define-key evil-normal-state-map (kbd "SPC") #'evil-force-normal-state)
   ;; (define-key evil-normal-state-map (kbd "g f") #'my-beginning-of-defun)
+  (define-key evil-normal-state-map (kbd "g I") #'my-put-file-compile-flags)
+  (define-key evil-normal-state-map (kbd "g i") #'xref-find-references)
+  (define-key evil-normal-state-map (kbd "g o") #'xref-find-definitions)
+  (define-key evil-normal-state-map (kbd "g 0") #'xref-go-back)
+  (define-key evil-normal-state-map (kbd "g j") #'git-gutter:next-hunk)
+  (define-key evil-normal-state-map (kbd "g k") #'git-gutter:previous-hunk)
   (define-key evil-normal-state-map (kbd "g s") #'git-gutter:popup-hunk)        ;; git diff
   (define-key evil-normal-state-map (kbd "g r") #'git-gutter:revert-hunk)       ;; git unstage
   (define-key evil-normal-state-map (kbd "g u") #'git-gutter:revert-hunk)       ;; git unstage
   (define-key evil-normal-state-map (kbd "g a") #'git-gutter:stage-hunk)        ;; git add
   ;; (define-key evil-normal-state-map (kbd "g p") #'what-cursor-position)         ;; g a --> g p
-  (define-key evil-normal-state-map (kbd "g j") #'git-gutter:next-hunk)
-  (define-key evil-normal-state-map (kbd "g k") #'git-gutter:previous-hunk)
   (define-key evil-normal-state-map (kbd "A") #'nop)                 ; unmap A
   (define-key evil-normal-state-map (kbd "a") #'evil-append-line)    ; works as A
   (define-key evil-normal-state-map (kbd "1 1") #'show-overlay-and-prop-and-face-at)
@@ -1371,6 +1375,20 @@ That is, a string used to represent it on the tab bar."
   ;;   (evil-define-key 'normal macrostep-keymap (kbd "C-c C-c") 'macrostep-collapse-all)))
 
   ;; ----------
+  (defun my-put-file-compile-flags (&optional dir)
+    "put minimum 'compile-flags.txt' for LSP () "
+    (interactive "p")
+    (let* ((file-name "compile_flags.txt")
+           (insert-default-directory t)
+           (dir (read-directory-name (concat file-name " --> ")))
+           (path (concat dir "/" file-name))
+           (lines "-xc
+-std=c17"))
+      (if (file-exists-p path)
+          (message "already exists. do nothing.")
+        (write-region lines nil path)
+        )))
+
   (defun my-evil-visual-eval-region (beg end)
     (interactive "r")
     (if (eq evil-visual-selection 'line)
@@ -1850,6 +1868,9 @@ If COUNT is given, move COUNT - 1 lines downward first."
 (use-package consult
   ;; :disabled
   :config
+  (setq xref-show-xrefs-function #'consult-xref)
+  (setq xref-show-definitions-function #'consult-xref)
+
   (defun my-consult-after-init-hook ()
     (vertico-mode)
     (marginalia-mode)
@@ -3215,8 +3236,8 @@ alternative, you can run `embark-export' from commands like `M-x' and
 ;; ----------------------------------------------------------------------
 (use-package cc-mode
   :mode (("\\.c$" . c-mode)
-         ;; ("\\.h$" . c-mode)
-         ("\\.h$"       . c++-mode)
+         ("\\.h$" . c-mode)
+         ;; ("\\.h$"       . c++-mode)
          ("\\.cpp$"     . c++-mode)
          ("\\.c\\+\\+$" . c++-mode)
          ("\\.hpp$"     . c++-mode))
@@ -4150,15 +4171,15 @@ $0`(yas-escape-text yas-selected-text)`
 ;;  :disabled t
   :ensure t
   :hook ((c-mode-common . eglot-ensure)    ;; C/C++
-         (rust-mode     . eglot-ensure)
-         (dts-mode      . eglot-ensure))   ;; device tree source
+         ;; (dts-mode      . eglot-ensure)    ;; device tree source
+         (rust-mode     . eglot-ensure))
   :config
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
   (add-to-list 'eglot-server-programs '((rust-mode) "rust-analyzer"))
 
   ;; (add-to-list 'exec-path (expand-file-name "~/.cargo/bin"))     ;; for ginko_ls if it needs
   ;; (add-to-list 'eglot-server-programs '((dts-mode) "ginko_ls"))
-  (add-to-list 'eglot-server-programs '((dts-mode) "~/git-clone/ginko/target/debug/ginko_ls"))
+  ;; (add-to-list 'eglot-server-programs '((dts-mode) "~/git-clone/ginko/target/debug/ginko_ls"))
   )
 ;; ----------------------------------------------------------------------
 (use-package lsp-mode
@@ -4700,6 +4721,7 @@ For example, `consult-recent-file' try to embed its preview into popper window i
     ;; nop
     )
   )
+
 ;; ----------------------------------------------------------------------
 (use-package lua-mode
   :mode "\\.lua\\'"
