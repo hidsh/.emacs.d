@@ -4701,9 +4701,12 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 
 ;; ----------------------------------------------------------------------
 (use-package dts-mode
-  :disabled t
-  :mode (("\\.keymap$"  . dts-mode)      ;; for zephyr/zmk
-         ("\\.overlay$" . dts-mode))
+  ;; :disabled
+  :mode ("\\(\\.keymap\\|\\.overlay\\)$" . dts-mode)
+  ;; :mode (("\\.keymap\\'"  . dts-mode)      ;; for zephyr/zmk
+         ;; ("\\.overlay\\'" . dts-mode))
+  :hook (dts-mode . (lambda () (setq comment-start "//"
+                                     comment-end   "")))
   )
 
 ;; ----------------------------------------------------------------------
