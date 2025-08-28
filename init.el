@@ -3322,21 +3322,21 @@ alternative, you can run `embark-export' from commands like `M-x' and
   (set-face-attribute 'font-lock-comment-face nil :slant 'normal)
   (set-face-attribute 'font-lock-comment-delimiter-face nil :slant 'normal)
 
-  (defun flymake-cc-init ()
-    (let* ((temp-file   (flymake-init-create-temp-buffer-copy
-                         'flymake-create-temp-inplace))
-           (local-file  (file-relative-name
-                         temp-file
-                         (file-name-directory buffer-file-name)))
-           (ext (file-name-extension local-file))
-           (compiler (executable-find (cond ((or (string= ext "c")
-                                                 (string= ext "h"))
-                                             "gcc")
-                                            (t
-                                             "g++")))))
-      (unless (file-executable-p compiler)
-        (error "Not found: %s" compiler))
-      (list compiler (list "-Wall" "-Wextra" "-fsyntax-only" local-file))))
+  ;; (defun flymake-cc-init ()
+  ;;   (let* ((temp-file   (flymake-init-create-temp-buffer-copy
+  ;;                        'flymake-create-temp-inplace))
+  ;;          (local-file  (file-relative-name
+  ;;                        temp-file
+  ;;                        (file-name-directory buffer-file-name)))
+  ;;          (ext (file-name-extension local-file))
+  ;;          (compiler (executable-find (cond ((or (string= ext "c")
+  ;;                                                (string= ext "h"))
+  ;;                                            "gcc")
+  ;;                                           (t
+  ;;                                            "g++")))))
+  ;;     (unless (file-executable-p compiler)
+  ;;       (error "Not found: %s" compiler))
+  ;;     (list compiler (list "-Wall" "-Wextra" "-fsyntax-only" local-file))))
 
   ;; (push '("\\.c$" flymake-cc-init) flymake-allowed-file-name-masks)
   ;; (push '("\\.cpp$" flymake-cc-init) flymake-allowed-file-name-masks)
@@ -3848,6 +3848,7 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flycheck-posframe
+  :disabled t
   :if window-system
   :ensure t
   :after flycheck
@@ -3865,7 +3866,7 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flymake
-  ;; :disabled t
+  :disabled t
   :config
 
   ;; fringe indicator for HiDPI
@@ -3917,7 +3918,7 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flymake-posframe
-  ;; :disabled t
+  :disabled t
   :if window-system
   :load-path "elisp/flymake-posframe"
   :hook (flymake-mode . flymake-posframe-mode)
