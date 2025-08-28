@@ -294,7 +294,7 @@ Can be an integer to determine the exact padding."
    (consult-separator :foreground base8 :background red)
    (consult-grep-context :foreground base8 :background yellow)
    (consult-help :foreground base8 :background green)
-   (consult-preview-insertion :inherit 'vertico-current)
+   (consult-preview-insertion :inherit 'cursor)
 
    ;; ivy
    ;; (set-face-foreground 'ivy-action (mycolor 'red))
