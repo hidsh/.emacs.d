@@ -746,26 +746,26 @@
 ;; im-ctl
 ;; (defun im-ctl (on) (do-depends-on-each-os))
 
-(when window-system
-  (defun im-on ()
-    (interactive)
-    (if (fboundp 'im-ctl)
-        (im-ctl t)
-      (message "Error: void function \"im-ctl\"! System dependent")))
+;; (when window-system
+;;   (defun im-on ()
+;;     (interactive)
+;;     (if (fboundp 'im-ctl)
+;;         (im-ctl t)
+;;       (message "Error: void function \"im-ctl\"! System dependent")))
 
-  (defun im-off ()
-    (interactive)
-    (if (fboundp 'im-ctl)
-        (im-ctl nil)
-      (message "Error: void function \"im-ctl\"! System dependent")))
+;;   (defun im-off ()
+;;     (interactive)
+;;     (if (fboundp 'im-ctl)
+;;         (im-ctl nil)
+;;       (message "Error: void function \"im-ctl\"! System dependent")))
 
-  (add-hook 'minibuffer-setup-hook #'im-off)
-  (add-hook 'minibuffer-exit-hook #'im-off)
-  ;; (add-hook 'focus-out-hook #'im-off)
-  (add-hook 'evil-insert-state-exit-hook #'im-off)
+;;   (add-hook 'minibuffer-setup-hook #'im-off)
+;;   (add-hook 'minibuffer-exit-hook #'im-off)
+;;   ;; (add-hook 'focus-out-hook #'im-off)
+;;   (add-hook 'evil-insert-state-exit-hook #'im-off)
 
-  (im-off)      ;; なぜか起動直後にim-onしているので追加
-)
+;;   (im-off)      ;; なぜか起動直後にim-onしているので追加
+;; )
 
 ;; ----------------------------------------------------------------------
 ;; (defvar exclude-face-list '(rainbow-delimiters-base-face
