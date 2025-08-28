@@ -4942,6 +4942,11 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 ;;   (advice-add 'Info-find-node :around 'Info-find-node--elisp-ja))
 
 ;; ----------------------------------------------------------------------
+;; to use emacsclient from yazi
+(unless (server-running-p)
+  (server-start))
+
+;; ----------------------------------------------------------------------
 ;; customize setting
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
 (load custom-file nil t)
