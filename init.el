@@ -2128,11 +2128,42 @@ alternative, you can run `embark-export' from commands like `M-x' and
                     ()
                 (vertico-exit)))))))
 
+  ;; sort by time in vertico
+  ;; thttps://www.reddit.com/r/emacs/comments/1g8yccr/sorting_file_date_using_vertico/
+  (defun my/sort-by-mtime (files)
+    "Sort FILES by modification time (newest first)."
+    (sort files
+          (lambda (a b)
+            (let ((ta (file-attribute-modification-time (file-attributes a)))
+                  (tb (file-attribute-modification-time (file-attributes b))))
+              (time-less-p tb ta)))))
+
+  (setq vertico-sort-function #'my/sort-by-mtime)
+
+  (setq vertico-sort-override-function
+        (lambda (files)
+          (if (and (eq minibuffer-history-variable 'file-name-history)
+                   (not (eq (car-safe minibuffer-completion-table) 'boundaries)))
+              (my/sort-by-mtime files)
+            (vertico-sort-history-length-alpha files))))
+
+  (defun my/toggle-vertico-file-sorting ()
+    "Toggle between different sorting methods for files in Vertico."
+    (interactive)
+    (if (eq vertico-sort-function #'my/sort-by-mtime)
+        (setq vertico-sort-function #'vertico-sort-history-length-alpha)
+      (setq vertico-sort-function #'my/sort-by-mtime))
+    (message "Vertico sorting: %s"
+             (if (eq vertico-sort-function #'my/sort-by-mtime)
+                 "by modification time"
+               "by history and alpha")))
+
   :bind (:map vertico-map
          ("TAB" . minibuffer-complete)
          ("C-j" . vertico-next)
          ("C-k" . vertico-previous)
          ("M-y" . vertico-save)
+         ("M-s" . my/toggle-vertico-file-sorting)
 
          :map evil-motion-state-map
          ("M-z" .  vertico-repeat))
