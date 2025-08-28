@@ -1,8 +1,4 @@
-;;; init.el --- my init  -*- coding:utf-8-unix; mode:emacs-lisp -*-
-
-;;; Commentary:
-
-;; init.el a.k.a my BONSAI thing XD
+;;; init.el --- aka. my BONSAI thing XD  -*- coding:utf-8-unix; mode:emacs-lisp -*-
 
 ;; (setq debug-on-error t)
 
@@ -1131,6 +1127,7 @@ That is, a string used to represent it on the tab bar."
   (setq evil-want-keybinding nil)
   (setq evil-want-integration t)
   (setq evil-kill-on-visual-paste nil)
+  (setq evil-want-fine-undo t)              ;; fine grained
   (setq evil-undo-system 'undo-fu)
 
   :config
@@ -1167,7 +1164,7 @@ That is, a string used to represent it on the tab bar."
   (add-function :after after-focus-change-function #'evil-exit-visual-state)
 
   ;; evil keybindings
-  (define-key evil-normal-state-map (kbd "M-c") #'ffap)                       ; M-RET
+  ;; (define-key evil-normal-state-map (kbd "M-c") #'ffap)                       ; M-RET
   ;; (define-key evil-insert-state-map (kbd "M-v") #'nop)                        ; prevent paste in Mac
   (define-key evil-visual-state-map (kbd "x") #'evil-delete)
 
@@ -1296,8 +1293,8 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-motion-state-map (kbd "M-w") #'my-forward-word)
   ;; (define-key evil-motion-state-map (kbd "g g") #'my-evil-beginning-of-buffer)
   ;; (define-key evil-motion-state-map (kbd "g e") #'my-evil-end-of-buffer)
-  (define-key evil-motion-state-map (kbd "g p") #'flymake-goto-prev-error)
-  (define-key evil-motion-state-map (kbd "g n") #'flymake-goto-next-error)
+  ;; (define-key evil-motion-state-map (kbd "g p") #'flymake-goto-prev-error)
+  ;; (define-key evil-motion-state-map (kbd "g n") #'flymake-goto-next-error)
   (define-key evil-motion-state-map (kbd "g h") 'evil-jump-backward)
   ;; (define-key evil-motion-state-map (kbd "Y") #'my-evil-yank-whole-buffer)
   (define-key evil-motion-state-map (kbd "TAB") #'evil-indent-line)
@@ -1323,7 +1320,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-normal-state-map (kbd "g p") nil)        ; evil-paste-after-cursor-after
   (define-key evil-normal-state-map (kbd "C-r") nil)        ; evil-redo
   (define-key evil-normal-state-map (kbd "U")   #'evil-redo)
-  ;; (define-key evil-normal-state-map (kbd "M-p") #'counsel-yank-pop)
+  (define-key evil-normal-state-map (kbd "M-p") 'consult-yank-pop)
   ;; (define-key evil-normal-state-map (kbd "SPC") #'evil-force-normal-state)
   ;; (define-key evil-normal-state-map (kbd "g f") #'my-beginning-of-defun)
   (define-key evil-normal-state-map (kbd "g I") #'my-put-file-compile-flags)
@@ -1345,8 +1342,9 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-normal-state-map "X" 'delete-backward-char)      ; "X" command without kill-new
 
   ;; insert-state-map
+  (define-key evil-insert-state-map (kbd "C-y") #'consult-yank-pop)
   (define-key evil-insert-state-map (kbd "C-h") #'delete-backward-char)
-  ;; (define-key evil-insert-state-map (kbd "M-h") #'my-backward-kill-word)
+  (define-key evil-insert-state-map (kbd "M-h") #'backward-kill-word)
   (define-key evil-insert-state-map (kbd "TAB") #'(lambda () (interactive) (insert-tab)))
   ;; (define-key evil-insert-state-map (kbd "'") #'my-insert-squote)
   ;; (define-key evil-insert-state-map (kbd "\"") #'my-insert-dquote)
@@ -1359,6 +1357,11 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-visual-state-map (kbd ";") #'my-evil-visual-comment-region)
   (define-key evil-visual-state-map (kbd "i") #'my-evil-visual-indent-region)
   ;; (define-key evil-visual-state-map (kbd "g g") #'my-evil-beginning/end-of-buffer)
+
+  (evil-define-key 'normal image-mode-map (kbd "i") #'image-increase-size)
+  (evil-define-key 'normal image-mode-map (kbd "u") #'image-decrease-size)
+  (evil-define-key 'normal image-mode-map (kbd "o") #'image-decrease-size)
+  (evil-define-key 'normal image-mode-map (kbd "0") #'image-transform-fit-both)
 
   ;; (add-to-list 'evil-emacs-state-modes 'macrostep-mode)
 
@@ -1856,20 +1859,60 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 ;; ----------------------------------------------------------------------
 (use-package orderless
-  :custom
-  `((completion-styles '(orderless partial-completion basic))
-    (orderless-matching-styles
-     . '(orderless-prefixes
-         orderless-flex
-         orderless-regexp
-         orderless-initialism
-         orderless-literal)))
+  :after corfu
+  :hook ((corf-mode . (lambda () (setq-local orderless-matching-styles
+                                             '(orderless-flex)))))
+  :init
+  (setq completeion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides nil)
+  ;; :custom
+  ;; `((completion-styles '(orderless partial-completion basic))
+  ;;   (orderless-matching-styles
+  ;;    . '(orderless-prefixes
+  ;;        orderless-flex
+  ;;        orderless-regexp
+  ;;        orderless-initialism
+  ;;        orderless-literal)))
   )
+
+(use-package prescient
+  :disabled t
+  :config
+  (setq prescient-aggressive-file-save t)
+  (prescient-persist-mode +1))
+
+(use-package corfu-prescient
+  :disabled t
+  :after corfu orderless
+  :config
+  (setq corfu-prescient-enable-filtering nil)
+  (corfu-prescient-mode +1))
+
+(use-package kind-icon
+  :disabled t
+  :after corfu
+  :custom (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package marginalia)
 
+;; (use-package counsel
+;;   :bind ("C-x C-f" . counsel-find-file)
+;;   )
+
 (use-package consult
   ;; :disabled
+  :init
+  (dolist (kmap '(minibuffer-local-map
+                  minibuffer-local-completion-map
+                  consult-async-map
+                  completion-in-region-mode-map
+                  consult-narrow-map
+                  minibuffer-mode-map))
+    (define-key kmap (kbd "M-h") #'backward-kill-word))
+ 
   :config
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
@@ -2006,7 +2049,6 @@ alternative, you can run `embark-export' from commands like `M-x' and
          ("C-x C-g" . my-consult-find-command)
          ("M-e" . embark-act)
          ("C-x C-b" . my-consult-buffer))
- )
 
 (use-package embark-consult
   :ensure t
@@ -3314,6 +3356,8 @@ alternative, you can run `embark-export' from commands like `M-x' and
               (setq hide-ifdef-shadow t)
               (hide-ifdef-mode 1)
 
+              ;; (dumb-jump-mode)
+
               ;; (setq flycheck--automatically-enabled-checkers '(c/c++-gcc))
               ;; (flycheck-disable-checker 'c/c++-clang)
               ;; (flycheck-mode 1)      ;; flycheck will be enabled in prog-mode
@@ -3337,7 +3381,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
   ;; (ad-activate 'compilation-start)
 
   ;; enable ANSI color in *compilation* buffer
-  ;; (require 'ansi-color)
+  (require 'ansi-color)
   (defun colorize-compilation-mode-hook ()
     "Colorize from `compilation-filter-start' to `point'."
     (let ((inhibit-read-only t))
@@ -4152,7 +4196,28 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 ;; ----------------------------------------------------------------------
 (use-package cape
   :ensure t
-  :init
+  :hook (((prog-mode
+           ;; conf-mode
+           eglot-manage-mode) . my-set-super-capf))
+  :config
+  (setq cape-dabbrev-check-other-buffers nil)
+
+  (defun my-set-super-capf (&optional arg)
+    (setq-local completion-at-point-functions
+                (list (cape-capf-noninterruptible
+                       (cape-capf-buster
+                        (cape-capf-properties
+                         (cape-capf-super
+                          (if arg
+                              arg
+                            (car completion-at-point-functions))
+                          ;; #'tempel-complete
+                          ;; #'tabnine-completion-at-point
+                          #'cape-dabbrev
+                          #'cape-file)
+                         :sort t
+                         :exclusive 'no))))))
+
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   ;; (add-to-list 'completion-at-point-functions #'cape-history)
@@ -4166,8 +4231,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   ;; (add-to-list 'completion-at-point-functions #'cape-symbol)
   ;; (add-to-list 'completion-at-point-functions #'cape-line)
 
-  :config
-  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)    ;; forcely clear cache for lsp-server
+  ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)    ;; forcely clear cache for lsp-server
   )
 
 ;; ----------------------------------------------------------------------
@@ -4387,17 +4451,23 @@ $0`(yas-escape-text yas-selected-text)`
          (lambda () (require 'ccls) (lsp))))
 ;; ----------------------------------------------------------------------
 (use-package dumb-jump
-  :disabled t
+  ;; :disabled t
   :ensure t
+  :init
+  ;; (dumb-jump-mode)
+
   :config
-  ;; (setq dumb-jump-default-project "")
+  (setq dumb-jump-default-project "")
   ;; (setq dumb-jump-quiet t)
   (setq dumb-jump-force-searcher 'rg)
+  (setq dumb-jump-prefer-searcher 'rg)
+  (setq xref-show-definitions-function #'consult-xref)
+
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   ;; (define-key evil-motion-state-map (kbd "g d") #'dumb-jump-go)      ; obsolete
   ;; (define-key evil-motion-state-map (kbd "g h") #'dumb-jump-back)    ; obsolete
-  (dumb-jump-mode)
   )
+
 ;; ----------------------------------------------------------------------
 (use-package jumplist
   :ensure t
