@@ -10,10 +10,11 @@
 
 ;; ----------------------------------------------------------------------
 ;; @@ utility
-(defun nop ()
-  "often use to disable parent key-bindings"
+(defun nop (&optional silent)
+  "Often use to disable parent key-bindings."
   (interactive)
-  (message "no operation"))
+  (unless silent
+    (message "no operation")))
 
 (defun p-2 ()
   "Return string of info at the `point' in the echo area"
@@ -536,7 +537,8 @@ end-of-buffer signals; pass the rest to the default handler."
               (goto-char pos))))
       (message "No comment"))))
 
-(add-hook 'prog-mode-hook #'(lambda () (define-key prog-mode-map (kbd "M-;") 'my-comment-dwim)))
+;; (add-hook 'prog-mode-hook #'(lambda () (define-key prog-mode-map (kbd "M-;") 'my-comment-dwim)))
+(global-set-key (kbd "M-;") 'my-comment-dwim)
 (global-set-key (kbd "C-;") 'my-comment-set-column)
 
 ;; ----------------------------------------------------------------------
