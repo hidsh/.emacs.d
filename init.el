@@ -2251,8 +2251,15 @@ alternative, you can run `embark-export' from commands like `M-x' and
 	  (propertize cmd 'face 'font-lock-constant-face)
 	cmd)))
 
+  ;; "Tab" = `minibuffer-complete' or `vertico-insert' (vertico minibuffers)
+  (defun my-minibuffer-complete-or-vertico-insert ()
+    (interactive)
+    (if (< vertico--index 0)        ;; -1: not selected yet
+        (minibuffer-complete)
+      (vertico-insert)))
+
   :bind (:map vertico-map
-         ("TAB" . minibuffer-complete)
+         ("TAB" . my-minibuffer-complete-or-vertico-insert)
          ("C-j" . vertico-next)
          ("C-k" . vertico-previous)
          ("M-y" . vertico-save)
