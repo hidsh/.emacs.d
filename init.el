@@ -2123,6 +2123,25 @@ alternative, you can run `embark-export' from commands like `M-x' and
   )
 
 (use-package vertico
+  :ensure t
+  :custom
+  (read-buffer-completion-ignore-case t)
+  (read-file-name-completion-ignore-case t)
+  (completion-styles '(basic substring partial-completion flex))
+  (vertico-multiform-categories
+   '((symbol (vertico-sort-function . vertico-sort-alpha))
+     (file (vertico-sort-function . sort-directories-first)
+           (+vertico-transform-functions . +vertico-highlight-directory))))
+  (vertico-multiform-commands
+   '((consult-line (vertico-sort-override-function . vertico-sort-alpha))
+     (execute-extended-command
+      (+vertico-transform-functions . +vertico-highlight-enabled-mode))))
+
+  :init
+  (vertico-mode)
+  (vertico-multiform-mode)
+  (defvar +vertico-transform-functions nil)
+
   :config
   (setq vertico-count 20)
   (setq completion-styles '(substring orderless basic))     ;; In order to support completing prefixes, combine
@@ -2230,7 +2249,6 @@ alternative, you can run `embark-export' from commands like `M-x' and
                (memq sym minor-mode-list)
                (boundp sym)))
 	  (propertize cmd 'face 'font-lock-constant-face)
-	  ;; (propertize cmd 'face 'terminal-bold)
 	cmd)))
 
   :bind (:map vertico-map
