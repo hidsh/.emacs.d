@@ -4618,6 +4618,10 @@ $0`(yas-escape-text yas-selected-text)`
                                                (while (> n 0)
                                                  (vterm-send-right)
                                                  (setq n (1- n))))))
+
+
+  ;; (evil-define-key 'emacs vterm-mode-map (kbd "<return>>") #'vterm-send-return)
+
   ;; force emacs-state
   (defun my-adv-switch-to-bufffer--force-evil-emacs-state-in-vterm (&rest _)
     (when (eq major-mode 'vterm-mode)
