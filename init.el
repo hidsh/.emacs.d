@@ -2198,6 +2198,41 @@ alternative, you can run `embark-export' from commands like `M-x' and
                  "by modification time"
                "by history and alpha")))
 
+  ;; font-lock candidates for directories
+  ;; https://www.reddit.com/r/emacs/comments/190bne1/how_to_display_a_vertico_candidate_in_a_different/
+  (cl-defmethod vertico--format-candidate :around
+    (cand prefix suffix index start &context ((not +vertico-transform-functions) null))
+    (dolist (fun (ensure-list +vertico-transform-functions))
+      (setq cand (funcall fun cand)))
+    (cl-call-next-method cand prefix suffix index start))
+
+  ;; function to highlight directories
+  (defun +vertico-highlight-directory (file)
+    "If FILE ends with a slash, highlight it as a directory."
+    (if (string-suffix-p "/" file)
+	(propertize file 'face 'marginalia-file-priv-dir) ; or face 'dired-directory
+      file))
+
+  ;; function to sort directories first
+  (defun sort-directories-first (files)
+    ;; Still sort by history position, length and alphabetically
+    (setq files (vertico-sort-history-length-alpha files))
+    ;; But then move directories first
+    (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) files)
+           (seq-remove (lambda (x) (string-suffix-p "/" x)) files)))
+
+  ;; function to highlight enabled modes similar to counsel-M-x
+  (defun +vertico-highlight-enabled-mode (cmd)
+    "If MODE is enabled, highlight it as font-lock-constant-face."
+    (let ((sym (intern cmd)))
+      (if (or (eq sym major-mode)
+              (and
+               (memq sym minor-mode-list)
+               (boundp sym)))
+	  (propertize cmd 'face 'font-lock-constant-face)
+	  ;; (propertize cmd 'face 'terminal-bold)
+	cmd)))
+
   :bind (:map vertico-map
          ("TAB" . minibuffer-complete)
          ("C-j" . vertico-next)
@@ -4825,6 +4860,52 @@ For example, `consult-recent-file' try to embed its preview into popper window i
          ;; ("\\.overlay\\'" . dts-mode))
   :hook (dts-mode . (lambda () (setq comment-start "//"
                                      comment-end   "")))
+  )
+
+;; ----------------------------------------------------------------------
+(use-package kconfig-mode
+  ;; :disabled
+  :mode ("\\Kconfig.*$" . kconfig-mode)
+  :config
+  ;; re-define
+    (defconst kconfig-mode-font-lock-defaults
+    `(
+        ;; ;; Documentation
+        ;; (,(rx-to-string
+        ;; `(and
+        ;;         line-start space space (+ space) (group(+ not-newline)) line-end
+        ;;         )
+        ;; t)
+        ;; 1 font-lock-doc-face t)
+
+        ;; keywords
+        (,(rx-to-string
+        `(and  symbol-start (group (or ,@kconfig-keywords)) symbol-end)
+        t)
+        1 font-lock-keyword-face)
+        ;; types
+        (,(rx-to-string
+        `(and word-start (group (or ,@kconfig-type-keywords)) word-end)
+        t)
+        1 font-lock-type-face)
+        ;; constants
+        (,(rx-to-string
+        `(and word-start (group (or "y" "n")) word-end)
+        t)
+        1 font-lock-constant-face)
+        (,(rx-to-string
+            `(and word-start "default" word-end (+ space)
+                word-start (group (\? "0x") (+ hex)) word-end)
+            t)
+        1 font-lock-constant-face)
+        ;; Config declarations
+        (,(rx-to-string
+        `(and line-start word-start (or ,@kconfig-defun-keywords) word-end
+                (+ space) word-start (group (+ (or alnum "_"))) word-end)
+        t)
+        1 font-lock-function-name-face t)
+        )   "Font lock faces highlighting for `kconfig-mode'.")
+
   )
 
 ;; ----------------------------------------------------------------------
