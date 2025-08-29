@@ -1903,16 +1903,8 @@ If COUNT is given, move COUNT - 1 lines downward first."
 ;;   )
 
 (use-package consult
+  :ensure t
   ;; :disabled
-  :init
-  (dolist (kmap '(minibuffer-local-map
-                  minibuffer-local-completion-map
-                  consult-async-map
-                  completion-in-region-mode-map
-                  consult-narrow-map
-                  minibuffer-mode-map))
-    (define-key kmap (kbd "M-h") #'backward-kill-word))
- 
   :config
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
@@ -2042,6 +2034,15 @@ alternative, you can run `embark-export' from commands like `M-x' and
         (affe-find)
       (consult-find)))
 
+  ;; "M-h" = `backward-kill-word' (Vertico/Consult minibuffers)
+  (dolist (kmap '(minibuffer-local-map
+                  minibuffer-local-completion-map
+                  consult-async-map
+                  completion-in-region-mode-map
+                  consult-narrow-map
+                  minibuffer-mode-map))
+    (define-key (symbol-value kmap) (kbd "M-h") #'backward-kill-word))
+
   :bind (("M-r" . consult-recent-file)
          ("M-l" . my-consult-line-at-point)
          ("M-a" . my-consult-apropos-at-point)
@@ -2050,10 +2051,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
          ("M-e" . embark-act)
          ("C-x C-b" . my-consult-buffer))
 
-(use-package embark-consult
-  :ensure t
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
+ )
 
 (use-package embark
   :bind (:map embark-general-map
