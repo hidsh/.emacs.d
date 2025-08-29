@@ -315,6 +315,7 @@
 
 (defalias 'dm 'describe-mode)
 (defalias 'dv 'describe-variable)
+(defalias 'dc 'describe-command)
 (defalias 'dfun 'describe-function)
 (defalias 'face 'describe-face)
 (defalias 'dk 'describe-key)
