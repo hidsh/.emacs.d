@@ -9,6 +9,10 @@
 
 ;; 外部コマンドはmsys2/mingwを使う
 ;;D:\pgm\msys64\usr\bin
+
+;; packages
+;;rg: pacman -S mingw-w64-x86_64-ripgrep
+
 (setenv "PATH" (concat "D:\\pgm\\msys64\\mingw64\\bin;"
                        ;; "D:\\pgm\\msys64\\mingw64\\usr\\bin;"
                        (getenv "PATH")))
@@ -40,6 +44,11 @@
 ;; (setq coding-system-for-read 'utf-8-unix)
 ;; (setq coding-system-for-write 'utf-8-unix)
 
+;; Windows上でemacsにコピペしたときの文字化け対応（windowsではutf16なのでそれに合わせる）
+(set-selection-coding-system 'utf-16-le)
+(set-clipboard-coding-system 'utf-16-le)
+
+
 ;; http://sakito.jp/emacs/emacsshell.html#id7
 
 ;; mac os x の hfs+ ファイルフォーマットではファイル名は nfd (の様な物)で扱うため以下の設定をする必要がある
@@ -67,13 +76,17 @@
     (setq initial-frame-alist `(
                               (top    . 0)
                               (left   . ,wleft)
-                              (height . 63)
+                              (height . 61)
                               (width  . 110))))
   (setq default-frame-alist initial-frame-alist)
 
+
+
   ;; font
   ;(set-default-font (myfont 'default)) ;; ~26.3
-  (set-frame-font (myfont 'default))	;; 27.2~
+  (let ((name (myfont 'default3))
+        (size 13))
+    (set-frame-font (format "%s-%d" name size)))	;; 27.2~
 
   ;; for im-on/off in init.el
   (defun im-ctl (on)
@@ -97,9 +110,9 @@
 ;;;
 ;;; appearance adjust
 ;;;
-  (setq my-face-adj-line-number-height 1.2)
-  (setq my-face-adj-tabbar-height 1.2)
-  (setq my-face-adj-mode-line-height 1.2)
+  (setq my-face-adj-line-number-height 1.0)
+  (setq my-face-adj-tabbar-height 1.0)
+  (setq my-face-adj-mode-line-height 1.0)
   ;; (add-hook 'after-init-hook 'mac-change-language-to-us)          ;; emacs 起動時は英数モードから始める
   ;; (add-hook 'minibuffer-setup-hook 'mac-change-language-to-us)    ;; minibuffer 内は英数モードにする
   ;; (add-hook 'isearch-mode-hook 'mac-change-language-to-us)        ;; [migemo]isearch のとき IME を英数モードにする
