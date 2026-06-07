@@ -2301,9 +2301,18 @@ alternative, you can run `embark-export' from commands like `M-x' and
   :bind (:map vertico-map
          ("TAB" . my-vertico-directory-insert-current-candidate)
          ;; ("M-h" . my-vertico-directory-up)
-         ("M-h" . vertico-directory-up)
+         ;; ("M-h" . vertico-directory-up)
          ;; ("M-l" . vertico-directory-enter)  ;; enter dired
          ("M-d" . vertico-directory-delete-char))
+  )
+
+(use-package my-backward-kill-path-element
+  :defer t
+  :load-path "elisp"
+  :after vertico
+  :bind (:map vertico-map
+              ("M-h" . my-backward-kill-path-element)
+              ("M-f" . my-backward-kill-path-element--revert))
   )
 
 (use-package affe
