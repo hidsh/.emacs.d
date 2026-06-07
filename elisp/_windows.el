@@ -33,13 +33,15 @@
 ;; (add-to-list 'exec-path (path-join bin-windows-path "PortableGit/bin"))
 ;; (setq my-counsel-rg-exe (path-join bin-windows-path "rg.exe"))
 
-(set-language-environment 'utf-8)
+;; (set-language-environment 'utf-8)
+(set-language-environment "Japanese")
 (prefer-coding-system 'utf-8-unix)
 (setq default-buffer-file-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-clipboard-coding-system 'utf-8)
+(setq default-process-coding-system '(utf-8 . utf-8))
 
 ;; (setq coding-system-for-read 'utf-8-unix)
 ;; (setq coding-system-for-write 'utf-8-unix)
@@ -76,8 +78,10 @@
     (setq initial-frame-alist `(
                               (top    . 0)
                               (left   . ,wleft)
-                              (height . 61)
-                              (width  . 110))))
+                              ;; (height . 61)
+                              ;; (width  . 110))))
+                              (height . 45)
+                              (width  . 90))))
   (setq default-frame-alist initial-frame-alist)
 
 
@@ -85,7 +89,7 @@
   ;; font
   ;(set-default-font (myfont 'default)) ;; ~26.3
   (let ((name (myfont 'default3))
-        (size 13))
+        (size 15))
     (set-frame-font (format "%s-%d" name size)))	;; 27.2~
 
   ;; for im-on/off in init.el
@@ -166,14 +170,41 @@
   ;;  (add-to-list 'exec-path bin-path)
   ;;  (setenv "PATH" (concat bin-path ":" (getenv "PATH")))
   ;;  )
-  )
+
+
+  ;; rust
+  (defun cargo-run-wsl ()
+    (interactive)
+    (when (buffer-modified-p)
+      (save-buffer))
+    (cargo-run-wsl-1))
+
+  (defun cargo-run-wsl-1 ()
+    ;; //wsl.localhost/Ubuntu/home/g/rust-tuto3/t02-1-kazuate/src/main.rs
+    (let* ((path (split-string (buffer-file-name) "/"))
+           (len (length path))
+           (pwd (if (and
+                     (string= (nth 0 path) "")
+                     (string= (nth 1 path) "")
+                     (string= (nth 2 path) "wsl.localhost")
+                     (string= (car (last path)) "main.rs"))
+                    (let ((i 5)
+                          (end (- len 3))
+                          (s "~"))
+                      (while (< i end)
+                        (setq i (1+ i))
+                        (setq s (concat s "/" (nth i path))))
+                      (format "%S" s))
+                  (error "ERROR: invalid wsl2/cargo project!"))))
+      (evil-ex (concat "!wsl --cd " pwd " bash -l -c \"source $HOME/.cargo/env && cargo run\""))))
+
+  (add-hook 'rust-mode-hook (lambda ()
+                              (define-key rust-mode-map (kbd "C-c C-c") #'cargo-run-wsl)))
+
+    )
 
 ;; go-translate
-(setq dropbox-dir "D:/Dropbox")
-
-
-
-(message "<-- done    \"_windows.el\"")
+;; (setq dropbox-dir "D:/Dropbox")
 
 
 (provide '_windows)

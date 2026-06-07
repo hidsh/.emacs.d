@@ -15,6 +15,7 @@
 ;; ignore `(require 'cl)'
 (setq byte-compile-warnings '(not cl-functions obsolete))
 
+(setenv "LANG" "C")     ;; メッセージの文字化け対策
 
 ;; ----------------------------------------------------------------------
 ;; my-elisp
@@ -59,7 +60,8 @@
 ;; e.g. (mycolor 'red) => "#ff6b7f"
 
 (defun myfont (type)
-  (let* ((fonts '((default  . "Source Han Code JP N")
+  ;; (let* ((fonts '((default  . "Source Han Code JP N")
+  (let* ((fonts '((default  . "Source Han Code JP")
                   (default2 . "Consolas")
                   (default3 . "Cica")
                   (nerdfont . "ShureTechMono Nerd Font Mono")
@@ -135,7 +137,9 @@
  idle-update-delay 0.3
 
  indicate-unused-lines t                     ; 左フランジにEOFがわかるように
- electric-pair-mode nil
+ ;; electric-pair-mode 1
+ ;; electric-pair-open-newline-between-pairs t
+
 
  ;;
  ;; backup files
@@ -341,6 +345,7 @@
 (defun my-adv-load-theme--font-change (&rest _)
  (let ((font (myfont 'ui)))
    (when font
+     ;; (set-face-attribute 'default            nil :family (myfont 'default3) :height my-face-adj-default)
      (set-face-attribute 'mode-line          nil :family font :height my-face-adj-mode-line-height)     ;; defined at _mac.el or _windows.el
      (set-face-attribute 'mode-line-inactive nil :inherit 'mode-line)
      (set-face-attribute 'minibuffer-prompt  nil :family font)
@@ -1077,6 +1082,7 @@ This makes use of the fact that by `message' a newline, the window configuration
 ;; https://github.com/uwabami/emacs#cp5022xel
 (require 'cp5022x)
 (set-charset-priority 'ascii 'japanese-jisx0208 'latin-jisx0201 'katakana-jisx0201 'iso-8859-1 'unicode)
+;; (set-coding-system-priority 'utf-8 'euc-jp 'iso-2022-jp 'cp932)
 (set-coding-system-priority 'utf-8 'euc-jp 'iso-2022-jp 'cp932)
 
 ;; https://handlename.hatenablog.jp/entry/2014/10/17/103603
@@ -1803,7 +1809,8 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; :disabled
   :after evil
   :config
-  (evil-collection-init '(edebug dired neotree slime help calc ediff magit))
+  (evil-collection-init '(edebug dired info custom
+                                 neotree slime help calc ediff magit))
 
   ;; optional: this is the evil state that evil-magit will use
   (setq evil-magit-state 'normal)
@@ -1820,7 +1827,23 @@ If COUNT is given, move COUNT - 1 lines downward first."
     "L"        'kill-current-buffer-and-dired-up-directory
     "q"        'kill-current-buffer
     "r"        'revert-buffer)                                    ; reload
-)
+
+  (evil-collection-define-key 'normal 'info-mode-map
+    "H"             'info-history-back
+    "L"             'info-history-forward
+    (kbd "C-o")     'other-window
+    )
+
+  (evil-collection-define-key 'normal 'custom-mode-map
+    "RET"           'Custom-newline
+    (kbd "SPC")     'Custom-newline
+    "j"             'widget-forward
+    "k"             'widget-backward
+    "m"             'scroll-up-command
+    "M"             'scroll-down-command
+    (kbd "C-o")     'other-window
+    )
+  )
 
 ;; ----------------------------------------------------------------------
 (use-package evil-little-word
@@ -2191,6 +2214,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
 
 (use-package embark-consult
   :ensure t
+  :after (embark consult)
   :hook (embark-collect-mode . consult-preview-at-point-mode)
   )
 
@@ -3019,9 +3043,11 @@ alternative, you can run `embark-export' from commands like `M-x' and
 
 ;; ----------------------------------------------------------------------
 (use-package smartparens
+  :disabled t
   :diminish smartparens-mode
   :config
   (use-package smartparens-config
+    :disabled
     :after smartparens
     :hook (prog-mode-hook . smartparens-mode))
 
@@ -3687,51 +3713,11 @@ alternative, you can run `embark-export' from commands like `M-x' and
   )
 
 ;; ----------------------------------------------------------------------
-(use-package rustic
-  :disabled t
-  ;; :defer t
-  :ensure t
-  :mode ("\\.rs$" . rustic-mode)
-  ;; :hook ((rustic-mode . eglot-ensure))
-  :config
-  (setq rustic-lsp-client 'eglot)
-  )
+;; (use-package rust-ts-mode
+;;   :mode ("\\.rs$" . rust-ts-mode)
+;;   :hook ((rust-ts-mode . eglot-ensure))
 
-;; ----------------------------------------------------------------------
-(use-package rust-mode
-  ;; :disabled t
-  :mode ("\\.rs$" . rust-mode)
-  :hook (
-         ;; (rust-mode . my/rust-mode-hook-func)
-         (rust-mode . eglot-ensure)
-         (rust-mode . eldoc-mode)
-         (rust-mode . flymake-mode))
-
-  :bind (
-         :map rust-mode-map
-         ("C-c C-c"   . my-rust-run)
-  ;; :map compilation-mode-map
-  ;; ("q"     . kill-this-buffer))        ;; kill-buffer instead to bury-buffer
-  ;; ("q"     . kill-this-buffer))        ;; kill-buffer instead to bury-buffer
-         )
-
-  :custom (rust-format-on-save t)
-  :config
-  (defun my-rust-run ()
-    (interactive)
-    (rust-run)
-    (pop-to-buffer "*compilation*")
-    (setq truncate-lines nil)
-    (scroll-up-line 2))
-
-  ;; https://syohex.hatenablog.com/entry/2022/11/08/000610
-  (defun my/find-rust-project-root (dir)
-   (when-let ((root (locate-dominating-file dir "Cargo.toml")))
-     (list 'vc 'Git root)))
-
-  (defun my/rust-mode-hook-func ()
-    (setq-local project-find-functions (list #'my/find-rust-project-root)))
-)
+;;   )
 
 ;; ----------------------------------------------------------------------
 (use-package jal-mode
@@ -4310,43 +4296,61 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package corfu
-  :ensure t
-  :hook ((prog-mode . corfu-mode))
-  :bind (:map corfu-map
-         ("TAB"        . corfu-next)
-         ("<tab>"      . corfu-next)
-         ("C-j"        . corfu-next)
-         ("C-k"        . corfu-previous)
-         ("RET"        . corfu-insert)
-         ("<return>"   . corfu-insert)
-         ("C-c"   . my-corfu-quit)
-         ("C-g"   . my-corfu-quit))
-
-  :custom ((corfu-auto t)
-           (corfu-auto-delay 0)
-           (corfu-auto-prefix 1)
-           (corfu-cycle t)
-           ;; (corfu-on-exact-match nil)
-           (corfu-bar-width 1)
-           (corfu-right-margin-width 2.5))
-
+  :disabled t
+  :custom
+  (corfu-preview-current nil) ;; 入力中に候補を勝手に挿入させない
+  (corfu-preselect 'prompt)   ;; 最初の候補を勝手に選択状態にしない
   :config
-  (corfu-popupinfo-mode)
+  ;; スペース入力を補完確定ではなく、ただのスペース入力として扱う
+  (define-key corfu-map (kbd "SPC") #'corfu-insert-separator)
 
-  (defun my-corfu-quit ()
-    (interactive)
-    ;; (message "!!!")
-    (corfu--popup-hide)
-    (corfu-quit)
-    ;; (with-no-message (undo))
-    ;; (evil-normal-state)
-    ;; (evil-forward-char)
-    (redraw-display)            ;; for evil state indicator
-    )
+(setq corfu-auto nil)      ;; 勝手に補完窓を出さない（M-TABで出す）
+;; または
+;; (setq corfu-preview-current nil) ;; 出しても、バッファに「仮挿入」させない
+;; (setq corfu-preselect 'prompt)   ;; 最初の候補を勝手に選択状態にしない
   )
+
+
+;; (use-package corfu
+;;   :disabled t
+;;   :ensure t
+;;   :hook ((prog-mode . corfu-mode))
+;;   :bind (:map corfu-map
+;;          ("TAB"        . corfu-next)
+;;          ("<tab>"      . corfu-next)
+;;          ("C-j"        . corfu-next)
+;;          ("C-k"        . corfu-previous)
+;;          ("RET"        . corfu-insert)
+;;          ("<return>"   . corfu-insert)
+;;          ("C-c"   . my-corfu-quit)
+;;          ("C-g"   . my-corfu-quit))
+
+;;   :custom ((corfu-auto t)
+;;            (corfu-auto-delay 0)
+;;            (corfu-auto-prefix 1)
+;;            (corfu-cycle t)
+;;            ;; (corfu-on-exact-match nil)
+;;            (corfu-bar-width 1)
+;;            (corfu-right-margin-width 2.5))
+
+;;   :config
+;;   (corfu-popupinfo-mode)
+
+;;   (defun my-corfu-quit ()
+;;     (interactive)
+;;     ;; (message "!!!")
+;;     (corfu--popup-hide)
+;;     (corfu-quit)
+;;     ;; (with-no-message (undo))
+;;     ;; (evil-normal-state)
+;;     ;; (evil-forward-char)
+;;     (redraw-display)            ;; for evil state indicator
+;;     )
+;;   )
 
 ;; ----------------------------------------------------------------------
 (use-package cape
+  :disabled t
   :ensure t
   :hook (((prog-mode
            ;; conf-mode
@@ -4419,7 +4423,6 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package treesit-auto
-  ;; :disabled t
   :config
   (setq treesit-auto-install t)
   (global-treesit-auto-mode)
@@ -4429,159 +4432,63 @@ $0`(yas-escape-text yas-selected-text)`
 (use-package eglot
 ;;  :disabled t
   :ensure t
-  :hook ((c-mode-common . eglot-ensure)    ;; C/C++
-         ;; (dts-mode      . eglot-ensure)    ;; device tree source
-         (rust-mode     . eglot-ensure))
+  :hook ((rust-ts-mode  . eglot-ensure)     ;; rust
+         ;; (c-mode-common . eglot-ensure)     ;; C/C++
+         )
+
   :config
-  ;; (setq eglot-eldoc-strategy 'none)
-  (setq eglot-ignored-server-capabilities '(:hoverProvider))        ;; disable eldoc from eglot
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  (setq eglot-ignored-server-capabilities
+        '( :inlayHintProvider)      ;; disabled becauuse this feature modify buffer on-the-fly arbitrarily sucks!
+        )
+
+
+  ;; lang servers
   (add-to-list 'eglot-server-programs '((rust-mode) "rust-analyzer"))
-
-  ;; (add-to-list 'exec-path (expand-file-name "~/.cargo/bin"))     ;; for ginko_ls if it needs
-  ;; (add-to-list 'eglot-server-programs '((dts-mode) "ginko_ls"))
-  ;; (add-to-list 'eglot-server-programs '((dts-mode) "~/git-clone/ginko/target/debug/ginko_ls"))
-  )
-;; ----------------------------------------------------------------------
-(use-package lsp-mode
-  :disabled
-  :ensure t
-  :commands (lsp lsp-deferred)
-  :hook
-  ;; (prog-major-mode . lsp-prog-major-mode-enable)
-  ;; (c++-mode . lsp)
-  ;; (c-mode   . lsp)
-  ;; (nim-mode . lsp)
-  (js-mode . lsp-deferred)
-
-  :custom
-  ;; debug
-  (lsp-print-io nil)                     ;; => *lsp-log*
-  (lsp-trace nil)
-  (lsp-print-performance nil)
-  ;; general
-  (lsp-auto-guess-root t)
-  ;; (lsp-document-sync-method 'incremental) ;; always send incremental document
-  (lsp-response-timeout 5)
-  ;; (lsp-enable-completion-at-point nil)
-  (lsp-enable-snippet t)
-  (lsp-enable-indentation nil)     ;; disable when using ccls
-  ;; (lsp-prefer-flymake t)
-  (lsp-prefer-capf t)              ;; use capf instead of company
-  ;; (lsp-document-sync-method 2)
-  (lsp-inhibit-message t)
-  (lsp-message-project-root-warning nil)
-  (lsp-idle-delay 0.1)
-  (create-lockfiles nil)
-
-  :config
-  ;; nim-mode into lsp
-  (add-to-list 'lsp-language-id-configuration '(nim-mode . "nim"))
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection "nimlsp")
-                    :major-modes '(nim-mode)
-                    :server-id 'nimlsp))
-
-  ;; :init
-  ;; (unbind-key "C-l")
-  :bind
-  (
-   ;; ("C-l C-l"  . lsp)
-   ;; ("C-l h"    . lsp-describe-session)
-   ;; ("C-l <f5>" . lsp-restart-workspace)
-
-   ;; :map evil-motion-state-map
-   ;; ("g h" . xref-quit-and-pop-marker-stack)
-   ;; ("g t" . lsp-goto-type-definition)
-   ;; ("g d" . xref-find-definitions)
-   ;; ("g r" . xref-find-references)
-   ;; ("g R" . lsp-rename)
-   ;; ("g l" . lsp-lens-mode)
-
-   :map xref--xref-buffer-mode-map
-   ("C-o" . other-window)
-   ("C-0" . quit-window)
-   ("q q" . quit-window)
-   ("RET" . xref-goto-xref)
-   )
   )
 
 ;; ----------------------------------------------------------------------
-(use-package lsp-ui
-  :disabled t
-  :commands lsp-ui-mode
-  :after lsp-mode
-  :custom
-  ;; lsp-ui-doc
-  (lsp-ui-doc-enable t)
-  ;; (lsp-ui-doc-header t)           ;; tabbar.el が使うし、'>'が文字化けするので無効化
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-doc-position 'top)
-  (lsp-ui-doc-max-width  60)
-  (lsp-ui-doc-max-height 20)
-  (lsp-ui-doc-use-childframe t)
-  (lsp-ui-doc-use-webkit nil)
-
-  ;; lsp-ui-flycheck
-  (lsp-ui-flycheck-enable nil)
-
-  ;; lsp-ui-sideline
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-sideline-ignore-duplicate t)
-  (lsp-ui-sideline-show-symbol t)
-  (lsp-ui-sideline-show-hover t)
-  (lsp-ui-sideline-show-diagnostics t)
-  (lsp-ui-sideline-show-code-actions t)
-
-  ;; lsp-ui-imenu
-  (lsp-ui-imenu-enable nil)
-  (lsp-ui-imenu-kind-position 'top)
-
-  ;; lsp-ui-peek
-  (lsp-ui-peek-enable t)
-  (lsp-ui-peek-always-show t)
-  (lsp-ui-peek-peek-height 30)
-  (lsp-ui-peek-list-width 30)
-  (lsp-ui-peek-fontify 'always)
-
-  :hook
-  (lsp-mode . lsp-ui-mode)
+(use-package rust-ts-mode
+  :mode ("\\.rs$" . rust-ts-mode)
+  :hook ((rust-ts-mode . eglot-ensure))
 
   :config
-  (defun my-lsp-ui-peek-select-next ()
+  (add-hook 'rust-ts-mode-hook
+          (lambda ()
+            ;; (setq electric-pair-open-newline-between-pairs t)
+            ;; (evil-define-key 'insert rust-ts-mode-map (kbd "RET") 'my/newline-and-indent)
+            ;; (setq-local electric-pair-mode)
+
+            ;; 電気ショック的な解決：改行時の自動インデント以外を極力減らす
+            (setq-local electric-indent-chars t)))
+  )
+
+;; (use-package prog-mode
+;;   :hook ((before-save . delete-trailing-whitespace))
+;;   :config
+  ;; (defun my/newline-and-indent ()
+  ;;   (interactive)
+  ;;   (newline-and-indent)
+  ;;   (let ((pt (point)))
+  ;;     (next-line 1)
+  ;;     (evil-indent-line (point) (point))
+  ;;     (goto-char pt)))
+
+(use-package prog-mode
+  :hook ((before-save . delete-trailing-whitespace))
+  :config
+  (defun my/newline-and-indent ()
     (interactive)
-    (if ()))
+    (newline-and-indent)
+    (save-excursion
+      (next-line 1)
+      (let ((pt (point)))
+        (evil-indent-line pt pt))))
 
-  :bind
-  (
-   ;; ("C-l C-l"  . lsp)
-   ;; ("C-l h"    . lsp-describe-session)
-   ;; ("C-l <f5>" . lsp-restart-workspace)
-   :map evil-motion-state-map
-   ("g s" . xref-quit-and-pop-marker-stack)
-   ("g t" . lsp-goto-type-definition)
-   ("g R" . lsp-rename)
-   ("g l" . lsp-lens-mode)
-
-   :map lsp-ui-mode-map
-   ("g d" . lsp-ui-peek-find-definitions)
-   ("g r" . lsp-ui-peek-find-references)
-
-   :map lsp-ui-peek-mode-map
-   ("j" . lsp-ui-peek--select-next)
-   ("k" . lsp-ui-peek--select-prev)
-
-   :map xref--xref-buffer-mode-map
-   ("C-o" . other-window)
-   ("C-0" . quit-window)
-   ("q q" . quit-window)
-   ("RET" . xref-goto-xref)
-   )
-
-  (("C-l s"   . lsp-ui-sideline-mode)
-   ("C-l C-d" . lsp-ui-peek-find-definitions)
-   ("C-l C-r" . lsp-ui-peek-find-references))
+  (evil-define-key 'insert rust-ts-mode-map (kbd "RET") 'my/newline-and-indent)
   )
+
+;; ----------------------------------------------------------------------
+
 
 ;; ----------------------------------------------------------------------
 (use-package cmake-ide
@@ -4679,7 +4586,7 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package vterm
-  ;; :disabled t                ;; Vterm はWindowsでは非推奨っぽいので使わない
+  :disabled t                ;; Vterm はWindowsでは非推奨っぽいので使わない
   ;; :if (string= window-system "ns")
   ;; :if t
 
@@ -5070,7 +4977,14 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 
 ;; ----------------------------------------------------------------------
+(use-package fennel-ls
+  :disabled t
+  :config
+
+  )
+;; ----------------------------------------------------------------------
 (use-package go-translate
+  :disabled t
   :init
   (use-package web-api-auth-key
     :load-path dropbox-dir)   ;; defined at _mac.el or _windows.el

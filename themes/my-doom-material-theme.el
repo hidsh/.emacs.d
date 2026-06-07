@@ -393,10 +393,10 @@ Can be an integer to determine the exact padding."
    (ediff-current-diff-A :background 'unspecified)
    (ediff-fine-diff-A :background 'unspecified)
 
+    ;; custom-mode
+   (widget-unselected :foreground "dark gray")
+   (widget-inactive :foreground "dark gray")
+
    ))
-
-
-
-
 (provide 'doom-material-theme)
 ;;; my-doom-material-theme.el ends here
