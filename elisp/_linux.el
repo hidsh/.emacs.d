@@ -47,7 +47,7 @@
   ;; ;; 日本語が合成されたフォントを設定する場合
   ;(set-default-font (myfont 'default)) ;; ~26.3
   ;; (set-frame-font (myfont 'default))	;; 27.2~
-  (set-frame-font "Cica-12")	;; 27.2~
+  (set-frame-font "Cica-15")	;; 27.2~
   ;; (set-frame-font "Utatane-12")	;; 27.2~    ;; Utataneにするとisearchでwrong type argument: arrayp, nilが出る
   ;; (set-frame-font "Input MonoLight-11" nil t)	;; 27.2~
 

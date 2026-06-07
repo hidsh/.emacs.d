@@ -1,4 +1,5 @@
-;;; init.el --- aka. my BONSAI thing XD  -*- coding:utf-8-unix; mode:emacs-lisp -*-
+;;; -*- coding:utf-8-unix; mode:emacs-lisp -*-
+;;; init.el --- aka. my BONSAI thing XD
 
 ;; (setq debug-on-error t)
 
@@ -164,10 +165,18 @@
 
  ) ;; setq-default
 
+;; to hide ^M for dos files in emacs
+;;
+;; todo: check again on linux
+;;
+;;(setq  buffer-display-table (make-display-table))
+;;(aset buffer-display-table ?\^M [])
+
+
 ;; ----------------------------------------------------------------------
 (fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
 (tool-bar-mode -1)
-;; (scroll-bar-mode -1)
+(scroll-bar-mode -1)
 (menu-bar-mode 0)                                 ; Disable the menu bar
 (add-hook 'focus-out-hook #'garbage-collect)
 (electric-indent-mode)
@@ -420,9 +429,47 @@
 )
 
 ;; ----------------------------------------------------------------------
+(use-package bug-hunter
+  :defer t
+  )
+
+;; ----------------------------------------------------------------------
+(use-package emacs-lisp
+  ;; :defer t
+  :bind (("M-P" . my-consult-line-for-use-packages))
+  :config
+
+(defun my-consult-line-for-use-packages ()
+    (interactive)
+    (consult-line "^\(use-package "))
+
+  )
+
+;; ----------------------------------------------------------------------
+(use-package theme-loader
+  ;;:disabled t
+  :load-path "~/.emacs.d/themes"
+  :init
+  (setq theme-loader-theme 'my-doom-material)
+
+  )
+
+;; ----------------------------------------------------------------------
 (use-package my-doom-material-theme
+  ;; :disabled t
+  :defer t
   :load-path "~/.emacs.d/themes"
   :if window-system
+  ;; :init
+  ;; (defun my/apply-theme (frame)
+  ;;   "フレームが作成されたときにテーマを適用する"
+  ;;   (select-frame frame)
+  ;;   (load-theme 'my-doom-material t)) ; your-favorite-theme は実際のテーマ名に変更してください
+
+  ;; (if (daemonp)
+  ;;     (add-hook 'after-make-frame-functions #'my/apply-theme)
+  ;;   (load-theme 'my-doom-material t))
+
   :config
   (defface my-evil-normal-tag-face `((t (:inherit default) :weight bold)) "")
   (copy-face 'my-evil-normal-tag-face 'my-evil-emacs-tag-face)
@@ -1123,7 +1170,12 @@ That is, a string used to represent it on the tab bar."
   )
 
 ;; ----------------------------------------------------------------------
+;; https://github.com/emacs-evil/evil-collection/issues/60 for more details.
+(setq evil-want-keybinding nil)
+
 (use-package evil
+  :after mood-line
+  :defer t
   :init
   (setq evil-want-keybinding nil)
   (setq evil-want-integration t)
@@ -1667,8 +1719,8 @@ That is, a string used to represent it on the tab bar."
   ;;          (delete-region (car my-evil-paste-rgn) (cdr my-evil-paste-rgn)))
   ;;         (t (apply orig-fun _arg))))
 
-  (advice-add 'evil-paste-before :around #'my-adv-evil-paste-before--save-rgn)
-  (advice-add 'evil-paste-after  :around #'my-adv-evil-paste-after--save-rgn)
+;;  (advice-add 'evil-paste-before :around #'my-adv-evil-paste-before--save-rgn)
+;;  (advice-add 'evil-paste-after  :around #'my-adv-evil-paste-after--save-rgn)
   ;; (advice-add 'counsel-yank-pop  :around #'my-adv-counsel-yank-pop--oeverwrite)
 
   ;; ----------
@@ -1750,7 +1802,6 @@ If COUNT is given, move COUNT - 1 lines downward first."
 (use-package evil-collection
   ;; :disabled
   :after evil
-  :ensure t
   :config
   (evil-collection-init '(edebug dired neotree slime help calc ediff magit))
 
@@ -1920,6 +1971,20 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; (setq consult-preview-key (kbd "C-l"))
   (setq consult-preview-key '(:debounce 0.1 any))
 
+  ;; -----------------
+ (defun my-consult-find-alternate-file ()
+  "my \"File Completion Enabled\" find-alternate-file for vertico/consult"
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (let ((alt-file (read-file-name "Find alternate file: "
+                                    nil
+                                    filename
+                                    t)))
+      (find-alternate-file alt-file))))
+
+(global-set-key (kbd "C-x C-v") #'my-consult-find-alternate-file)
+
+  ;; -----------------
   (setq my-consult-ripgrep-exclude-list-orig
     '("#*#"
       ".eslintrc.*" "node_modules/**"
@@ -1976,11 +2041,29 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
                 (_ (let ((insert-default-directory t))
                      (read-directory-name "Ripgrep Dir: ")))))
     (consult-ripgrep dir initial))
+  ;; -----------------
 
+  (defun my-consult-ripgrep (&optional parg dir initial)
+    "`consult-ripgrep` with symbol-at-point.
+Besides, it can be Specified top directory to search using prefix-argument, e.g. C-u."
+    (interactive "p")
+    (setq initial (thing-at-point 'symbol))
+    (setq dir (pcase parg
+                (1 nil)               ;; not given prefix-arg
+                (_ (let ((insert-default-directory t))
+                     (read-directory-name "Ripgrep Dir: ")))))
+    (consult-ripgrep dir initial))
   (defun my-consult-line-at-point ()
     (interactive)
     (consult-line (thing-at-point 'symbol)))
 
+  (defun my-consult-ripgrep-command (parg)
+    (interactive "P")
+    (if parg
+        (affe-grep)
+      (my-consult-ripgrep)))
+
+  ;; -----------------
   (defun my-consult-apropos-symbol-at-point ()
     (interactive)
     (consult-apropos (thing-at-point 'symbol)))
@@ -2022,18 +2105,6 @@ alternative, you can run `embark-export' from commands like `M-x' and
    affe-regexp-function 'orderless-pattern-compiler
    ;; findのかわりにfdを利用する
    affe-find-command "fd --color=never --full-path")
-
-  (defun my-consult-ripgrep-command (parg)
-    (interactive "P")
-    (if parg
-        (affe-grep)
-      (my-consult-ripgrep)))
-
-  (defun my-consult-find-command (parg)
-    (interactive "P")
-    (if parg
-        (affe-find)
-      (consult-find)))
 
   ;; "M-h" = `backward-kill-word' (Vertico/Consult minibuffers)
   (dolist (kmap '(minibuffer-local-map
@@ -2325,6 +2396,15 @@ alternative, you can run `embark-export' from commands like `M-x' and
     (cons input (apply-partially #'orderless--highlight input t)))
   (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
   )
+
+;; -----------
+(defun my/consult-find ()
+  "Like `affe-find`, but always prompt for a directory."
+  (interactive)
+  (let ((current-prefix-arg '(4)))   ;; simulate C-u
+    (call-interactively #'consult-find))
+
+(global-set-key (kbd "M-k") #'my/consult-find))
 
 ; (use-package avy
 ;   :config
@@ -3065,9 +3145,11 @@ alternative, you can run `embark-export' from commands like `M-x' and
 
 ;; ----------------------------------------------------------------------
 (use-package quick-back
+  :disabled t
+  :defer t
   :load-path "elisp"
   :bind (:map evil-normal-state-map
-              ("q SPC" . quick-back-mark)
+              ("q m"   . quick-back-mark)
               ("q q"   . quick-back-jump))
   )
 
@@ -4129,6 +4211,8 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   :if window-system
   :config
   (setq default-text-scale-amount 30)
+  ;; (setq default-text-scale-amount 50)
+
   (default-text-scale-mode 1)
 
   (defun my-adv-default-text-scale--reset-frame (&rest _)
@@ -4563,7 +4647,7 @@ $0`(yas-escape-text yas-selected-text)`
   (set-face-background 'bm-face (face-foreground 'warning))
 
   (define-key evil-motion-state-map (kbd "g m") #'bm-toggle)
-  (define-key evil-motion-state-map (kbd "g SPC") #'bm-next)
+  (define-key evil-motion-state-map (kbd "g ESC") #'bm-next)
   )
 
 ;; ----------------------------------------------------------------------
@@ -5044,6 +5128,15 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 
 ;; ----------------------------------------------------------------------
+;; macrostep-c-mode (minor-mode)
+(use-package macro-step-c-mode
+  :disabled t   ;; error occurs on 30.2
+  :load-path "elisp"
+  :config
+
+  )
+
+;; ----------------------------------------------------------------------
 ;; emacs lisp reference manual (Japanese)
 ;;
 ;; todo does not work!
@@ -5063,6 +5156,87 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 ;; to use emacsclient from yazi
 (unless (server-running-p)
   (server-start))
+
+
+;; ----------------------------------------------------------------------
+;; QUICK HACKS
+;;
+
+;; 30.2 2026-05-21 -> global-text-scale-adjust in face-remap.el
+(defun global-text-scale-adjust (increment)
+  "Change (a.k.a. \"adjust\") the font size of all faces by INCREMENT.
+
+Interactively, INCREMENT is the prefix numeric argument, and defaults
+to 1.  Positive values of INCREMENT increase the font size, negative
+values decrease it.
+
+When you invoke this command, it performs the initial change of the
+font size, and after that allows further changes by typing one of the
+following keys immediately after invoking the command:
+
+   \\`+', \\`='   Globally increase the height of the default face
+   \\`-'      Globally decrease the height of the default face
+   \\`0'      Globally reset the height of the default face
+
+(The change of the font size produced by these keys depends on the
+final component of the key sequence, with all modifiers removed.)
+
+Buffer-local face adjustments have higher priority than global
+face adjustments.
+
+The variable `global-text-scale-adjust-resizes-frames' controls
+whether the frames are resized to keep the same number of lines
+and characters per line when the font size is adjusted.
+
+See also the related command `text-scale-adjust'.  Unlike that
+command, which scales the font size with a factor,
+`global-text-scale-adjust' scales the font size with an
+increment."
+  ;; (interactive "p")
+  (interactive)
+  (when (display-graphic-p)
+    (unless global-text-scale-adjust--default-height
+      (setq global-text-scale-adjust--default-height
+            (face-attribute 'default :height)))
+    ;; (let* ((key (event-basic-type last-command-event))   ;; orig
+    (let* ((key nil)                                        ;; mod
+           (echo-keystrokes nil)
+           (cur (face-attribute 'default :height))
+           (inc
+            ;; (pcase key
+            ;;   (?- (* (- increment)
+            ;;          global-text-scale-adjust--increment-factor))
+            ;;   (?0 (- global-text-scale-adjust--default-height cur))
+            ;;   (_ (* increment
+            ;;         global-text-scale-adjust--increment-factor))))
+            (pcase increment
+              (0 (- global-text-scale-adjust--increment-factor global-text-scale-default-height))
+              (_ (* increment
+                    global-text-scale-adjust--increment-factor))))
+           (new (+ cur inc)))
+      (when (< (car global-text-scale-adjust-limits)
+               new
+               (cdr global-text-scale-adjust-limits))
+        (let ((frame-inhibit-implied-resize
+               (not global-text-scale-adjust-resizes-frames)))
+          (set-face-attribute 'default nil :height new)
+          (redisplay 'force)
+          (when (and (not (and (characterp key) (= key ?0)))
+                     (= cur (face-attribute 'default :height)))
+            (setq global-text-scale-adjust--increment-factor
+                  (1+ global-text-scale-adjust--increment-factor))
+            (global-text-scale-adjust increment))))
+      (when (characterp key)
+        (set-transient-map
+         (let ((map (make-sparse-keymap)))
+           (dolist (mod '(() (control meta)))
+             (dolist (key '(?+ ?= ?- ?0))
+               (define-key map (vector (append mod (list key)))
+                 'global-text-scale-adjust)))
+           map)
+       nil nil
+       "Use %k for further adjustment")))))
+
 
 ;; ----------------------------------------------------------------------
 ;; customize setting
