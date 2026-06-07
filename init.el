@@ -5064,6 +5064,12 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 
 ;; ----------------------------------------------------------------------
+(use-package sift-number
+  :bind (("M-k" . shift-number-up)
+         ("M-j" . shift-number-down))
+  )
+
+;; ----------------------------------------------------------------------
 (use-package go-translate
   :init
   (use-package web-api-auth-key

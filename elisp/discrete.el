@@ -385,6 +385,14 @@ end-of-buffer signals; pass the rest to the default handler."
       (progn 	(copy-file filename newname 1) 	(delete-file filename) 	(set-visited-file-name newname) 	(set-buffer-modified-p nil) 	t))))
 
 ;; ----------------------------------------------------------------------
+;; @@ `my-swap-buffer'
+(defun my-swap-buffer ()
+  (interactive)
+  (swap-buffers -1))     ;; keep focus
+
+(global-set-key (kbd "S-C-o") 'my-swap-buffer)
+
+;; ----------------------------------------------------------------------
 ;; @@ `my-beginning-of-defun'
 (defvar my-beginning-of-defun-pos nil)
 
