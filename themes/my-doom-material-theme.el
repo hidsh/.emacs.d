@@ -100,9 +100,11 @@ Can be an integer to determine the exact padding."
    (dark-cyan   '("#80cbc4" "#00d7af" "cyan"))
 
    ;; face categories -- required for all themes
-   (highlight      teal)
-   (highlight-dark (doom-darken highlight 0.3))
+   (highlight-teal teal)
    (highlight-red  red)
+   (highlight-yellow  yellow)
+   (highlight highlight-yellow)
+   (highlight-dark (doom-darken highlight 0.3))
    (vertical-bar   base2)
 ;; (selection      base4)
    (selection      nil)
@@ -285,7 +287,7 @@ Can be an integer to determine the exact padding."
    (vertico-group-separator :foreground red)
    ;; (vertico-current :foreground teal :background black :inverse-video t)
    ;; (vertico-current :underline teal :background black)
-   (vertico-current :underline dark-teal2 :background black)
+   (vertico-current :underline highlight :background black)
    ;; (vertico-group-title :foreground orange :inverse-video t)
    (vertico-group-title :foreground base3 :background base8)
    (vertico-multiline :foreground base8)

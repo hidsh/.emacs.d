@@ -330,7 +330,7 @@
 (defalias 'dv 'describe-variable)
 (defalias 'dc 'describe-command)
 (defalias 'dfun 'describe-function)
-(defalias 'face 'describe-face)
+(defalias 'dface 'describe-face)
 (defalias 'dk 'describe-key)
 
 (defalias 'l 'display-line-numbers-mode)
@@ -2076,9 +2076,16 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
                 (_ (let ((insert-default-directory t))
                      (read-directory-name "Ripgrep Dir: ")))))
     (consult-ripgrep dir initial))
+
   (defun my-consult-line-at-point ()
     (interactive)
-    (consult-line (thing-at-point 'symbol)))
+    (consult-line (cond ((and buffer-file-name
+                              (string=
+                               (file-name-nondirectory buffer-file-name)
+                               "init.el"))
+                         "(use-package ")
+                        (t (thing-at-point 'symbol)))
+                  1))
 
   (defun my-consult-ripgrep-command (parg)
     (interactive "P")
@@ -2372,16 +2379,16 @@ alternative, you can run `embark-export' from commands like `M-x' and
   (setq vertico-directory-up ())
   (defun my-vertico-directory-up ()
     (interactive)
-    (if (eq 'file (vertico--metadata-get 'category))
+    (if (eq 'file (vertico--metadata-get 'category))    ;; for files
         (let ((pt (point)))
-          (call-interactively #'vertico-directory-up)    ;; first, trying this
+          (call-interactively #'vertico-directory-up)   ;; first, trying this
           (when (= pt (point))
-            (backward-kill-word 2)))                     ;; do this if it does not move the point
-      (backward-kill-word 1)))
+            (backward-kill-word 2)))                    ;; do this if it does not move the point
+      (backward-kill-word 1)))                          ;; for others
 
   (defun my-vertico-directory-insert-current-candidate ()
     (interactive)
-    (let ((delim "/"))      ;; todo system types
+    (let ((delim (if (eq system-type 'windows-nt) "\\" "/")))
       (pcase vertico--total
         (0 (nop t))
         (1 (if (string= (car (last (split-string (minibuffer-contents) delim)))
@@ -2393,15 +2400,30 @@ alternative, you can run `embark-export' from commands like `M-x' and
                (vertico-first)    ;; goto first cand unless selected yet
              (vertico-insert))))))
 
+  (defvar my-vertico-directory--initial-str "")
+
+  (defun my-vertico-directory--backup ()
+    (setq my-vertico-directory--initial-str
+          (buffer-substring (minibuffer-prompt-end) (point-max))))
+
+  (defun my-vertico-directory-revert ()
+    (interactive)
+    (delete-minibuffer-contents)
+    (insert my-vertico-directory--initial-str))
+
+(add-hook 'minibuffer-setup-hook #'my-vertico-directory--backup)
+
   :bind (:map vertico-map
          ("TAB" . my-vertico-directory-insert-current-candidate)
-         ;; ("M-h" . my-vertico-directory-up)
          ;; ("M-h" . vertico-directory-up)
+         ("M-h" . my-vertico-directory-up)
+         ("M-f" . my-vertico-directory-revert)
          ;; ("M-l" . vertico-directory-enter)  ;; enter dired
          ("M-d" . vertico-directory-delete-char))
   )
 
 (use-package my-backward-kill-path-element
+  :disabled t
   :defer t
   :load-path "elisp"
   :after vertico
@@ -3713,13 +3735,6 @@ alternative, you can run `embark-export' from commands like `M-x' and
   )
 
 ;; ----------------------------------------------------------------------
-;; (use-package rust-ts-mode
-;;   :mode ("\\.rs$" . rust-ts-mode)
-;;   :hook ((rust-ts-mode . eglot-ensure))
-
-;;   )
-
-;; ----------------------------------------------------------------------
 (use-package jal-mode
   :disabled     ;; temporary
   :load-path "~/git-clone/jal-mode"
@@ -4432,7 +4447,7 @@ $0`(yas-escape-text yas-selected-text)`
 (use-package eglot
 ;;  :disabled t
   :ensure t
-  :hook ((rust-ts-mode  . eglot-ensure)     ;; rust
+  :hook ((rust-ts-mode  . eglot-ensure)     ;; rust: need `rustup component add rust-analyzer` in terminal
          ;; (c-mode-common . eglot-ensure)     ;; C/C++
          )
 
