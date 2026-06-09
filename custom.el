@@ -25,16 +25,16 @@
                            company-posframe company-quickhelp consult
                            consult-flycheck consult-lsp corfu cp5022x dashboard
                            default-text-scale dimmer dirvish disable-mouse
-                           doom-themes dts-mode dumb-jump eglot embark
-                           embark-consult epc evil evil-cleverparens
-                           evil-collection evil-extra-operator evil-numbers
-                           evil-smartparens expand-region fennel-mode flycheck
-                           flycheck-indicator flycheck-nim flycheck-posframe
-                           fontawesome fringe-helper gist git-gutter
-                           git-gutter-fringe go-translate google-translate
-                           guide-key-tip hide-mode-line hiwin ido-yes-or-no
-                           json-mode kconfig-mode langdoc lsp-mode lsp-ui
-                           marginalia markdown-mode migemo mode-line-bell
+                           doom-themes dts-mode dumb-jump eglot eglot-booster
+                           eldoc-box embark embark-consult epc evil
+                           evil-cleverparens evil-collection evil-extra-operator
+                           evil-numbers evil-smartparens expand-region
+                           fennel-mode flycheck flycheck-indicator flycheck-nim
+                           flycheck-posframe fontawesome fringe-helper gist
+                           git-gutter git-gutter-fringe go-translate
+                           google-translate guide-key-tip hide-mode-line hiwin
+                           ido-yes-or-no json-mode kconfig-mode langdoc lsp-mode
+                           lsp-ui marginalia markdown-mode migemo mode-line-bell
                            neotree nim-mode nodejs-repl orderless org-bullets
                            org-tree-slide paredit popper prescient pulsar
                            quickrun rainbow-delimiters rainbow-mode scratch-log
@@ -42,6 +42,9 @@
                            swap-buffers symbol-overlay tabbar telephone-line
                            treesit-auto undo-fu use-package v-mode vertico vterm
                            web-beautify web-mode wgrep-ag yaml-mode yasnippet))
+ '(package-vc-selected-packages
+   '((eglot-booster :vc-backend Git :url
+                    "https://github.com/jdtsmith/eglot-booster")))
  '(recentf-auto-cleanup 'never)
  '(rust-ts-mode-indent-offset 4)
  '(vertico-group-format

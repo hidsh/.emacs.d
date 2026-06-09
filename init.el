@@ -4455,13 +4455,28 @@ $0`(yas-escape-text yas-selected-text)`
          )
 
   :config
-  (setq eglot-ignored-server-capabilities
-        '( :inlayHintProvider)      ;; disabled becauuse this feature modify buffer on-the-fly arbitrarily sucks!
-        )
+  (setq gc-cons-threshold 100000000)    ;; 100 MB <-- 800KB at default
 
+  (setq eglot-ignored-server-capabilities
+        '( :inlayHintProvider)      ;; disabled because this feature modify buffer on-the-fly arbitrarily sucks!
+        )
 
   ;; lang servers
   (add-to-list 'eglot-server-programs '((rust-mode) "rust-analyzer"))
+  (add-to-list 'eglot-workspace-configuration
+               '(:rust-analyzer
+                 (:checkOnSave t
+                  :workspace (:symbol (:search (:limit 100)))
+                  :numThreads 2)))
+  )
+
+;; ----------------------------------------------------------------------
+(use-package eglot-booster
+  :after eglot
+  :config
+  (setq eglot-booster-io-only t)        ;; >= emacs-30
+  (eglot-booster-mode 1)
+
   )
 
 ;; ----------------------------------------------------------------------
@@ -4505,7 +4520,10 @@ $0`(yas-escape-text yas-selected-text)`
   )
 
 ;; ----------------------------------------------------------------------
+(use-package eldoc-box
+  :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode)
 
+  )
 
 ;; ----------------------------------------------------------------------
 (use-package cmake-ide
