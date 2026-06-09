@@ -4439,7 +4439,10 @@ $0`(yas-escape-text yas-selected-text)`
 ;; ----------------------------------------------------------------------
 (use-package treesit-auto
   :config
+  ;; (setq treesit-auto-install 'prompt)
   (setq treesit-auto-install t)
+  (treesit-auto-add-to-auto-mode-alist 'all)
+
   (global-treesit-auto-mode)
 )
 
@@ -4463,18 +4466,17 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package rust-ts-mode
-  :mode ("\\.rs$" . rust-ts-mode)
   :hook ((rust-ts-mode . eglot-ensure))
 
   :config
-  (add-hook 'rust-ts-mode-hook
-          (lambda ()
-            ;; (setq electric-pair-open-newline-between-pairs t)
-            ;; (evil-define-key 'insert rust-ts-mode-map (kbd "RET") 'my/newline-and-indent)
-            ;; (setq-local electric-pair-mode)
+  (add-to-list 'project-vc-extra-root-markers "Cargo.toml")
+  ;; (setq electric-pair-open-newline-between-pairs t)
+  ;; (evil-define-key 'insert rust-ts-mode-map (kbd "RET") 'my/newline-and-indent)
+  ;; (setq-local electric-pair-mode)
 
-            ;; 電気ショック的な解決：改行時の自動インデント以外を極力減らす
-            (setq-local electric-indent-chars t)))
+  ;; 改行時の自動インデント以外を極力減らす
+  (setq electric-indent-chars t)
+
   )
 
 ;; (use-package prog-mode
