@@ -4517,7 +4517,10 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package eldoc-box
-  :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode)
+  :hook ((eglot-managed-mode . eldoc-box-hover-at-point-mode)
+         (eldoc-box-buffer . (lambda () (setq cursor-in-non-selected-windows nil))))
+  :config
+  (setq eldoc-box-cursor-in-non-selected-windows nil)
 
   )
 
