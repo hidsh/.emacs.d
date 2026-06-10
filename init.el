@@ -183,7 +183,9 @@
 (scroll-bar-mode -1)
 (menu-bar-mode 0)                                 ; Disable the menu bar
 (add-hook 'focus-out-hook #'garbage-collect)
-(electric-indent-mode)
+(electric-pair-mode)
+;; (electric-indent-mode -1)
+
 (which-function-mode -1)
 
 (setq cursor-type 'box)
@@ -3664,20 +3666,32 @@ alternative, you can run `embark-export' from commands like `M-x' and
 
 ;; ----------------------------------------------------------------------
 (use-package prog-mode
+  :hook ((before-save . delete-trailing-whitespace)
+         (prog-mode   . my-prog-mode-hook-func))
   :config
-  (defun prog-mode-hooks-func ()
+  (defun my-prog-mode-hook-func ()
     (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
-    (electric-pair-mode +1)
-    ;; (c-toggle-auto-newline +1)
-    ;; (add-hook 'before-save-hook #'delete-trailing-whitespace nil 'buffer-local)
-
-    ;; (set-face-background 'trailing-whitespace (face-foreground 'error))      ;; should be defined by theme
     (setq show-trailing-whitespace t)
-
-    ;; (flycheck-mode +1)
     )
 
-  (add-hook 'prog-mode-hook #'prog-mode-hooks-func)
+  ;; (defun my/newline-and-indent ()
+  ;;   (interactive)
+  ;;   (newline-and-indent)
+  ;;   (let ((pt (point)))
+  ;;     (next-line 1)
+  ;;     (evil-indent-line (point) (point))
+  ;;     (goto-char pt)))
+  ;;
+  ;; (defun my/newline-and-indent ()
+  ;;   (interactive)
+  ;;   (newline-and-indent)
+  ;;   (save-excursion
+  ;;     (next-line 1)
+  ;;     (let ((pt (point)))
+  ;;       (evil-indent-line pt pt))))
+  ;;
+  ;; (evil-define-key prog-mode-map (kbd "RET") 'my/newline-and-indent)
+
   )
 
 ;; ----------------------------------------------------------------------
@@ -4450,11 +4464,18 @@ $0`(yas-escape-text yas-selected-text)`
 (use-package eglot
 ;;  :disabled t
   :ensure t
-  :hook ((rust-ts-mode  . eglot-ensure)     ;; rust: need `rustup component add rust-analyzer` in terminal
+  :hook ((rust-ts-mode . eglot-ensure)     ;; rust: need `rustup component add rust-analyzer` in terminal
+         (eglot-managed-mode . my-fix-eglot-hook-func)
          ;; (c-mode-common . eglot-ensure)     ;; C/C++
          )
 
   :config
+  (defun my-fix-eglot-hook-func ()
+    ;; check details --> ```M-x toggle-debug-on-error``` yourself!!
+    (setq-default electric-indent-chars '(?\n))
+    )
+
+
   (setq gc-cons-threshold 100000000)    ;; 100 MB <-- 800KB at default
 
   (setq eglot-ignored-server-capabilities
@@ -4492,31 +4513,6 @@ $0`(yas-escape-text yas-selected-text)`
   ;; 改行時の自動インデント以外を極力減らす
   (setq electric-indent-chars t)
 
-  )
-
-;; (use-package prog-mode
-;;   :hook ((before-save . delete-trailing-whitespace))
-;;   :config
-  ;; (defun my/newline-and-indent ()
-  ;;   (interactive)
-  ;;   (newline-and-indent)
-  ;;   (let ((pt (point)))
-  ;;     (next-line 1)
-  ;;     (evil-indent-line (point) (point))
-  ;;     (goto-char pt)))
-
-(use-package prog-mode
-  :hook ((before-save . delete-trailing-whitespace))
-  :config
-  (defun my/newline-and-indent ()
-    (interactive)
-    (newline-and-indent)
-    (save-excursion
-      (next-line 1)
-      (let ((pt (point)))
-        (evil-indent-line pt pt))))
-
-  (evil-define-key 'insert rust-ts-mode-map (kbd "RET") 'my/newline-and-indent)
   )
 
 ;; ----------------------------------------------------------------------
