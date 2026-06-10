@@ -2963,6 +2963,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
 (use-package nerd-icons)
 
 ;; ----------------------------------------------------------------------
+;; emacs-lisp-mode, lisp-interaction-mode
 (defun my-font-lock-add-keywords-elisp ()
   (font-lock-add-keywords nil
                           '(("(\\(lambda\\|cons\\|car\\|cdr\\|nth\\|eq\\|equal\\|null\\|remove\\|delete
@@ -2971,7 +2972,9 @@ alternative, you can run `embark-export' from commands like `M-x' and
 \\|assoc\\|rassoc\\|add-hook\\|remove-hook\\|define-key\\|global-set-key\\|local-set-key\\|define-key
 \\|ad-activate\\|ad-enable-advice\\|ad-disable-advice\\|propertize\\|run-hooks\\)[ \t\n]" . font-lock-keyword-face))))
 
-(add-hook 'emacs-lisp-mode-hook #'my-font-lock-add-keywords-elisp)
+(dolist (hook '(emacs-lisp-mode-hook lisp-interaction-mode-hook))
+        (add-hook hook #'my-font-lock-add-keywords-elisp))
+
 ;; (add-hook 'emacs-lisp-mode-hook #'flymake-mode)
 ;; (add-hook 'lisp-interaction-mode-hook #'my-font-lock-add-keywords-elisp)
 ;; (add-hook 'lisp-interaction-mode-hook #'flymake-mode)   ;; これを削除すると .elファイルを開くときに↓のエラーが出るので注意
