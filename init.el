@@ -1804,6 +1804,29 @@ If COUNT is given, move COUNT - 1 lines downward first."
   (define-key evil-normal-state-map "j" #'(lambda () (interactive) (evil-line-move 1 t)))
   (define-key evil-normal-state-map "k" #'(lambda () (interactive) (evil-line-move -1 t)))
   (define-key evil-normal-state-map "l" #'(lambda () (interactive) (evil-forward-char 1 nil t)))
+
+  ;; ----------
+  (defun my-evil-char-at-point ()
+    (if (and (bound-and-true-p evil-mode)
+             (eq evil-state 'normal)
+             (eolp)
+             (not (bobp)))
+        (char-before)
+      (char-after)))
+
+  (defun my-evil-swap-chars ()
+    (interactive)
+    (unless (or (eolp) (eobp))
+      (let ((s (format "%c%c"
+                       (save-excursion
+                         (evil-forward-char 1 nil t)
+                         (my-evil-char-at-point))
+                       (my-evil-char-at-point))))
+        (delete-char 2)
+        (insert s)
+        (forward-char -1))))
+
+  (define-key evil-normal-state-map (kbd "C-t") 'my-evil-swap-chars)
 )
 
 ;; ----------------------------------------------------------------------
