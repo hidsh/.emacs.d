@@ -1,0 +1,457 @@
+;;; lsp-proxy-utils.el --- Utility functions for lsp-proxy -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2023-2025 JadeStrong
+
+;; Author: JadeStrong <jadestrong@163.com>
+;; Keywords: tools, languages
+
+;; This file is not part of GNU Emacs.
+
+;;; Commentary:
+
+;; Utility functions and helpers for lsp-proxy
+
+;;; Code:
+
+(require 'cl-lib)
+(require 'url-util)
+(require 'project)
+(require 'eglot)
+
+(defvar lsp-proxy-mode)
+(defvar lsp-proxy-enable-org-babel)
+(defvar lsp-proxy-org-babel--info-cache)
+
+(defcustom lsp-proxy-log-buffer-max message-log-max
+  "Maximum number of lines to keep in the log buffer.
+If nil, disable message logging.  If t, log messages but don't truncate
+the buffer when it becomes large."
+  :group 'lsp-proxy
+  :type '(choice (const :tag "Disable" nil)
+          (integer :tag "lines")
+          (const :tag "Unlimited" t)))
+
+(defcustom lsp-proxy-idle-delay 0.500
+  "Debounce interval for `after-change-functions'."
+  :type 'number
+  :group 'lsp-proxy)
+
+(defcustom lsp-proxy-on-idle-hook nil
+  "Hooks to run after `lsp-proxy-idle-delay'."
+  :type 'hook
+  :group 'lsp-proxy)
+
+;;; Message and logging functions
+
+(defvar lsp-proxy--show-message t
+  "Whether to show lsp-proxy messages.")
+
+(defconst lsp-proxy--message-type-face
+  `((1 . ,compilation-error-face)
+    (2 . ,compilation-warning-face)
+    (3 . ,compilation-message-face)
+    (4 . ,compilation-info-face))
+  "Faces for different message types.")
+
+(defun lsp-proxy--message (format &rest args)
+  "Wrapper for `message'.
+
+We `inhibit-message' the message when the cursor is in the
+minibuffer and when emacs version is before emacs 27 due to the
+fact that we often use `lsp--info', `lsp--warn' and `lsp--error'
+in async context and the call to these function is removing the
+minibuffer prompt. The issue with async messages is already fixed
+in emacs 27.
+
+See #2049"
+  (when lsp-proxy--show-message
+    (let ((inhibit-message (or inhibit-message
+                               (and (minibufferp)
+                                    (version< emacs-version "27.0")))))
+      (apply #'message format args))))
+
+(defun lsp-proxy--info (format &rest args)
+  "Display lsp info message with FORMAT with ARGS."
+  (lsp-proxy--message "%s :: %s" (propertize "LSP-PROXY" 'face 'success) (apply #'format format args)))
+
+(defun lsp-proxy--warn (format &rest args)
+  "Display lsp warn message with FORMAT with ARGS."
+  (lsp-proxy--message "%s :: %s" (propertize "LSP-PROXY" 'face 'warning) (apply #'format format args)))
+
+(defun lsp-proxy--error (format &rest args)
+  "Display lsp error message with FORMAT with ARGS."
+  (lsp-proxy--message "%s :: %s" (propertize "LSP-PROXY" 'face 'error) (apply #'format format args)))
+
+(defun lsp-proxy--propertize (str type)
+  "Propertize STR as per TYPE."
+  (propertize str 'face (alist-get type lsp-proxy--message-type-face)))
+
+;;; Logging functionality
+
+(defvar lsp-proxy--log-lines)
+
+(defun lsp-proxy-log (format &rest args)
+  "Log message to the *lsp-proxy-log* buffer.
+FORMAT and ARGS is the same as for `message'."
+  (when lsp-proxy-log-buffer-max
+    (let ((log-buffer (get-buffer "*lsp-proxy-log*"))
+          (inhibit-read-only t))
+      (unless log-buffer
+        (setq log-buffer (get-buffer-create "*lsp-proxy-log*"))
+        (with-current-buffer log-buffer
+          (buffer-disable-undo)
+          (view-mode 1)
+          (set (make-local-variable 'lsp-proxy--log-lines) 0)))
+      (with-current-buffer log-buffer
+        (save-excursion
+          (let* ((message (apply 'format format args))
+                 ;; Count newlines in message.
+                 (newlines (1+ (cl-loop with start = 0
+                                        for count from 0
+                                        while (string-match "\n" message start)
+                                        do (setq start (match-end 0))
+                                        finally return count))))
+            (goto-char (point-max))
+
+            ;; in case the buffer is not empty insert before last \n to preserve
+            ;; the point position(in case it is in the end)
+            (if (eq (point) (point-min))
+                (progn
+                  (insert "\n")
+                  (backward-char))
+              (backward-char)
+              (insert "\n"))
+            (insert message)
+
+            (setq lsp-proxy--log-lines (+ lsp-proxy--log-lines newlines))
+
+            (when (and (integerp lsp-proxy-log-buffer-max) (> lsp-proxy--log-lines lsp-proxy-log-buffer-max))
+              (let ((to-delete (- lsp-proxy--log-lines lsp-proxy-log-buffer-max)))
+                (goto-char (point-min))
+                (forward-line to-delete)
+                (delete-region (point-min) (point))
+                (setq lsp-proxy--log-lines lsp-proxy-log-buffer-max)))))))))
+
+;;; Project management
+
+(defvar-local lsp-proxy--current-project-root nil
+  "Cached project root for current buffer.")
+
+(defun lsp-proxy-project-root ()
+  "Return the project root of current project."
+  (if lsp-proxy--current-project-root
+      lsp-proxy--current-project-root
+    (let* ((project (project-current))
+           (root (and project (project-root project)))
+           (root-path (and root (directory-file-name root))))
+      (setq lsp-proxy--current-project-root root-path)
+      root-path)))
+
+;;; Pattern matching utilities
+
+(eval-and-compile
+  (defun lsp-proxy--transform-pattern (pattern)
+    "Transform PATTERN to (&plist PATTERN) recursively."
+    (cons '&plist
+          (mapcar (lambda (p)
+                    (if (listp p)
+                        (lsp-proxy--transform-pattern p)
+                      p))
+                  pattern))))
+
+(defmacro lsp-proxy--dbind (pattern source &rest body)
+  "Destructure SOURCE against plist PATTERN and eval BODY."
+  (declare (indent 2))
+  `(-let ((,(lsp-proxy--transform-pattern pattern) ,source))
+     ,@body))
+
+;;; Path utilities
+
+(defun lsp-proxy--fix-path-casing (path)
+  "On windows, downcases path because the windows file system is
+case-insensitive.
+
+On other systems, returns path without change."
+  (if (eq system-type 'windows-nt) (downcase path) path))
+
+(defun lsp-proxy--normalize-path (path)
+  "On Windows systems, normalize path separators to Unix-style.
+If the system is not Windows, return the original path."
+  (if (eq system-type 'windows-nt)
+      (replace-regexp-in-string "\\\\" "/" path)
+    path))
+
+(declare-function w32-long-file-name "w32proc.c" (fn))
+
+(defun lsp-proxy--path-to-uri (path)
+  "Convert PATH to an LSP `file://' URI.
+Unlike `eglot-path-to-uri', this preserves a TRAMP prefix (`/ssh:host:')
+rather than stripping it. lsp-proxy's Rust backend uses that prefix as
+the sole signal for routing the request to a remote LSP server; if we
+let eglot drop it, every buffer looks local and remote mode never
+engages."
+  (let ((remote-prefix (and path (file-remote-p path))))
+    (if remote-prefix
+        (concat "file://"
+                remote-prefix
+                (url-hexify-string
+                 (substring path (length remote-prefix))
+                 url-path-allowed-chars))
+      (concat "file://"
+              (if (eq system-type 'windows-nt) "/" "")
+              (url-hexify-string path url-path-allowed-chars)))))
+
+(defun lsp-proxy--TextDocumentIdentifier ()
+  "Build a TextDocumentIdentifier for the current buffer.
+Drop-in replacement for `eglot--TextDocumentIdentifier' that uses
+`lsp-proxy--path-to-uri', so TRAMP-rooted buffers produce URIs the
+Rust-side remote router can recognise."
+  (let ((path (or buffer-file-name
+                  (ignore-errors (buffer-file-name (buffer-base-buffer))))))
+    (unless path
+      (error "lsp-proxy: buffer has no file name"))
+    (list :uri (lsp-proxy--path-to-uri path))))
+
+(defun lsp-proxy--VersionedTextDocumentIdentifier ()
+  "Build a VersionedTextDocumentIdentifier for the current buffer.
+Mirrors `eglot--VersionedTextDocumentIdentifier' but routes the URI
+through `lsp-proxy--path-to-uri' so TRAMP prefixes survive.
+Reads the version directly from the eglot-side buffer-local variables
+to avoid a circular require on `lsp-proxy-core'."
+  (let ((version (cond ((boundp 'eglot--docver) eglot--docver)
+                       ((boundp 'eglot--versioned-identifier)
+                        eglot--versioned-identifier)
+                       (t 0))))
+    (append (lsp-proxy--TextDocumentIdentifier)
+            (list :version version))))
+
+(defun lsp-proxy--TextDocumentPositionParams ()
+  "Build a TextDocumentPositionParams for the current buffer + point.
+Mirrors `eglot--TextDocumentPositionParams' but the embedded URI goes
+through `lsp-proxy--path-to-uri', keeping TRAMP prefixes intact so the
+Rust remote router can dispatch the request."
+  (list :textDocument (lsp-proxy--TextDocumentIdentifier)
+        :position (eglot--pos-to-lsp-position)))
+
+(defun lsp-proxy--uri-to-path (uri)
+  "Convert URI to file path.
+When the URI's path already carries a TRAMP method marker (`/ssh:' or
+`/rpc:') the Rust backend preserved the remote identity in the URI
+itself — we must NOT glue the project's own remote-prefix on top, or
+the path ends up with the method/host segment doubled (which then
+fails to open on the remote FS)."
+  (when (keywordp uri) (setq uri (substring (symbol-name uri) 1)))
+  (let* ((remote-prefix (and lsp-proxy--current-project-root
+                             (file-remote-p lsp-proxy--current-project-root)))
+         (url (url-generic-parse-url uri)))
+    ;; Only parse file:// URIs, leave other URIs untouched as
+    ;; `file-name-handler-alist' should know how to handle them
+    ;; (bug#58790).
+    (if (string= "file" (url-type url))
+        (let* ((retval (url-unhex-string (url-filename url)))
+               (already-tramp (or (string-prefix-p "/ssh:" retval)
+                                  (string-prefix-p "/rpc:" retval)))
+               ;; Remove the leading "/" for local MS Windows-style paths.
+               (normalized (if (and (not remote-prefix)
+                                    (not already-tramp)
+                                    (eq system-type 'windows-nt)
+                                    (cl-plusp (length retval))
+                                    (eq (aref retval 0) ?/))
+                               (w32-long-file-name (substring retval 1))
+                             retval)))
+          (if already-tramp
+              normalized
+            (concat remote-prefix normalized)))
+      uri)))
+
+;;; Request parameters
+
+(declare-function lsp-proxy--make-virtual-doc-context "lsp-proxy-core")
+
+(defun lsp-proxy--should-skip-request-p ()
+  "Return non-nil if LSP request should be skipped.
+In org-mode with `lsp-proxy-enable-org-babel' enabled, requests are
+only allowed when cursor is inside a code block."
+  (and lsp-proxy-enable-org-babel
+       (eq major-mode 'org-mode)
+       (not lsp-proxy-org-babel--info-cache)))
+
+(defun lsp-proxy--build-params (params &rest args)
+  "Build complete request/notify params from base PARAMS and extra ARGS.
+Automatically adds virtual-doc context when in org babel block.
+
+The virtual-doc context is orthogonal to request-specific context
+and is used for position translation between the org file and the
+virtual document sent to the language server."
+  (let* ((rest (if (and args (not (sequencep (car args))))
+                   ;; If first arg is not a sequence (like :context), treat as plist
+                   args
+                 ;; Otherwise, flatten as before
+                 (apply 'append args)))
+         (base-params (append (lsp-proxy--TextDocumentIdentifier)
+                              `(:params ,params)
+                              rest))
+         (virtual-doc (lsp-proxy--make-virtual-doc-context)))
+    (if virtual-doc
+        (append base-params `(:virtual-doc ,virtual-doc))
+      base-params)))
+
+
+;;; Hash table project management utilities
+
+(defun lsp-proxy--add-project (project-root-path project-map)
+  "Add PROJECT-ROOT-PATH to PROJECT-MAP."
+  (puthash project-root-path (make-hash-table :test 'equal) project-map))
+
+(defun lsp-proxy--remove-project (project-root-path project-map)
+  "Remove PROJECT-ROOT-PATH from PROJECT-MAP."
+  (remhash project-root-path project-map))
+
+(defun lsp-proxy--ensure-project-map (project-root project-map)
+  "Ensure PROJECT-ROOT exists in PROJECT-MAP, creating if necessary.
+Returns the hash table for the project."
+  (or (gethash project-root project-map)
+      (puthash project-root (make-hash-table :test 'equal) project-map)))
+
+;;; Formatting utilities
+
+(defun lsp-proxy--format-file-size (bytes)
+  "Format file size BYTES in human readable format."
+  (cond
+   ((< bytes 1024) (format "%dB" bytes))
+   ((< bytes (* 1024 1024)) (format "%.1fKB" (/ bytes 1024.0)))
+   ((< bytes (* 1024 1024 1024)) (format "%.1fMB" (/ bytes 1024.0 1024.0)))
+   (t (format "%.1fGB" (/ bytes 1024.0 1024.0 1024.0)))))
+
+;;; Text Edit utilities
+
+(defun lsp-proxy--create-apply-text-edits-handlers ()
+  "Create (handler cleanup-fn) for applying text edits in async request.
+Only works when mode is `tick or `alive."
+  (let* (first-edited
+         (func (lambda (start &rest _)
+                 (setq first-edited (if first-edited
+                                        (min start first-edited)
+                                      start)))))
+    (add-hook 'before-change-functions func nil t)
+    (list
+     (lambda (edits)
+       (if (and first-edited
+                (seq-find (lambda (edit) (let* ((range (plist-get edit :range))
+                                                (end (plist-get range :end))
+                                                (end-point (eglot--lsp-position-to-point end)))
+                                           (> end-point first-edited)))
+                          edits))
+           (lsp-proxy--warn "%s" "TextEdits will not be applied since document has been modified before of them.")
+         (eglot--apply-text-edits edits)))
+     (lambda ()
+       (remove-hook 'before-change-functions func t)))))
+
+;;; Idle handling
+(defvar-local lsp-proxy--on-idle-timer nil)
+
+(defun lsp-proxy--idle-reschedule (buffer)
+  "Reschedule idle timer for BUFFER."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (when lsp-proxy--on-idle-timer
+        (cancel-timer lsp-proxy--on-idle-timer))
+      (setq lsp-proxy--on-idle-timer
+            (run-with-idle-timer lsp-proxy-idle-delay nil
+                                 #'lsp-proxy--on-idle buffer)))))
+
+(defun lsp-proxy--on-idle (buffer)
+  "Handle idle timeout for BUFFER."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (setq lsp-proxy--on-idle-timer nil)
+      (when lsp-proxy-mode
+        (run-hooks 'lsp-proxy-on-idle-hook)))))
+
+(defun lsp-proxy--propose-changes-as-diff (prepared)
+  "Helper for `lsp-proxy--apply-workspace-edit'.
+Goal is to popup a `diff-mode' buffer containing all the changes
+of PREPARED, ready to apply with C-c C-a.  PREPARED is a
+list ((FILENAME EDITS VERSION)...)."
+  (with-current-buffer (get-buffer-create "*EGLOT proposed server changes*")
+    (buffer-disable-undo (current-buffer))
+    (let ((inhibit-read-only t)
+          (target (current-buffer)))
+      (diff-mode)
+      (erase-buffer)
+      (pcase-dolist (`(,path ,edits ,_) prepared)
+        (with-temp-buffer
+          (let* ((diff (current-buffer))
+                 (existing-buf (find-buffer-visiting path))
+                 (existing-buf-label (prin1-to-string existing-buf)))
+            (with-temp-buffer
+              (if existing-buf
+                  (insert-buffer-substring existing-buf)
+                (insert-file-contents path))
+              (eglot--apply-text-edits edits nil t)
+              (diff-no-select (or existing-buf path) (current-buffer) nil t diff)
+              (when existing-buf
+                ;; Here we have to pretend the label of the unsaved
+                ;; buffer is the actual file, just so that we can
+                ;; diff-apply without troubles.  If there's a better
+                ;; way, it probably involves changes to `diff.el'.
+                (with-current-buffer diff
+                  (goto-char (point-min))
+                  (while (search-forward existing-buf-label nil t)
+                    (replace-match (buffer-file-name existing-buf))))))
+            (with-current-buffer target
+              (insert-buffer-substring diff))))))
+    (setq-local buffer-read-only t)
+    (buffer-enable-undo (current-buffer))
+    (goto-char (point-min))
+    (pop-to-buffer (current-buffer))
+    (font-lock-ensure)))
+
+(defun lsp-proxy--apply-workspace-edit (wedit origin)
+  "Apply (or offer to apply) the workspace edit WEDIT.
+ORIGIN is a symbol designating the command that originated this
+edit proposed by the server."
+  (eglot--dbind ((WorkspaceEdit) changes documentChanges) wedit
+    (let ((prepared
+           (mapcar (eglot--lambda ((TextDocumentEdit) textDocument edits)
+                     (eglot--dbind ((VersionedTextDocumentIdentifier) uri version)
+                         textDocument
+                       (list (lsp-proxy--uri-to-path uri) edits version)))
+                   documentChanges)))
+      (unless (and changes documentChanges)
+        ;; We don't want double edits, and some servers send both
+        ;; changes and documentChanges.  This unless ensures that we
+        ;; prefer documentChanges over changes.
+        (cl-loop for (uri edits) on changes by #'cddr
+                 do (push (list (lsp-proxy--uri-to-path uri) edits) prepared)))
+      (cl-flet ((notevery-visited-p ()
+                  (cl-notevery #'find-buffer-visiting
+                               (mapcar #'car prepared)))
+                (accept-p ()
+                  (y-or-n-p
+                   (format "[eglot] Server wants to edit:\n%sProceed? "
+                           (cl-loop
+                            for (f eds _) in prepared
+                            concat (format
+                                    "  %s (%d change%s)\n"
+                                    f (length eds)
+                                    (if (> (length eds) 1) "s" ""))))))
+                (apply ()
+                  (cl-loop for edit in prepared
+                   for (path edits version) = edit
+                   do (with-current-buffer (find-file-noselect path)
+                        (eglot--apply-text-edits edits version))
+                   finally (eldoc) (eglot--message "Edit successful!"))))
+        (let ((decision (eglot--confirm-server-edits origin prepared)))
+          (cond
+           ((or (eq decision 'diff)
+                (and (eq decision 'maybe-diff) (notevery-visited-p)))
+            (lsp-proxy--propose-changes-as-diff prepared))
+           ((or (memq decision '(t summary))
+                (and (eq decision 'maybe-summary) (notevery-visited-p)))
+            (when (accept-p) (apply)))
+           (t
+            (apply))))))))
+
+(provide 'lsp-proxy-utils)
+;;; lsp-proxy-utils.el ends here

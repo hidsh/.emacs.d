@@ -1,0 +1,982 @@
+use crate::{
+    application::Application,
+    client::{Client, RegisteredCapability},
+    config::{self, DEFAULT_MAX_DIAGNOSTICS_PUSH},
+    connection::Connection,
+    controller::Controller,
+    dispatch::{NotificationDispatcher, RequestDispatcher},
+    document::{
+        DiagnosticItem, DiagnosticProvider, Document, DocumentId,
+        DEFAULT_VIRTUAL_DOC_SERVER_TTL_SECS,
+    },
+    handlers::{
+        self,
+        request::{
+            create_error_response, create_error_response_with_uri, handle_code_action, handle_inline_completion,
+            handle_pull_diagnostic_response, pull_diagnostics_for_document,
+        },
+    },
+    lsp::{
+        self,
+        jsonrpc::{self, Call},
+        MethodCall,
+    },
+    lsp_ext::{self, RustAnalyzerExpandMacro},
+    msg::{self, Message, Response},
+    registry::NotificationFromServer,
+    syntax::{self},
+    thread,
+    utils::{
+        find_workspace_folder_for_uri, from_json, is_diagnostic_vectors_equal,
+        limit_diagnostics_for_push,
+    },
+};
+use anyhow::Result;
+use crossbeam_channel::{bounded, Sender};
+use futures_util::StreamExt;
+use log::{debug, error, info, warn};
+use lsp_types::{notification::Notification, request::Request, LogMessageParams};
+use serde_json::{json, Value};
+use std::sync::Arc;
+use std::time::Duration;
+use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
+
+pub fn main_loop(connection: Connection, syn_loader_config: syntax::Configuration) -> Result<()> {
+    let (sender_for_application, mut recevier_by_application) = unbounded_channel();
+    let (sender_for_controller, receiver_by_controller) = bounded(0);
+    let mut thread_handles = vec![];
+    thread_handles.push(thread::spawn(move || {
+        Controller::new(sender_for_application, connection.sender)
+            .run(connection.receiver, receiver_by_controller)
+            .unwrap();
+    }));
+    thread_handles.push(thread::spawn(move || {
+        tokio::runtime::Runtime::new().unwrap().block_on(async {
+            Application::new(sender_for_controller, syn_loader_config)
+                .run(&mut recevier_by_application)
+                .await
+                .unwrap();
+        });
+    }));
+
+    for handle in thread_handles {
+        handle.join();
+    }
+    Ok(())
+}
+
+#[allow(dead_code, unused_variables)]
+impl Application {
+    async fn run(&mut self, emacs_receiver: &mut UnboundedReceiver<Message>) -> Result<()> {
+        let (tx, mut rx) = unbounded_channel();
+
+        // Create interval for cleaning up expired virtual document servers
+        // Check every 60 seconds
+        let mut cleanup_interval = tokio::time::interval(Duration::from_secs(60));
+        // Don't run immediately on start
+        cleanup_interval.tick().await;
+
+        loop {
+            tokio::select! {
+                biased;
+                Some((id, call)) = self.editor.language_servers.incoming.next() => {
+                    self.handle_language_server_message(call, id, tx.clone()).await;
+                }
+                Some(msg) = emacs_receiver.recv() => {
+                    self.handle_msg(msg).await.expect("handle msg exception");
+                }
+                Some(msg) = rx.recv() => {
+                    self.send(msg);
+                }
+                Some(callback) = self.jobs.callbacks.recv() => {
+                    self.jobs.handle_callback(&mut self.editor, Ok(Some(callback)));
+                }
+                _ = cleanup_interval.tick() => {
+                    self.cleanup_expired_virtual_doc_servers().await;
+                }
+            }
+        }
+    }
+
+    /// Cleanup expired virtual document servers.
+    /// This is called periodically to reclaim resources from unused servers.
+    async fn cleanup_expired_virtual_doc_servers(&mut self) {
+        let removed = self
+            .editor
+            .cleanup_expired_virtual_doc_servers(DEFAULT_VIRTUAL_DOC_SERVER_TTL_SECS);
+
+        for (uri, language, client) in removed {
+            // Send shutdown request to the server
+            if client.is_initialized() {
+                debug!(
+                    "Shutting down expired virtual doc server '{}' for '{}'",
+                    client.name(),
+                    uri
+                );
+
+                // First send didClose for the virtual document
+                let _ = client.text_document_did_close(lsp_types::DidCloseTextDocumentParams {
+                    text_document: lsp_types::TextDocumentIdentifier { uri: uri.clone() },
+                });
+
+                // Note: We don't shutdown the server itself because it might be shared
+                // with other documents. The server will be cleaned up when no more
+                // documents reference it.
+
+                // Notify user about server cleanup
+                self.send_notification::<lsp_types::notification::ShowMessage>(
+                    lsp_types::ShowMessageParams {
+                        typ: lsp_types::MessageType::INFO,
+                        message: format!(
+                            "Recycled {} server for {} (idle timeout).",
+                            client.name(),
+                            language
+                        ),
+                    },
+                );
+            }
+        }
+    }
+
+    pub async fn handle_language_server_message(
+        &mut self,
+        call: Call,
+        server_id: usize,
+        debounce_sender: UnboundedSender<Message>,
+    ) {
+        macro_rules! language_server {
+            () => {
+                match self.editor.language_server_by_id(server_id) {
+                    Some(language_server) => language_server,
+                    None => {
+                        warn!("can't find language server with id `{}`", server_id);
+                        return;
+                    }
+                }
+            };
+        }
+
+        match call {
+            Call::MethodCall(jsonrpc::MethodCall {
+                method, params, id, ..
+            }) => {
+                let reply = match MethodCall::parse(&method, params) {
+                    Err(lsp::Error::Unhandled) => {
+                        error!("Language Server: Method {method} not found in request {id}");
+                        Err(jsonrpc::Error {
+                            code: jsonrpc::ErrorCode::MethodNotFound,
+                            message: format!("Method not found: {method}"),
+                            data: None,
+                        })
+                    }
+                    Err(err) => {
+                        error!(
+                            "Language Server: Received malformed method call {method} in request {id}: {err}"
+                        );
+                        Err(jsonrpc::Error {
+                            code: jsonrpc::ErrorCode::ParseError,
+                            message: format!("Malformed method call: {method}"),
+                            data: None,
+                        })
+                    }
+                    Ok(MethodCall::WorkDoneProgressCreate(_params)) => {
+                        let language_server = language_server!();
+                        Ok(serde_json::Value::Null)
+                    }
+                    Ok(MethodCall::ApplyWorkspaceEdit(params)) => {
+                        let language_server = language_server!();
+                        if language_server.is_initialized() {
+                            self.send_request::<lsp_types::request::ApplyWorkspaceEdit>(
+                                params,
+                                |_, res| {
+                                    debug!("res {res:?}");
+                                },
+                            );
+                            Ok(json!(lsp_types::ApplyWorkspaceEditResponse {
+                                applied: true,
+                                failure_reason: None,
+                                failed_change: None
+                            }))
+                        } else {
+                            Err(jsonrpc::Error {
+                                code: jsonrpc::ErrorCode::InvalidRequest,
+                                message: "Server must be initialized to request workspace edits"
+                                    .to_string(),
+                                data: None,
+                            })
+                        }
+                    }
+                    Ok(MethodCall::WorkspaceFolders) => {
+                        Ok(json!(&*language_server!().workspace_folders().await))
+                    }
+                    Ok(MethodCall::WorkspaceConfiguration(params)) => {
+                        let language_server = language_server!();
+                        let result: Vec<_> = params
+                            .items
+                            .iter()
+                            .map(|item| {
+                                let mut config = language_server.config()?;
+                                if let Some(section) = item.section.as_ref() {
+                                    // for some reason some lsps send an empty string (observed in 'vscode-eslint-language-server')
+                                    if !section.is_empty() {
+                                        for part in section.split('.') {
+                                            config = config.get(part)?;
+                                        }
+                                    }
+                                }
+
+                                // eslint need scope_uri to set workspaceFolder
+                                if language_server.name() == "eslint" {
+                                    if let Some(uri) = item.scope_uri.as_ref() {
+                                        let workspace_folder = find_workspace_folder_for_uri(uri);
+                                        if let Some(workspace_folder) = workspace_folder {
+                                            let v = json!({
+                                                "uri": workspace_folder.0,
+                                                "name": workspace_folder.1,
+                                            });
+                                            let config = match config {
+                                                Value::Object(m) => {
+                                                    let mut m = m.clone();
+                                                    m.insert("workspaceFolder".to_string(), v);
+                                                    Value::Object(m)
+                                                }
+                                                v => v.clone(),
+                                            };
+                                            return Some(config);
+                                        }
+                                    }
+                                }
+
+                                Some(config.to_owned())
+                            })
+                            .collect();
+                        Ok(json!(result))
+                    }
+                    Ok(MethodCall::RegisterCapability(params)) => {
+                        if let Some(client) = self
+                            .editor
+                            .language_servers
+                            .iter_clients()
+                            .find(|client| client.id() == server_id)
+                        {
+                            for reg in params.registrations {
+                                match reg.method.as_str() {
+                                    lsp_types::notification::DidChangeWatchedFiles::METHOD => {
+                                        let Some(options) = reg.register_options else {
+                                            continue;
+                                        };
+                                        let ops: lsp_types::DidChangeWatchedFilesRegistrationOptions = match serde_json::from_value(options) {
+                                            Ok(ops) => ops,
+                                            Err(err) => {
+                                                warn!("Failed to deserialize DidChangeWatchedFilesRegistrationOptions: {err}");
+                                                continue;
+                                            },
+                                        };
+                                        self.editor.language_servers.file_event_handler.register(
+                                            client.id(),
+                                            Arc::downgrade(client),
+                                            reg.id,
+                                            ops,
+                                        )
+                                    }
+                                    lsp_types::request::Formatting::METHOD => {
+                                        let Some(options) = reg.register_options else {
+                                            continue;
+                                        };
+                                        let ops: lsp_types::TextDocumentRegistrationOptions =
+                                            match serde_json::from_value(options) {
+                                                Ok(ops) => ops,
+                                                Err(err) => {
+                                                    warn!("Failed to deserialize TextDocumentRegistrationOptions: {err}");
+                                                    continue;
+                                                }
+                                            };
+                                        client.registered_capabilities.lock().push(
+                                            RegisteredCapability {
+                                                id: reg.id,
+                                                method: reg.method,
+                                                register_options: Some(ops),
+                                            },
+                                        );
+                                    }
+                                    _ => {
+                                        // Language Servers based on the `vscode-languageserver-node` library often send
+                                        // client/registerCapability even though we do not enable dynamic registration
+                                        // for most capabilities. We should send a MethodNotFound JSONRPC error in this
+                                        // case but that rejects the registration promise in the server which causes an
+                                        // exit. So we work around this by ignoring the request and sending back an OK
+                                        // response.
+                                        log::warn!("Ignoring a client/registerCapability request because dynamic capability registration is not enabled. Please report this upstream to the language server");
+                                    }
+                                }
+                            }
+                        }
+
+                        Ok(serde_json::Value::Null)
+                    }
+                    Ok(MethodCall::UnregisterCapability(params)) => {
+                        for unreg in params.unregisterations {
+                            match unreg.method.as_str() {
+                                lsp_types::notification::DidChangeWatchedFiles::METHOD => {
+                                    self.editor
+                                        .language_servers
+                                        .file_event_handler
+                                        .unregister(server_id, unreg.id);
+                                }
+                                _ => {
+                                    log::warn!("Received unregistration request for unsupported method: {}", unreg.method);
+                                }
+                            }
+                        }
+                        Ok(serde_json::Value::Null)
+                    }
+                    Ok(MethodCall::ShowMessageRequest(params)) => {
+                        log::warn!("unhandled window/showMessageRequest: {params:?}");
+                        let log_message = LogMessageParams {
+                            typ: params.typ,
+                            message: params.message,
+                        };
+                        self.send_notification::<lsp_types::notification::LogMessage>(log_message);
+                        Ok(serde_json::Value::Null)
+                    }
+                };
+
+                tokio::spawn(language_server!().reply(id, reply));
+            }
+            Call::Notification(jsonrpc::Notification { method, params, .. }) => {
+                let notification = match NotificationFromServer::parse(&method, params) {
+                    Ok(notification) => notification,
+                    Err(crate::registry::Error::Unhandled) => {
+                        info!("Ignoring unhandled notification from Language Server {method:?}");
+                        return;
+                    }
+                    Err(err) => {
+                        error!("Ignoring unknown notification from Language Server: {err}");
+                        return;
+                    }
+                };
+
+                match notification {
+                    NotificationFromServer::Initialized => {
+                        let language_server = language_server!();
+                        // NOTE Trigger a workspace/didChangeConfiguration notification after initialization.
+                        // This might not be required by the spec but Neovim does this as well, so it's
+                        // probably a good idea for compatibility.
+                        let config = match language_server.config() {
+                            Some(value) => value.clone(),
+                            None => json!({}),
+                        };
+
+                        language_server.did_change_configuration(config).unwrap();
+
+                        // Send capabilities for regular documents
+                        self.editor
+                            .documents()
+                            .filter(|doc| {
+                                doc.language_servers()
+                                    .any(|ls| ls.id() == language_server.id())
+                            })
+                            .for_each(|doc| {
+                                self.send_notification::<lsp_ext::CustomServerCapabilities>(
+                                    doc.get_server_capabilities(),
+                                )
+                            });
+
+                        // Send capabilities for virtual documents (org babel blocks)
+                        self.editor
+                            .documents()
+                            .filter(|doc| {
+                                doc.language_servers_of_virtual_doc
+                                    .values()
+                                    .any(|entry| entry.client.id() == language_server.id())
+                            })
+                            .for_each(|doc| {
+                                self.send_notification::<lsp_ext::CustomServerCapabilities>(
+                                    doc.get_virtual_doc_server_capabilities(),
+                                )
+                            });
+                    }
+                    NotificationFromServer::Exit => {
+                        let language_server = language_server!();
+                        for doc in self.editor.documents_mut() {
+                            doc.clear_all_diagnostics(server_id);
+                        }
+                        // Remove the language server from the registry
+                        self.editor.language_servers.remove_by_id(server_id);
+                        self.send_notification::<lsp_types::notification::ShowMessage>(
+                            lsp_types::ShowMessageParams {
+                                typ: lsp_types::MessageType::ERROR,
+                                message: format!(
+                                    "Language server {} has exited",
+                                    language_server.name()
+                                ),
+                            },
+                        );
+                    }
+                    NotificationFromServer::PublishDianostics(params) => {
+                        let language_server = language_server!();
+                        if !language_server.is_initialized() {
+                            log::error!("Discarding pushlishDiagnostic notification sent by uninitialized server: {}", language_server.name());
+                            return;
+                        }
+                        let doc = self.editor.get(&params.uri);
+                        if doc.is_org_file() {
+                            log::debug!("Disabled pushlishDiagnostics for org file.");
+                            return;
+                        }
+                        if let Some(version) = params.version {
+                            if version != doc.version {
+                                log::error!("Version ({version}) is out of date for {:?} (expected ({}), dropping PublishDiagnostic notification", params.uri, doc.version());
+                                return;
+                            }
+                        }
+                        let provider = DiagnosticProvider {
+                            server_id,
+                            identifier: None,
+                        };
+                        let version = doc.version;
+                        let old_diagnostics = doc.get_diagnostics_by_provider(&provider);
+                        if old_diagnostics.is_none()
+                            || !is_diagnostic_vectors_equal(
+                                old_diagnostics.as_ref().unwrap(),
+                                &params.diagnostics,
+                            )
+                        {
+                            let diagnostics: Vec<DiagnosticItem> = params
+                                .diagnostics
+                                .iter()
+                                .map(|diagnostic| DiagnosticItem {
+                                    item: diagnostic.to_owned(),
+                                    provider: provider.clone(),
+                                    file_path: doc
+                                        .path()
+                                        .map(|p| p.to_string_lossy().to_string())
+                                        .unwrap_or("".to_string()),
+                                })
+                                .collect();
+                            doc.replace_diagnostics(diagnostics, &provider);
+                            let all_diagnostics: Vec<lsp_types::Diagnostic> = match doc
+                                .diagnostics()
+                                .as_ref()
+                            {
+                                Some(diags) => diags.iter().map(|diag| diag.item.clone()).collect(),
+                                None => vec![],
+                            };
+
+                            // Apply diagnostic limiting for push notification
+                            let total_count = all_diagnostics.len();
+                            let max_diagnostics_push = config::MAX_DIAGNOSTICS_PUSH
+                                .get()
+                                .copied()
+                                .unwrap_or(DEFAULT_MAX_DIAGNOSTICS_PUSH);
+                            let limited_diagnostics =
+                                limit_diagnostics_for_push(&all_diagnostics, max_diagnostics_push);
+
+                            // Log diagnostic limiting info
+                            if total_count > max_diagnostics_push {
+                                debug!(
+                                    "Limiting diagnostics for {}: {} -> {} diagnostics (max: {})",
+                                    params.uri,
+                                    total_count,
+                                    limited_diagnostics.len(),
+                                    max_diagnostics_push
+                                );
+                            }
+
+                            self.send_notification::<lsp_types::notification::PublishDiagnostics>(
+                                lsp_types::PublishDiagnosticsParams {
+                                    version: Some(version),
+                                    uri: params.uri,
+                                    diagnostics: limited_diagnostics,
+                                },
+                            )
+                        } else {
+                            debug!("old and new equal, ignore");
+                        }
+                    }
+                    NotificationFromServer::ShowMessage(params) => {
+                        self.send_notification::<lsp_types::notification::ShowMessage>(params)
+                    }
+                    NotificationFromServer::LogMessage(params) => {
+                        self.send_notification::<lsp_types::notification::LogMessage>(params)
+                    }
+                    NotificationFromServer::ProgressMessage(params) => {
+                        let language_server = language_server!();
+                        self.send_notification::<lsp_ext::CustomProgress>(
+                            lsp_ext::CustomProgressParams {
+                                root_path: language_server.root_path.to_string_lossy().to_string(),
+                                params,
+                            },
+                        )
+                    }
+                    NotificationFromServer::ForwardRequest(params) => {
+                        let language_server = language_server!();
+                        let servers = self
+                            .editor
+                            .language_servers
+                            .get_project_clients(&language_server);
+                        let ts_server = servers.into_iter().find(|ls| {
+                            if let Some(lsp_types::ExecuteCommandOptions { commands, .. }) =
+                                &ls.capabilities().execute_command_provider
+                            {
+                                commands
+                                    .iter()
+                                    .any(|command| command == "typescript.tsserverRequest")
+                            } else {
+                                false
+                            }
+                        });
+                        if let Some(ts_server) = ts_server {
+                            tokio::spawn(async move {
+                                let lsp_ext::TsserverRequestParams(seq, command, args) = params;
+                                let command_request = ts_server
+                                    .execute_command(lsp_types::Command {
+                                        title: "vue_request_forward".to_string(),
+                                        command: "typescript.tsserverRequest".to_string(),
+                                        arguments: Some(vec![command.into(), args]),
+                                    })
+                                    .unwrap();
+                                let resp: Option<lsp_ext::TsserverRequestResult> =
+                                    match command_request.await {
+                                        Ok(value) => {
+                                            match serde_json::from_value(value) {
+                                                Ok(response) => Some(response),
+                                                Err(e) => {
+                                                    tracing::error!("Failed to deserialize tsserver response: {}", e);
+                                                    None
+                                                }
+                                            }
+                                        }
+                                        Err(e) => {
+                                            tracing::error!("Command request failed: {}", e);
+                                            None
+                                        }
+                                    };
+                                if let Err(e) =
+                                    language_server.notify::<lsp_ext::TsserverResponse>(vec![
+                                        lsp_ext::TsserverResponseParams(
+                                            seq,
+                                            resp.map(|r| r.body).unwrap_or(serde_json::Value::Null),
+                                        ),
+                                    ])
+                                {
+                                    tracing::error!(
+                                        "Failed to send tsserver/response notification: {}",
+                                        e
+                                    );
+                                };
+                            });
+                        } else {
+                            error!("No tsserver found.");
+                            self.send_notification::<lsp_types::notification::ShowMessage>(
+                                lsp_types::ShowMessageParams {
+                                    typ: lsp_types::MessageType::ERROR,
+                                    message: format!("[Vue] No tsserver to forward {params:?}"),
+                                },
+                            );
+                        }
+                    }
+                }
+            }
+            Call::Invalid { id } => {
+                log::error!("Invalid {id:?}");
+                panic!("Invalid Call");
+            }
+        }
+    }
+
+    async fn handle_msg(&mut self, msg: Message) -> Result<()> {
+        match msg {
+            Message::Request(req)
+                if req.method == lsp_types::request::CodeActionRequest::METHOD =>
+            {
+                match self.get_working_document(&req) {
+                    Ok(doc) => {
+                        tokio::spawn(handle_code_action(
+                            req,
+                            self.sender.clone(),
+                            doc.get_all_language_servers(),
+                            match doc.diagnostics().as_ref() {
+                                Some(diags) => diags.to_vec(),
+                                None => vec![],
+                            },
+                        ));
+                    }
+                    Err(response) => self.respond(response),
+                }
+            }
+            Message::Request(req)
+                if req.method == lsp_types::request::DocumentDiagnosticRequest::METHOD =>
+            {
+                match self.get_working_document(&req) {
+                    Ok(doc) => {
+                        let language_servers = doc.language_servers_with_feature(
+                            syntax::LanguageServerFeature::PullDiagnostics,
+                        );
+                        let sender = self.sender.clone();
+                        let doc_id = doc.id();
+                        let previous_result_id = doc.previous_diagnostic_id.clone();
+
+                        let limit_diagnostics = req
+                            .params
+                            .context
+                            .as_ref()
+                            .and_then(|ctx| match ctx {
+                                msg::Context::Diagnostic(diag_ctx) => {
+                                    Some(diag_ctx.limit_diagnostics)
+                                }
+                                _ => None,
+                            })
+                            .unwrap_or(true);
+
+                        tokio::spawn(async move {
+                            // If limit_diagnostics is false, push all existing diagnostics from the document directly
+                            if !limit_diagnostics {
+                                crate::job::dispatch(move |editor| {
+                                    if let Some(doc) = editor.document_mut(doc_id) {
+                                        // Get all diagnostics from the document
+                                        let all_diagnostics: Vec<lsp_types::Diagnostic> = doc
+                                            .diagnostics()
+                                            .as_ref()
+                                            .map(|diags| {
+                                                diags.iter().map(|d| d.item.clone()).collect()
+                                            })
+                                            .unwrap_or_default();
+
+                                        // Send PublishDiagnostics notification
+                                        let notification = crate::msg::Notification::new(
+                                            lsp_types::notification::PublishDiagnostics::METHOD
+                                                .to_string(),
+                                            lsp_types::PublishDiagnosticsParams {
+                                                version: Some(doc.version),
+                                                uri: doc.uri.clone(),
+                                                diagnostics: all_diagnostics,
+                                            },
+                                        );
+
+                                        let _ = sender.send(notification.into());
+                                    }
+                                })
+                                .await;
+                                return;
+                            }
+
+                            for language_server in language_servers {
+                                let params = from_json(
+                                    lsp_types::request::DocumentDiagnosticRequest::METHOD,
+                                    &req.params.params,
+                                )
+                                .unwrap();
+
+                                let identifier = language_server
+                                    .capabilities()
+                                    .diagnostic_provider
+                                    .as_ref()
+                                    .and_then(|diagnostic_provider| match diagnostic_provider {
+                                        lsp_types::DiagnosticServerCapabilities::Options(options) => {
+                                            options.identifier.clone()
+                                        }
+                                        lsp_types::DiagnosticServerCapabilities::RegistrationOptions(
+                                            options,
+                                        ) => options.diagnostic_options.identifier.clone(),
+                                    });
+
+                                let response = pull_diagnostics_for_document(
+                                    req.clone(),
+                                    identifier.clone(),
+                                    previous_result_id.to_owned(),
+                                    params,
+                                    &language_server,
+                                )
+                                .await;
+
+                                let provider = DiagnosticProvider {
+                                    server_id: language_server.id(),
+                                    identifier: Some(
+                                        identifier.unwrap_or(language_server.name().to_string()),
+                                    ),
+                                };
+
+                                if let Some(result) = response {
+                                    let _ = handle_pull_diagnostic_response(
+                                        sender.clone(),
+                                        provider,
+                                        result,
+                                        doc_id,
+                                        limit_diagnostics,
+                                    )
+                                    .await;
+                                }
+                            }
+                        });
+                    }
+                    Err(response) => self.respond(response),
+                }
+            }
+            Message::Request(req)
+                if req.method == lsp_types::request::InlineCompletionRequest::METHOD =>
+            {
+                match self.get_working_document(&req) {
+                    Ok(doc) => {
+                        let language_servers = doc.get_all_language_servers();
+                        let language_server = language_servers.into_iter().find(|ls| {
+                            ls.with_feature(syntax::LanguageServerFeature::InlineCompletion)
+                        });
+                        if let Some(ls) = language_server {
+                            let language_id = doc.language_id().unwrap().to_owned();
+                            tokio::spawn(handle_inline_completion(
+                                req,
+                                ls,
+                                language_id,
+                                self.sender.clone(),
+                            ));
+                        }
+                    }
+                    Err(response) => self.respond(response),
+                }
+            }
+            Message::Request(req) if req.method == lsp_types::request::Shutdown::METHOD => {
+                log::info!("Received shutdown request");
+                self.request_shutdown();
+                self.respond(Response::new_ok(req.id, serde_json::Value::Null));
+            }
+            Message::Request(req) if req.method == lsp_ext::WorkspaceRestart::METHOD => {
+                self.handle_workspace_restart(&req);
+            }
+            Message::Request(req) => {
+                // After shutdown, reject any requests.
+                if self.shutdown_requested {
+                    log::warn!("Rejecting request '{}' after shutdown", req.method);
+                    self.respond(Response::new_err(
+                        req.id,
+                        jsonrpc::ErrorCode::InvalidRequest,
+                        "Server is shutting down".to_string(),
+                    ));
+                    return Ok(());
+                }
+
+                match self.get_working_document(&req) {
+                    Ok(doc) => {
+                        if doc.is_org_file() {
+                            // Check for virtual document context
+                            if let Some(ref vdoc_ctx) = req.params.virtual_doc {
+                                // Get the client from the entry
+                                let language_server = doc
+                                    .language_servers_of_virtual_doc
+                                    .get(&vdoc_ctx.language)
+                                    .map(|entry| entry.client.clone());
+
+                                if let Some(ls) = language_server {
+                                    // Touch the entry to update last_used (need mutable access)
+                                    let uri = doc.uri.clone();
+                                    let language = vdoc_ctx.language.clone();
+                                    if let Some(doc_mut) = self.editor.document_by_uri_mut(&uri) {
+                                        if let Some(entry) = doc_mut
+                                            .language_servers_of_virtual_doc
+                                            .get_mut(&language)
+                                        {
+                                            entry.touch();
+                                        }
+                                    }
+
+                                    Self::on_request(req, self.sender.clone(), vec![ls]);
+                                } else {
+                                    self.respond(create_error_response(
+                                        &req.id,
+                                        format!(
+                                            "No available language server for {:?}.",
+                                            req.method
+                                        ),
+                                    ));
+                                }
+                                return Ok(());
+                            }
+                        }
+                        let language_servers = doc.get_all_language_servers();
+                        if language_servers.is_empty() {
+                            self.respond(create_error_response(
+                                &req.id,
+                                format!("No available language server for {:?}.", req.method),
+                            ));
+                            debug!("No available language server for {:?}.", req.method);
+                            return Ok(());
+                        }
+                        Self::on_request(req, self.sender.clone(), language_servers);
+                    }
+                    Err(response) => self.respond(response),
+                }
+            }
+            Message::Notification(not) => self.on_notification(not)?,
+            Message::Response(resp) => self.complete_request(resp),
+        }
+        Ok(())
+    }
+
+    fn on_request(
+        req: msg::Request,
+        response_sender: Sender<Message>,
+        language_servers: Vec<Arc<Client>>,
+    ) {
+        let mut dispatcher = RequestDispatcher {
+            req: Some(req),
+            sender: response_sender,
+            language_servers,
+        };
+
+        dispatcher
+            .on::<lsp_types::request::GotoDefinition, _, _>(
+                handlers::request::handle_goto_definition::<lsp_types::request::GotoDefinition>,
+            )
+            .on::<lsp_types::request::GotoImplementation, _, _>(
+                handlers::request::handle_goto_definition::<lsp_types::request::GotoImplementation>,
+            )
+            .on::<lsp_types::request::GotoDeclaration, _, _>(
+                handlers::request::handle_goto_definition::<lsp_types::request::GotoDeclaration>,
+            )
+            .on::<lsp_types::request::GotoTypeDefinition, _, _>(
+                handlers::request::handle_goto_definition::<lsp_types::request::GotoTypeDefinition>,
+            )
+            .on::<lsp_types::request::References, _, _>(handlers::request::handle_goto_references)
+            .on::<lsp_types::request::Completion, _, _>(handlers::request::handle_completion)
+            .on::<lsp_types::request::ResolveCompletionItem, _, _>(
+                handlers::request::handle_completion_resolve,
+            )
+            .on::<lsp_types::request::CodeActionResolveRequest, _, _>(
+                handlers::request::handle_code_action_resolve,
+            )
+            .on::<lsp_types::request::Formatting, _, _>(handlers::request::handle_formating)
+            .on::<lsp_types::request::HoverRequest, _, _>(handlers::request::handle_hover)
+            .on::<lsp_types::request::ExecuteCommand, _, _>(
+                handlers::request::handle_execute_command,
+            )
+            .on::<lsp_types::request::SignatureHelpRequest, _, _>(
+                handlers::request::handle_signature_help,
+            )
+            .on::<lsp_types::request::Rename, _, _>(handlers::request::handle_rename)
+            .on::<lsp_ext::GetCommands, _, _>(handlers::request::handle_get_commands)
+            .on::<lsp_ext::GetWorkspaceInfo, _, _>(handlers::request::handle_get_workspace_info)
+            .on::<lsp_ext::GetLanguagesConfig, _, _>(handlers::request::handle_get_languages_config)
+            .on::<lsp_ext::ViewFileText, _, _>(handlers::request::handle_view_file_text)
+            .on::<lsp_types::request::InlayHintRequest, _, _>(handlers::request::handle_inlay_hints)
+            .on::<lsp_types::request::DocumentHighlightRequest, _, _>(
+                handlers::request::handle_document_highlight,
+            )
+            .on::<lsp_types::request::DocumentSymbolRequest, _, _>(
+                handlers::request::handle_document_symbols,
+            )
+            .on::<RustAnalyzerExpandMacro, _, _>(handlers::request::handle_ra_expand_macro)
+            .on::<lsp_ext::ForwardRequest, _, _>(handlers::request::handle_forward_request)
+            .finish();
+    }
+
+    fn on_notification(&mut self, not: msg::Notification) -> Result<()> {
+        use lsp_types::notification as notfis;
+
+        NotificationDispatcher {
+            not: Some(not),
+            app: self,
+        }
+        .on_sync_mut_with_virtual_doc::<notfis::DidOpenTextDocument>(
+            handlers::notification::handle_did_open_text_document,
+        )?
+        .on_sync_mut_with_virtual_doc::<notfis::DidChangeTextDocument>(
+            handlers::notification::handle_did_change_text_document,
+        )?
+        .on_sync_mut::<notfis::WillSaveTextDocument>(
+            handlers::notification::handle_will_save_text_document,
+        )?
+        .on_sync_mut::<notfis::DidSaveTextDocument>(
+            handlers::notification::handle_did_save_text_document,
+        )?
+        .on_sync_mut::<notfis::DidCloseTextDocument>(
+            handlers::notification::handle_did_close_text_document,
+        )?
+        .on_sync_mut::<lsp_ext::CustomizeCancel>(handlers::notification::handle_cancel)?
+        .on_sync_mut::<lsp_ext::EmacsLargeFileLoadStart>(
+            handlers::notification::handle_large_file_load_start,
+        )?
+        .on_sync_mut::<lsp_ext::EmacsLargeFileChunk>(
+            handlers::notification::handle_large_file_chunk,
+        )?
+        .on_sync_mut::<lsp_ext::EmacsLargeFileLoadCancel>(
+            handlers::notification::handle_large_file_load_cancel,
+        )?
+        .on_sync_mut::<lsp_ext::DidFocusTextDocument>(
+            handlers::notification::handle_did_focus_text_document,
+        )?
+        .on_sync_mut::<notfis::Exit>(handlers::notification::handle_exit)?
+        .finish();
+
+        Ok(())
+    }
+
+    fn handle_workspace_restart(&mut self, req: &msg::Request) {
+        match self.get_working_document(req) {
+            Ok(doc) => {
+                let config = doc.language_config().unwrap().clone();
+                let doc_path = doc.path();
+                let old_client_ids: Vec<usize> = doc
+                    .get_all_language_servers()
+                    .iter()
+                    .map(|ls| ls.id())
+                    .collect();
+                let document_ids_to_refresh: Vec<DocumentId> = self
+                    .editor
+                    .documents()
+                    .filter_map(|doc| {
+                        if doc
+                            .language_servers()
+                            .any(|ls| old_client_ids.contains(&ls.id()))
+                        {
+                            Some(doc.id())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+                match self
+                    .editor
+                    .language_servers
+                    .restart_v2(&config, old_client_ids, doc_path)
+                {
+                    Ok(_) => {
+                        let mut doc_paths: Vec<String> = vec![];
+                        for document_id in document_ids_to_refresh {
+                            if let Some(doc) = self.editor.documents.remove(&document_id) {
+                                doc_paths.push(doc.path().unwrap().to_string_lossy().to_string());
+                            }
+                        }
+                        self.respond(Response::new_ok(req.id.clone(), doc_paths));
+                    }
+                    Err(error) => {
+                        self.respond(create_error_response(&req.id, error.to_string()));
+                    }
+                };
+            }
+            Err(response) => self.respond(response),
+        }
+    }
+
+    fn get_working_document(&self, req: &msg::Request) -> Result<&Document, Response> {
+        match &req.params.uri {
+            Some(uri) => {
+                if let Some(doc) = self
+                    .editor
+                    .document_by_uri(&lsp_types::Url::parse(uri).unwrap())
+                {
+                    Ok(doc)
+                } else {
+                    Err(create_error_response_with_uri(
+                        &req.id,
+                        "No document opened".to_string(),
+                        uri.clone(),
+                    ))
+                }
+            }
+            None => Err(create_error_response(
+                &req.id,
+                "No uri provided".to_string(),
+            )),
+        }
+    }
+}

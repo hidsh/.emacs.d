@@ -1,0 +1,112 @@
+use anyhow::Result;
+use std::path::PathBuf;
+
+#[derive(Default, Debug)]
+pub struct Args {
+    pub config_file: Option<PathBuf>,
+    pub log_level: u64,
+    pub log_file: Option<PathBuf>,
+    pub stdio: bool,
+    pub remote_server: bool,
+    pub show_help: bool,
+    pub show_version: bool,
+    pub max_item_num: usize,
+    pub max_diagnostics_push: usize,
+    pub enable_bytecode: bool,
+    pub enable_snippets: bool,
+    pub copilot_server_name: String,
+}
+
+impl Args {
+    pub fn parse_args() -> Result<Args> {
+        let mut args = Args::default();
+        let mut argv = std::env::args().peekable();
+        argv.next(); // skip the program, we don't care about that;
+
+        while let Some(arg) = argv.next() {
+            match arg.as_str() {
+                "-c" | "--config" => match argv.next().as_deref() {
+                    Some(path) => args.config_file = Some(path.into()),
+                    None => anyhow::bail!("--config must specify a path to read"),
+                },
+                "--max-item" => match argv.next().as_deref() {
+                    Some(n) => args.max_item_num = n.parse().unwrap_or(20),
+                    None => args.max_item_num = 20,
+                },
+                "--max-diagnostics-push" => match argv.next().as_deref() {
+                    Some(n) => args.max_diagnostics_push = n.parse().unwrap_or(50),
+                    None => args.max_diagnostics_push = 50,
+                },
+                "--log-level" => match argv.next().as_deref() {
+                    Some(level) => args.log_level = level.parse().unwrap_or(1),
+                    None => anyhow::bail!("--log-level must specify to a level"),
+                },
+                "--log" => match argv.next().as_deref() {
+                    Some(path) => args.log_file = Some(path.into()),
+                    None => anyhow::bail!("--log must specify path to write"),
+                },
+                "--copilot-server-name" => match argv.next().as_deref() {
+                    Some(name) => {
+                        args.copilot_server_name = if name.is_empty() {
+                            "copilot".to_string()
+                        } else {
+                            name.to_string()
+                        }
+                    }
+                    None => args.copilot_server_name = "copilot".to_string(),
+                },
+                "--stdio" => args.stdio = true,
+                "--remote-server" => args.remote_server = true,
+                "--bytecode" => args.enable_bytecode = true,
+                "--enable-snippets" => args.enable_snippets = true,
+                "-h" | "--help" => {
+                    args.show_help = true;
+                    return Ok(args);
+                }
+                "-V" | "--version" => {
+                    args.show_version = true;
+                    return Ok(args);
+                }
+                _ => anyhow::bail!("unknown argument: {arg}"),
+            }
+        }
+        // `Args::default()` returns 0 for these; if the flag wasn't passed,
+        // substitute the documented defaults. Without this the remote-server
+        // (started with only --remote-server --log-level) silently truncates
+        // every completion response to 0 items.
+        if args.max_item_num == 0 {
+            args.max_item_num = 20;
+        }
+        if args.max_diagnostics_push == 0 {
+            args.max_diagnostics_push = 50;
+        }
+        Ok(args)
+    }
+
+    pub fn print_help() {
+        println!("emacs-lsp-proxy {}", env!("CARGO_PKG_VERSION"));
+        println!("{}", env!("CARGO_PKG_DESCRIPTION"));
+        println!();
+        println!("USAGE:");
+        println!("    emacs-lsp-proxy [OPTIONS] --stdio");
+        println!("    emacs-lsp-proxy [OPTIONS] --remote-server");
+        println!();
+        println!("OPTIONS:");
+        println!("    -c, --config <FILE>       Set configuration file path");
+        println!("        --log <FILE>          Set log file path");
+        println!("        --log-level <LEVEL>   Set log level (0-3, default: 1)");
+        println!("        --max-item <NUM>      Maximum completion items (default: 20)");
+        println!("        --max-diagnostics-push <NUM>  Maximum diagnostics to push (default: 50)");
+        println!("        --stdio               Enable stdio communication mode (required)");
+        println!("        --remote-server       Run as a remote server (reads/writes Protobuf Envelopes on stdio)");
+        println!("        LSP_PROXY_REMOTE_BINARY_PATH  env var: remote host path for the deployed binary");
+        println!("        --bytecode            Enable bytecode optimization for JSON-RPC");
+        println!("        --enable-snippets     Advertise snippet completion support to language servers");
+        println!("    -h, --help               Print help information");
+        println!("    -V, --version            Print version information");
+    }
+
+    pub fn print_version() {
+        println!("emacs-lsp-proxy {}", env!("CARGO_PKG_VERSION"));
+    }
+}

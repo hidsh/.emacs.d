@@ -1,0 +1,10 @@
+/target
+.aider*
+.env
+.vscode
+lsp-copilot
+lsp-copilot.exe
+lsp-proxy
+lsp-proxy.exe
+/emacs-lsp-proxy
+/emacs-lsp-proxy.exe
