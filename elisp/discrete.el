@@ -338,6 +338,7 @@ the target elisp files should be list in `my-elip-list'."
 (defconst my-command-error--commands '(buffer-read-only
                                       beginning-of-buffer
                                       end-of-buffer
+                                      backward-delete-char
 
                                       evil-line-move
                                       mwheel-scroll
