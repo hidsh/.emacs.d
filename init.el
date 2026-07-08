@@ -464,6 +464,17 @@
   :init
   (setq theme-loader-theme 'my-doom-material)
 
+  :config
+  (defun my-adv--echo-area-face (&rest _args)
+    (dolist (buf '(" *Echo Area 0*" " *Echo Area 1*"))
+      (when (get-buffer buf)
+        (with-current-buffer buf
+          (face-remap-add-relative 'default
+                                   `(:foreground (face-background ,tabbar-default) :background "black"))))))
+
+  (advice-add 'load-theme :after #'my-adv--echo-area-face)
+
+
   )
 
 ;; ----------------------------------------------------------------------
