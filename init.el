@@ -236,7 +236,7 @@
 
 ;; =====================================================================
 ;; key unbinding / binding
-(keyboard-translate ?\C-h ?\C-?)                        ; c-h
+;; (keyboard-translate ?\C-h ?\C-?)                        ; C-h ;; comment-out for GUI Emacs
 
 (global-unset-key (kbd "M-,"))                          ; xref
 ;; (global-unset-key (kbd "M-."))                          ; xref
@@ -252,6 +252,9 @@
 (global-unset-key [f11])                                ; toggle-frame-fullscreen
 (global-unset-key [f12])                                ; "M-c"
 (global-unset-key (kbd "C-M-e"))                        ; end-of-defun
+(global-unset-key (kbd "C-\\"))                         ; toggle-input-method
+(global-unset-key (kbd "M-\\"))                         ; delete-horizontal-space
+
 
 ;; (global-set-key "(" 'my-insert-paren)                   ; ()
 ;; (global-set-key "{" 'my-insert-brace)                   ; {}
@@ -259,6 +262,8 @@
 ;; (global-set-key "<" 'my-insert-angle)                   ; <>
 ;; (global-set-key "'" 'my-insert-squote)                  ; ''
 ;; (global-set-key "\"" 'my-insert-dquote)                 ; ""
+
+(global-set-key (kbd "C-h") 'my-c-h)                    ; backward-delete-hcar or help
 
 (global-set-key (kbd "C-m") 'newline-and-indent)             ; Returnキーで改行＋オートインデント
 (global-set-key (kbd "C-0") 'delete-window)

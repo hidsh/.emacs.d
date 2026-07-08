@@ -409,6 +409,23 @@ end-of-buffer signals; pass the rest to the default handler."
 ;; (define-key evil-normal-state-map (kbd "g f") 'my-beginning-of-defun)
 
 ;; ----------------------------------------------------------------------
+(defun my-c-h ()
+  (interactive)
+  (cond ((and (minibufferp) (< (minibuffer-prompt-end) (point)))
+         (delete-char -1))
+        ((not (boundp 'evil-mode))
+         (delete-char -1))
+        ((not evil-mode)
+         (delete-char -1))
+        ((evil-insert-state-p)
+         (delete-char -1))
+        ((evil-emacs-state-p)
+         (delete-char -1))
+        (t (help))))
+
+;; ----------------------------------------------------------------------
+
+;; ----------------------------------------------------------------------
 ;; @@ `my-comment-*'
 (defun my-comment-or-uncomment-region (beg end)
   (interactive)
