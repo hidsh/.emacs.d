@@ -116,6 +116,7 @@
  ring-bell-function 'ignore
  parens-require-spaces nil
  transient-mark-mode nil
+ truncate-lines nil                               ; eneble line wrap by default
  tab-width 4
  tab-stop-list nil
  comment-column 60
@@ -290,7 +291,7 @@
 ;; =====================================================================
 
 (setq truncate-partial-width-windows nil)
-(setq-default truncate-lines t)
+;; (setq-default truncate-lines t)
 
 ;; kill-ringに同じ内容を重複して入れない
 ;; (defadvice kill-new (before ys:no-kill-new-duplication activate)
