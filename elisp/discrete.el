@@ -1387,6 +1387,11 @@ is already narrowed."
   (fringe-indicator (point) 'right-triangle))
 
 ;; ----------------------------------------------------------------------
+(defmacro dp (variable)
+  "yet another debug print"
+  `(message "%s => %S" ',variable ,variable))
+
+;; ----------------------------------------------------------------------
 (defun my-eval-last-sexp ()
   "Looks like vanilla emacs even if in evil-mode, and then `kill-new' the result after `eval-last-sexp' "
   (interactive)
