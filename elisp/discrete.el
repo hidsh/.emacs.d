@@ -1404,6 +1404,56 @@ is already narrowed."
 (global-set-key (kbd "C-x C-e") #'my-eval-last-sexp)
 
 ;; ----------------------------------------------------------------------
+(defun tree-derived-major-mode ()
+  "現在定義されているメジャーモードの派生ツリーを階層の深い順にソートしてバッファに表示する。"
+  (interactive)
+  (let ((modes nil))
+    ;; 1. 定義されている全てのシンボルから "-mode" で終わるメジャーモード関数を抽出
+    (mapatoms
+     (lambda (sym)
+       (when (and (fboundp sym)
+                  (string-match-p "-mode$" (symbol-name sym)))
+         (push sym modes))))
+
+    ;; 2. 各モードの祖先をたどって「親 > ... > 子」の階層パスを作成
+    (let ((lines nil)
+          (visited (make-hash-table :test 'equal)))
+      (dolist (mode modes)
+        (let* ((hierarchy (list mode))
+               (current mode)
+               (parent (get mode 'derived-mode-parent)))
+          ;; 親をたどってリストの先頭に追加
+          (while parent
+            (push parent hierarchy)
+            (setq current parent
+                  parent (get current 'derived-mode-parent)))
+
+          ;; シンボルから文字列に変換し、" > " で結合
+          (let ((path (mapconcat #'symbol-name hierarchy " > ")))
+            ;; 重複していなければリストに追加
+            (unless (gethash path visited)
+              (puthash path t visited)
+              ;; ソート用に (階層の深さ . "親 > 子") のドット対で格納
+              (push (cons (length hierarchy) path) lines)))))
+
+      ;; 3. 階層の深い順（lengthの大きい順）にソート
+      ;; 深さが同じならアルファベット順（string<）にする
+      (setq lines (sort lines
+                        (lambda (a b)
+                          (if (= (car a) (car b))
+                              (string< (cdr a) (cdr b))
+                            (> (car a) (car b))))))
+
+      ;; 4. 文字列だけを取り出してバッファに出力
+       (with-current-buffer (get-buffer-create "*Major-Mode-Tree*")
+         (erase-buffer)
+         (insert (mapconcat #'cdr lines "\n"))
+         (goto-char (point-min))
+         (current-buffer)
+        ;; (display-buffer (current-buffer))))))
+         (pop-to-buffer-same-window (current-buffer))))))
+
+; ----------------------------------------------------------------------
 ;; (defun my-windows-path-region  (beg end)
 ;;   (interactive "r")
 ;;   (replace-string "\\" "\\\\" nil beg end))
