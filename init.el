@@ -37,6 +37,7 @@
 
 ;; ----------------------------------------------------------------------
 (defun mycolor (name)
+"e.g., (mycolor 'red) => \"#ff6b7f\""
   (let ((colors '((white       . "#f9f9f9")
                   (light-gray  . "#a4a2a2")
                   (gray        . "#7c7a7a")
@@ -57,14 +58,13 @@
                   (charcoal    . "#2b262c"))))
     (cdr (assoc name colors))))
 
-;; e.g. (mycolor 'red) => "#ff6b7f"
-
 (defun myfont (type)
-  ;; (let* ((fonts '((default  . "Source Han Code JP N")
+  "e.g., (myfont 'default) => \"Source Han Code JP N\""
   (let* ((fonts '((default  . "Source Han Code JP")
                   (default2 . "Consolas")
                   (default3 . "Cica")
-                  (nerdfont . "ShureTechMono Nerd Font Mono")
+                  ;; (nerdfont . "ShureTechMono Nerd Font Mono")
+                  (nerdfont . "JetBrainsMono NF")
                   (ui       . "x14y24pxHeadUpDaisy")
                   (ui2      . "Krungthep")
                   (ui3      . "Squarea")
@@ -81,8 +81,6 @@
         ;; NOT occurs error in batch mode (= while checking)
         (message "ERROR: Specifying font can only work under any window-system."))
       nil)))
-
-;; e.g. (myfont 'default) => "Source Han Code JP N"
 
 ;; ----------------------------------------------------------------------
 ; host independent
