@@ -353,6 +353,7 @@
    (when font
      ;; (set-face-attribute 'default            nil :family (myfont 'default3) :height my-face-adj-default)
      (set-face-attribute 'mode-line          nil :family font :height my-face-adj-mode-line-height)     ;; defined at _mac.el or _windows.el
+     (set-face-attribute 'mode-line-active   nil :inherit 'mode-line)
      (set-face-attribute 'mode-line-inactive nil :inherit 'mode-line)
      (set-face-attribute 'minibuffer-prompt  nil :family font)
 
