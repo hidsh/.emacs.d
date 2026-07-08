@@ -3719,8 +3719,16 @@ alternative, you can run `embark-export' from commands like `M-x' and
          (prog-mode   . my-prog-mode-hook-func))
   :config
   (defun my-prog-mode-hook-func ()
-    (modify-syntax-entry ?_ "w")  ;; treat '_' as a part of word for evil-search-word-forward/backward
+    (setq truncate-lines t)         ;; disable line wrap
+    (modify-syntax-entry ?_ "w")    ;; treat '_' as a part of word for evil-search-word-forward/backward
+    (setq electric-indent-chars '(?\n))
     (setq show-trailing-whitespace t)
+
+    ;; (evil-cleverparens-mode +1)
+    ;; TODO: need to mod keymaps e.g., M-i, u in evil-normal-state
+
+    (evil-local-set-key 'normal (kbd "g b") 'flymake-goto-next-error)
+    (evil-local-set-key 'normal (kbd "g t") 'flymake-goto-prev-error)
     )
 
   ;; (defun my/newline-and-indent ()
@@ -4181,8 +4189,7 @@ See URL `https://github.com/htacg/tidy-html5'."
   ;; (put 'flymake-note 'flymake-bitmap (propertize "🟢" 'face `(:inherit (success default) :underline nil)))
   ;;
   ;;;; without nerd font
-  (advice-add
-   #'flymake--fringe-overlay-spec :override
+  (advice-add #'flymake--fringe-overlay-spec :override
    (lambda (bitmap &optional recursed)
      (if (and (symbolp bitmap)
               (boundp bitmap)
@@ -4203,6 +4210,10 @@ See URL `https://github.com/htacg/tidy-html5'."
                          'display
                          `((margin left-margin)
                            (space :width 5))))))))
+
+;; flymake-error
+  ;; (set-face-attribute 'flymake-error nil :underline `(:color ,(mycolor 'red) :style wave))
+  (set-face-attribute 'flymake-error nil :inverse-video t :underline `(:color ,(face-attribute 'flymake-error :foreground) :style wave))
   )
 
 ;; ----------------------------------------------------------------------
@@ -4374,45 +4385,46 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package corfu
-  :disabled t
-  :custom
-  (corfu-preview-current nil) ;; 入力中に候補を勝手に挿入させない
-  (corfu-preselect 'prompt)   ;; 最初の候補を勝手に選択状態にしない
+  :bind (:map corfu-map
+              ("SPC"       . my-corfu-quit-and-insert)
+              ("C-l"       . corfu-insert-separator)
+              ("<tab>"     . corfu-next)
+              ("C-j"       . corfu-next)
+              ("<backtab>" . corfu-previous)
+              ("C-k"       . corfu-previous)
+              ("<return>"  . corfu-insert)
+              ("ESC"       . my-corfu-quit)
+              ("[escape]"  . my-corfu-quit)
+              ("C-g"       . my-corfu-quit))
+
+  :init
+  (corfu-history-mode)
+  (corfu-popupinfo-mode)            ; Popup completion info
+
   :config
-  ;; スペース入力を補完確定ではなく、ただのスペース入力として扱う
-  (define-key corfu-map (kbd "SPC") #'corfu-insert-separator)
+  (setq corfu-auto t
+        corfu-auto-prefix 1
+        corfu-auto-delay 0.1
+        corfu-cycle t
 
-(setq corfu-auto nil)      ;; 勝手に補完窓を出さない（M-TABで出す）
-;; または
-;; (setq corfu-preview-current nil) ;; 出しても、バッファに「仮挿入」させない
-;; (setq corfu-preselect 'prompt)   ;; 最初の候補を勝手に選択状態にしない
-  )
+        corfu-preselect 'valid
+        corfu-preview-current nil
+        corfu-on-exact-match nil
+        corfu-expand-lsp-queries t
+        corfu-popupinfo-delay '(0.1 . 0.1))
 
+  (defun my-corfu-quit-and-insert ()
+    (interactive)
+    (corfu--popup-hide)
+    (corfu-quit)
+    (self-insert-command 1))
 
-;; (use-package corfu
-;;   :disabled t
-;;   :ensure t
-;;   :hook ((prog-mode . corfu-mode))
-;;   :bind (:map corfu-map
-;;          ("TAB"        . corfu-next)
-;;          ("<tab>"      . corfu-next)
-;;          ("C-j"        . corfu-next)
-;;          ("C-k"        . corfu-previous)
-;;          ("RET"        . corfu-insert)
-;;          ("<return>"   . corfu-insert)
-;;          ("C-c"   . my-corfu-quit)
-;;          ("C-g"   . my-corfu-quit))
-
-;;   :custom ((corfu-auto t)
-;;            (corfu-auto-delay 0)
-;;            (corfu-auto-prefix 1)
-;;            (corfu-cycle t)
-;;            ;; (corfu-on-exact-match nil)
-;;            (corfu-bar-width 1)
-;;            (corfu-right-margin-width 2.5))
-
-;;   :config
-;;   (corfu-popupinfo-mode)
+  (defun my-corfu-quit ()
+    (interactive)
+    (corfu--popup-hide)
+    (corfu-quit)
+    (redraw-display)            ;; for evil state indicator
+    )
 
 ;;   (defun my-corfu-quit ()
 ;;     (interactive)
@@ -4428,30 +4440,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package cape
-  :disabled t
-  :ensure t
-  :hook (((prog-mode
-           ;; conf-mode
-           eglot-manage-mode) . my-set-super-capf))
   :config
-  (setq cape-dabbrev-check-other-buffers nil)
-
-  (defun my-set-super-capf (&optional arg)
-    (setq-local completion-at-point-functions
-                (list (cape-capf-noninterruptible
-                       (cape-capf-buster
-                        (cape-capf-properties
-                         (cape-capf-super
-                          (if arg
-                              arg
-                            (car completion-at-point-functions))
-                          ;; #'tempel-complete
-                          ;; #'tabnine-completion-at-point
-                          #'cape-dabbrev
-                          #'cape-file)
-                         :sort t
-                         :exclusive 'no))))))
-
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   ;; (add-to-list 'completion-at-point-functions #'cape-history)
@@ -4470,35 +4459,146 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package yasnippet
-  ;; :disabled
-  :ensure t
-  :hook
-  (snippet-mode . my-yas-keybindings)
-  :config
+  :commands (yas-new-snippet)
+  :hook (snippet-mode . my-yas-keybindings)
+  ;; :bind ("<C-return>" . yas-expand)     ;; C-RET
+
+  :init
   (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+  (defalias 'yas 'yas-new-snippet)
+  (defalias 'yas-edit 'yas-visit-snippet-file)
 
-  (defalias 'yas #'yas-new-snippet)
-  (defalias 'yas-edit #'yas-visit-snippet-file)
-
-  (defun my-adv--yas-load-snippet-buffer--kill-buffer (&rest _)
-    (kill-buffer (current-buffer)))
-  (advice-add 'yas-load-snippet-buffer :after #'my-adv--yas-load-snippet-buffer--kill-buffer)
-
+  :config
   (defun my-yas-keybindings ()
-    (define-key snippet-mode-map (kbd "C-x C-s") #'yas-load-snippet-buffer))
+    (define-key snippet-mode-map (kbd "C-c C-c") #'my-yas-load-snippet-buffer-and-close)
+    (define-key snippet-mode-map (kbd "C-x C-s") #'my-yas-load-snippet-buffer-and-close)
+    (evil-define-key 'normal snippet-mode-map (kbd "wq") #'my-yas-load-snippet-buffer-and-close)
+    )
+;; -----------
 
-  (setq yas-new-snippet-default  "\
-# -*- mode: snippet -*-
+  (setq my-yas-new-snippet-snippet "\
 # name: $1
-# key: ${2:${1:$(yas--key-from-desc yas-text)}}
+# key: $2
 # --
 $0`(yas-escape-text yas-selected-text)`
+")
 
-# e.g.: console.log('\\${1:debug} \\${2:value}: ' + \\$2);\\$0")
+;; template examples
+;; # name: $1
+;; # key: ${2:${1:$(yas--key-from-desc yas-text)}}
+;; # --
+;; # e.g., console.log('\\${1:debug} \\${2:value}: ' + \\$2);\\$0
+;; (define-key $1-map (kbd "$2") #'${3:fn})
+
+  (advice-add 'yas-new-snippet :before (lambda (&rest _)
+    (setq yas-new-snippet-default (concat
+        (format "# -*- mode: snippet; yas-table: %s -*-\n" major-mode)
+        my-yas-new-snippet-snippet))))
+
+  (evil-define-key 'normal prog-mode-map (kbd "S-TAB") #'yas-new-snippet)
+  ;; (evil-define-key 'normal prog-mode-map (kbd "M-TAB") !!! FOR WINDOW SYSTEM !!!)
+  (evil-define-key 'normal prog-mode-map (kbd "M-\\") #'yas-visit-snippet-file)
 
   (yas-global-mode 1)
+
+  ;; -----------------
+  (defvar-local yas-table nil
+    "Target major-mode string for this snippet buffer.
+It also be used as save path for snippet file")
+
+  (put 'yas-table 'safe-local-variable 'symbolp)
+
+  (defun my-yas-get-table ()
+    "Returns symbol of major-mode for current snippet buffer from
+file local variable `yas-table', rather than
+`yas--guess-snippet-directories'. Otherwise return nil."
+    (unless (derived-mode-p 'snippet-mode)
+      (user-error "Not snippet buffer"))
+    (let ((enable-local-variables :all))
+      (dolist (cell (hack-local-variables-prop-line))
+        (set (make-local-variable (car cell)) (cdr cell))))
+    (unless yas-table
+      (error "Not found `yas-table' in shebang  (e.g., \"-*- mode: snippet; yas-table: cc-mode -*-\")"))
+
+    (unless (symbolp yas-table)
+      (error "Unexpected error occured: `yas-table' should be symbol"))
+    yas-table)
+
+  (defun my-yas-load-snippet-buffer-and-close ()
+    "My customized yas-load-snippet-buffer-and-close"
+    (interactive)
+    (let* ((table (my-yas-get-table))
+           (template (yas-load-snippet-buffer table t)))
+      (when (buffer-modified-p)
+        (let* ((snippet-name (yas--template-name template))
+               (snippet-dir (file-name-concat (first yas-snippet-dirs)
+                                              (symbol-name yas-table))))
+          (unless buffer-file-name
+            (setq buffer-file-name
+                  (expand-file-name snippet-name snippet-dir))
+            (rename-buffer (file-name-nondirectory buffer-file-name) t))
+          ))
+      (write-file buffer-file-name)
+      (quit-window t)))
+
+  (defun my-yas-visit-snippet-file ()
+    (interactive)
+    (let* ((enabled (bound-and-true-p dirvish-peek-mode))
+           (snippet-dir (car yas-snippet-dirs))
+           (sub-dir (symbol-name major-mode))
+           (init-path (path-join snippet-dir sub-dir)))
+      (cl-labels ((hook-fn ()
+                    (delete-minibuffer-contents)
+                    (insert (file-name-as-directory init-path))))
+        (when (not (file-directory-p init-path))
+          (message "Not found: %s" init-path)
+          (setq init-path snippet-dir))        ;; fallback
+
+        (minibuffer-with-setup-hook #'hook-fn
+          (unwind-protect
+              (progn
+                (dirvish-peek-mode 1)
+                (call-interactively 'find-file))
+            (unless enabled
+              (dirvish-peek-mode -1)))))))
+
   )
 
+;; ----------------------------------------------------------------------
+(use-package yasnippet-capf
+  :load-path "~/.emacs.d/elisp/yasnippet-capf"
+  :config
+
+  (defun my-corfu-yasnippet-capf-setup (&rest _)
+    (setq-local completion-at-point-functions
+                (list (cape-capf-super
+                       #'yasnippet-capf
+                       ;; #'lspce-completion-at-point
+                       #'lsp-proxy-completion-at-point
+                       #'cape-dabbrev
+                       #'cape-file
+                       ))))
+
+  (advice-add 'lsp-proxy-mode :after #'my-corfu-yasnippet-capf-setup)
+)
+
+;; ----------------------------------------------------------------------
+(use-package eee
+  ;; Requirements:
+  ;;   devicon-lookup:  cargo install devicon-lookup --force
+  ;;
+  ;;   st:      git clone https://github.com/Shourai/st.git
+  ;;            cd st
+  ;;            make clean; make
+  ;;            sudo make install --> /usr/local/bin/st
+  :load-path "~/.emacs.d/elisp/eee"
+
+  :config
+  (add-to-list 'exec-path "~/.emacs.d/bin-arch")
+  (setq ee-terminal-command "st")
+  (define-key evil-normal-state-map (kbd "M-y") #'ee-yazi-project)
+
+  )
 ;; ----------------------------------------------------------------------
 (use-package treesit-auto
   :config
@@ -4511,7 +4611,7 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package eglot
-;;  :disabled t
+  :disabled t
   :ensure t
   :hook ((rust-ts-mode . eglot-ensure)     ;; rust: need `rustup component add rust-analyzer` in terminal
          (eglot-managed-mode . my-fix-eglot-hook-func)
@@ -4542,18 +4642,35 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package eglot-booster
+  :disabled t
   :after eglot
   :config
   (setq eglot-booster-io-only t)        ;; >= emacs-30
   (eglot-booster-mode 1)
 
+)
+
+;; ----------------------------------------------------------------------
+(use-package lsp-proxy
+  :load-path "~/.emacs.d/lsp-proxy"
+  :hook ((prog-mode . eldoc-box-hover-mode)
+         (prog-mode . corfu-mode)
+         (prog-mode . lsp-proxy-mode))
+  :config
+  (setq lsp-proxy-server-path "~/.emacs.d/lsp-proxy/emacs-lsp-proxy"
+        lsp-proxy-diagnostics-provider :flymake
+
+        lsp-proxy-max-completion-item 10
+        lsp-proxy-trim-trailing-whitespace nil)
+
+  ;; (add-hook 'prog-mode-hook #'lsp-proxy-mode)
+
   )
 
 ;; ----------------------------------------------------------------------
 (use-package rust-ts-mode
-  :hook ((rust-ts-mode . eglot-ensure))
-
   :config
+  (setq rust-mode-treesitter-derive t)
   (add-to-list 'project-vc-extra-root-markers "Cargo.toml")
   ;; (setq electric-pair-open-newline-between-pairs t)
   ;; (evil-define-key 'insert rust-ts-mode-map (kbd "RET") 'my/newline-and-indent)
@@ -4566,10 +4683,74 @@ $0`(yas-escape-text yas-selected-text)`
 
 ;; ----------------------------------------------------------------------
 (use-package eldoc-box
-  :hook ((eglot-managed-mode . eldoc-box-hover-at-point-mode)
-         (eldoc-box-buffer . (lambda () (setq cursor-in-non-selected-windows nil))))
+  ;; :disabled t
+  ;; :hook ((eglot-managed-mode . eldoc-box-hover-at-point-mode)
+  ;; :hook (eglot-managed-mode . eldoc-box-hover-mode)
+
   :config
+  ;; (setq eldoc-box-doc-separator "\n---\n")
+  (setq eldoc-box-max-pixel-width 370)
+  (setq eldoc-box-max-pixel-height 600)
   (setq eldoc-box-cursor-in-non-selected-windows nil)
+  (setq eldoc-box-mouse-mode-idle-delay 0.1)
+
+  ;; ---
+  (setq my-hook-cut--eldoc-box-buffer--lines-threshold 600)
+  (defun my-hook-cut--eldoc-box-buffer ()
+    (cond ((< (point-max) my-hook-cut--eldoc-box-buffer--lines-threshold)
+           (ignore))
+          ((progn (goto-char (point-min))
+                  (re-search-forward "^---\n$" nil t))
+           (progn
+             (re-search-forward "[.][ \n]" nil t)
+             (let ((beg (point)))
+               (goto-char (point-max))
+               (delete-region beg (point)))
+             (insert "\n(...snip)")))
+          (t
+           (delete-region (+ (point-min)
+                             (- my-hook-cut--eldoc-box-buffer--lines-threshold 8))
+                          (point-max))
+             (insert "\n(...snip)")))
+    (goto-char (point-min)))
+
+  (setq my-hook-replace--alist--eldoc-box-buffer '(("^\\[lspce]\n" . "")
+                                     ;; (" ->" . "\n->")
+                                     ("\\n{2,10}" . "\n")
+                                     ;; ("---\n" . "")
+                                     ))
+
+  (defun my-hook-replace--eldoc-box-buffer ()
+    ;; (message "%s" (buffer-string))     ;; debug
+    (dolist (dp my-hook-replace--alist--eldoc-box-buffer)
+      (let ((_re (car dp))
+            (_to (cdr dp)))
+        (goto-char (point-min))
+        (while (re-search-forward _re nil t)
+          (replace-match _to nil nil)))))
+
+  (defun my-hook--eldoc-box-frame (frame)
+    ;; (modify-frame-parameters frame '((cursor-type . nil)))
+    (set-window-cursor-type nil nil))
+
+  (add-hook 'eldoc-box-buffer-hook #'my-hook-cut--eldoc-box-buffer)
+  (add-hook 'eldoc-box-buffer-hook #'my-hook-replace--eldoc-box-buffer)
+  (add-hook 'eldoc-box-frame-hook #'my-hook--eldoc-box-frame)
+  ;; (remove-hook 'eldoc-box-frame-hook #'my-hook--eldoc-box-frame)
+
+  ;; ---
+  (defun my-eldoc-box-hide ()
+    "Hide child frame for eldoc-box from evil"
+    (interactive)
+    (when (eldoc-box--frame-visible-p)
+      (eldoc-box-quit-frame))
+      ;; (evil-force-normal-state)
+    ;; (when (and evil-mode (not (eq evil-state 'normal)))
+    ;;   (evil-force-normal-state))
+    )
+
+  (evil-define-key 'normal rust-ts-mode-map (kbd "<escape>") #'my-eldoc-box-hide)
+  (evil-define-key 'normal rust-ts-mode-map (kbd "C-g") #'my-eldoc-box-hide)
 
   )
 
