@@ -2006,16 +2006,15 @@ If COUNT is given, move COUNT - 1 lines downward first."
 ;;   )
 
 (use-package consult
-  :ensure t
-  ;; :disabled
+  :demand     ;; disable lazy-loading, even if specified `:bind', `:mode', `:hook', etc...
   :config
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
+  (setq consult-line-start-from-top t)
 
   (defun my-consult-after-init-hook ()
     (vertico-mode)
-    (marginalia-mode)
-    (savehist-mode))        ;; Verticoの順番を永続化する
+    (marginalia-mode))
 
   (add-hook 'after-init-hook #'my-consult-after-init-hook)
 
@@ -2033,7 +2032,15 @@ If COUNT is given, move COUNT - 1 lines downward first."
                                     t)))
       (find-alternate-file alt-file))))
 
-(global-set-key (kbd "C-x C-v") #'my-consult-find-alternate-file)
+ (global-set-key (kbd "C-x C-v") #'my-consult-find-alternate-file)
+
+ ;; --------------
+ (defun my-consult-file-only ()
+   (interactive)
+   (let ((completion-related-modifier nil))
+     ;; 入力欄に "f " をあらかじめ挿入してファイルに絞り込む
+     (run-at-time 0 nil (lambda () (insert "f ")))
+     (consult-buffer)))
 
   ;; -----------------
   (setq my-consult-ripgrep-exclude-list-orig
@@ -2105,15 +2112,28 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
                      (read-directory-name "Ripgrep Dir: ")))))
     (consult-ripgrep dir initial))
 
+  ;; -----------------
   (defun my-consult-line-at-point ()
     (interactive)
-    (consult-line (cond ((and buffer-file-name
-                              (string=
-                               (file-name-nondirectory buffer-file-name)
-                               "init.el"))
-                         "(use-package ")
-                        (t (thing-at-point 'symbol)))
-                  1))
+    (cond ((and buffer-file-name
+                (string= (file-name-nondirectory buffer-file-name)
+                         "init.el"))
+           (add-to-history 'consult--line-history "(use-package "))
+          (t (ignore)))
+    (consult-line (thing-at-point 'symbol) 1))
+
+  (set-face-attribute 'consult-line-number-prefix nil :inherit 'consult-line-number)
+
+
+  ;; consult-line
+  ;; (advice-add #'consult-line-at-point :after
+  ;;               (lambda (&rest args)
+  ;;                 (cond ((and buffer-file-name
+  ;;                             (string=
+  ;;                              (file-name-nondirectory buffer-file-name)
+  ;;                              "init.el"))
+  ;;                        (add-to-history 'consult--line-history "(use-package "))
+  ;;                       (t (ignore)))))
 
   (defun my-consult-ripgrep-command (parg)
     (interactive "P")
