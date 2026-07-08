@@ -190,7 +190,8 @@ If non-nil, in ‘eldoc-box-hover-at-point-mode’, the childframe is
 displayed above point rather than below it."
   :type 'boolean)
 
-(defcustom eldoc-box-mouse-mode-idle-delay 0.3
+;; (defcustom eldoc-box-mouse-mode-idle-delay 0.3
+(defcustom eldoc-box-mouse-mode-idle-delay 0.1
   "Seconds to wait before showing doc at mouse point.
 
 This only applies to ‘eldoc-box-mouse-mode’."
@@ -392,16 +393,31 @@ For DOCS, see ‘eldoc-display-functions’."
                 (or (bound-and-true-p eldoc-doc-buffer-separator) "---")
                 "\n"))))))
 
+;; (defun eldoc-box-focus-frame ()
+;;   "Switch focus to the childframe."
+;;   (interactive)
+;;   (when (eldoc-box--frame-visible-p)
+;;     (setq eldoc-box--main-frame (selected-frame))
+;;     (set-frame-parameter eldoc-box--frame 'no-accept-focus nil)
+;;     (set-frame-parameter eldoc-box--frame 'no-focus-on-map nil)
+;;     (select-frame-set-input-focus eldoc-box--frame)
+;;     (setq cursor-type 'bar)
+;;     (local-set-key (kbd "q") #'eldoc-box-quit-frame)))
+
 (defun eldoc-box-focus-frame ()
   "Switch focus to the childframe."
   (interactive)
-  (when (eldoc-box--frame-visible-p)
-    (setq eldoc-box--main-frame (selected-frame))
-    (set-frame-parameter eldoc-box--frame 'no-accept-focus nil)
-    (set-frame-parameter eldoc-box--frame 'no-focus-on-map nil)
-    (select-frame-set-input-focus eldoc-box--frame)
-    (setq cursor-type 'bar)
-    (local-set-key (kbd "q") #'eldoc-box-quit-frame)))
+  (while (not (eldoc-box--frame-visible-p))
+    (ignore))
+
+  (setq eldoc-box--main-frame (selected-frame))
+  (set-frame-parameter eldoc-box--frame 'no-accept-focus nil)
+  (set-frame-parameter eldoc-box--frame 'no-focus-on-map nil)
+  (select-frame-set-input-focus eldoc-box--frame)
+  (let ((w ())))
+  ;; (setq cursor-type 'bar)
+  (set-window-cursor nil nil)     ;; mod
+  (local-set-key (kbd "q") #'eldoc-box-quit-frame))
 
 (defun eldoc-box-unfocus-frame ()
   "Switch focus back to the main frame."
@@ -471,6 +487,7 @@ Value before enabling `eldoc-box--mouse-support-mode'")
   ;; WORKAROUND: (issue#66) If cursor-type is ‘box’, sometimes the
   ;; cursor is still shown for some reason.
   (setq-local cursor-type t)
+  ;; (setq-local cursor-type nil)      ;; mod
   (when (bound-and-true-p global-tab-line-mode)
     (setq tab-line-format nil))
   ;; Without this, clicking childframe will make doc buffer the
@@ -478,7 +495,7 @@ Value before enabling `eldoc-box--mouse-support-mode'")
   ;; `eldoc-box--cleanup-timer' will clear the childframe
   (buffer-face-set 'eldoc-box-body)
   (setq eldoc-box-hover-mode t)
-  (visual-line-mode)
+  ;; (visual-line-mode)
   ;; Use buffer-local binding in the original buffer
   ;; for the setup hook to allow original mode-specific setup.
   (setq-local eldoc-box-buffer-setup-hook
@@ -489,16 +506,18 @@ Value before enabling `eldoc-box--mouse-support-mode'")
 (defun eldoc-box--display (str)
   "Display STR in childframe.
 STR has to be a proper documentation, not empty string, not nil, etc."
-  (let ((doc-buffer (get-buffer-create eldoc-box--buffer))
-        (origin-buffer (current-buffer))
-        (setup-function eldoc-box-buffer-setup-function))
-    (with-current-buffer doc-buffer
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (insert str)
-        (goto-char (point-min))
-        (funcall setup-function origin-buffer)))
-    (eldoc-box--get-frame doc-buffer)))
+  (if (equal str "")    ;; mod add
+      (message "empty")          ;; mod add
+    (let ((doc-buffer (get-buffer-create eldoc-box--buffer))
+          (origin-buffer (current-buffer))
+          (setup-function eldoc-box-buffer-setup-function))
+      (with-current-buffer doc-buffer
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert str)
+          (goto-char (point-min))
+          (funcall setup-function origin-buffer)))
+      (eldoc-box--get-frame doc-buffer))))
 
 (defun eldoc-box--window-side ()
   "Return the side of the selected window.
@@ -665,7 +684,8 @@ FRAME is the childframe, WINDOW is the primary window."
           (eldoc-box--update-childframe-geometry
            eldoc-box--frame (frame-selected-window eldoc-box--frame)))
       ;; if not typing, inhibit display
-      (eldoc-box--inhibit-childframe-for 0.5))))
+      ;; (eldoc-box--inhibit-childframe-for 0.5))))
+      (eldoc-box--inhibit-childframe-for 0.1))))    ;; mod
 
 (defun eldoc-box--get-frame (buffer)
   "Return a childframe displaying BUFFER.
@@ -686,6 +706,7 @@ Checkout `lsp-ui-doc--make-frame', `lsp-ui-doc--move-frame'."
                  (setq window (frame-selected-window frame))
                  ;; in case the main frame changed
                  (set-frame-parameter frame 'parent-frame main-frame))
+        ;; (modify-frame-parameter frame '(cursor-type . nil))     ;; mod
         (setq window (display-buffer-in-child-frame
                       buffer
                       `((child-frame-parameters . ,parameter)
@@ -708,6 +729,7 @@ Checkout `lsp-ui-doc--make-frame', `lsp-ui-doc--move-frame'."
       (set-window-margins window nil nil)
       (setq eldoc-box--frame frame)
       (with-selected-frame frame
+        ;; (modify-frame-parameter frame '(cursor-type . nil))     ;; mod add
         (run-hook-with-args 'eldoc-box-frame-hook main-frame))
       (make-frame-visible frame))))
 
