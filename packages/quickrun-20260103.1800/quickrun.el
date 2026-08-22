@@ -1,13 +1,13 @@
 ;;; quickrun.el --- Run commands quickly  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2017 by Syohei YOSHIDA
-;; Copyright (C) 2020-2024 by Jen-Chieh Shen
+;; Copyright (C) 2020-2026 by Jen-Chieh Shen
 
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; Maintainer: Jen-Chieh Shen <jcs090218@gmail.com>
 ;; URL: https://github.com/emacsorphanage/quickrun
-;; Package-Version: 20240924.2359
-;; Package-Revision: bb0f7580cd95
+;; Package-Version: 20260103.1800
+;; Package-Revision: 9199e222f951
 ;; Package-Requires: ((emacs "26.1") (ht "2.0"))
 ;; Keywords: tools
 
@@ -86,12 +86,21 @@
   :type 'boolean
   :group 'quickrun)
 
+(defcustom quickrun-output-only nil
+  "If non-nil, omit the header and footer from the output."
+  :type 'boolean
+  :group 'quickrun)
+
 (defconst quickrun--buffer-name "*quickrun*")
 (defvar quickrun--executed-file nil)
 (defvar quickrun--remove-files nil)
 (defvar quickrun--compile-only-flag nil)
 (defvar quickrun--original-buffer nil)
 (defvar quickrun--original-outputter nil)
+
+(defun quickrun-2str (obj)
+  "Convert OBJ to string."
+  (format "%s" obj))
 
 (defmacro quickrun--awhen (test &rest body)
   "Anaphoric when.  If TEST is non-nil, do BODY (include `it')."
@@ -191,8 +200,7 @@ FMT and ARGS passed `message'."
   (image-mode))
 
 ;;
-;; language command parameters
-;;
+;;; language command parameters
 
 (defvar quickrun--language-alist
   '(("asm/masm" . ((:command . "ml")
@@ -691,8 +699,8 @@ if you set your own language configuration.")
              (format "not found [%s] language information" lang))))
 
 ;;
-;; Compile Only
-;;
+;;; Compile Only
+
 (defun quickrun--check-using-compilation-mode (compile-conf)
   "Not documented."
   (if (not compile-conf)
@@ -727,8 +735,8 @@ if you set your own language configuration.")
              (quickrun--awhen (assoc-default :mode compile-conf)
                (funcall it)
                (quickrun--pop-to-buffer
-                (current-buffer) (lambda () (read-only-mode +1)))
-               (read-only-mode +1)))
+                (current-buffer) (lambda () (read-only-mode 1)))
+               (read-only-mode 1)))
            (quickrun--remove-temp-files)))))
 
 (defun quickrun--compilation-finish-func (_buffer _str)
@@ -736,8 +744,8 @@ if you set your own language configuration.")
   (quickrun--remove-temp-files))
 
 ;;
-;; Execute
-;;
+;;; Execute
+
 (defvar quickrun--timeout-timer nil)
 (defvar quickrun--run-in-shell nil)
 
@@ -777,6 +785,34 @@ if you set your own language configuration.")
       (insert output)
       (ansi-color-apply-on-region start (point)))))
 
+(defun quickrun--get-timestamp ()
+  "Return timestamp for quickrun buffer."
+  (substring (current-time-string) 0 19))
+
+(defun quickrun--insert-header (process)
+  "Insert header to PROCESS buffer."
+  (unless quickrun-output-only
+    (with-current-buffer (process-buffer process)
+      (let ((inhibit-read-only t)
+            (time (quickrun--get-timestamp)))
+        (insert "-*- mode: quickrun-; default-directory: \""
+                default-directory
+                "\" -*-\n")
+        (insert "Quickrun started at " time "\n\n")))))
+
+(defun quickrun--insert-footer (process code)
+  "Insert footer to PROCESS buffer with exit CODE."
+  (unless quickrun-output-only
+    (with-current-buffer (process-buffer process)
+      (let ((inhibit-read-only t)
+            (time (quickrun--get-timestamp)))
+        (insert "\n\n")
+        (if (zerop code)
+            (insert "Quickrun finished at " time "\n")
+          (insert "Quickrun exited abnormally with code "
+                  (quickrun-2str code)
+                  " at " time "\n"))))))
+
 (defun quickrun--exec (cmd-lst src mode)
   "Not documented."
   (if quickrun--run-in-shell
@@ -793,7 +829,8 @@ if you set your own language configuration.")
         (when (eq outputter 'quickrun--default-outputter)
           (set-process-filter process #'quickrun--default-filter))
         (set-process-sentinel process
-                              (quickrun--make-sentinel rest-cmds outputter src mode))))))
+                              (quickrun--make-sentinel rest-cmds outputter src mode))
+        (quickrun--insert-header process)))))
 
 (defvar quickrun--eshell-buffer-name "*eshell-quickrun*")
 (defvar quickrun--shell-last-command)
@@ -826,7 +863,7 @@ if you set your own language configuration.")
               (setq rerun-p t))))
       (unless rerun-p
         (quickrun--eshell-finish)
-        (read-only-mode +1)
+        (read-only-mode 1)
         (use-local-map quickrun--eshell-map)))))
 
 (defun quickrun--insert-command (cmd-str)
@@ -907,7 +944,7 @@ if you set your own language configuration.")
                       (process-name process)
                       quickrun-timeout-seconds)))
     (quickrun--remove-temp-files)
-    (quickrun--pop-to-buffer buf (lambda () (read-only-mode +1)))))
+    (quickrun--pop-to-buffer buf (lambda () (read-only-mode 1)))))
 
 (defun quickrun--remove-temp-files ()
   "Remove temporary files."
@@ -935,13 +972,12 @@ if you set your own language configuration.")
 
 (define-derived-mode quickrun--mode nil "Quickrun"
   "Major mode for Quickrun execution process."
-  (read-only-mode +1)
+  (read-only-mode 1)
   (setq-local truncate-lines quickrun-truncate-lines)
   (use-local-map quickrun--mode-map))
 
 ;;
-;; Predefined outputter
-;;
+;;; Predefined outputter
 
 (defvar quickrun--defined-outputter-symbol
   '((message  . quickrun--outputter-message)
@@ -1057,11 +1093,11 @@ if you set your own language configuration.")
         (let ((quickrun--original-buffer origbuf))
           (read-only-mode -1)
           (funcall outputter-func)
-          (read-only-mode +1))))))
+          (read-only-mode 1))))))
 
 (defun quickrun--apply-compilation-mode (input-file mode)
   "Not documented."
-  (when (not (string= input-file quickrun--executed-file))
+  (unless (string= input-file quickrun--executed-file)
     (save-excursion
       (goto-char (point-min))
       (let ((case-fold-search nil))
@@ -1078,7 +1114,7 @@ if you set your own language configuration.")
       (read-only-mode -1))
     (quickrun--default-outputter)
     (goto-char (point-min))
-    (read-only-mode +1)))
+    (read-only-mode 1)))
 
 (defun quickrun--make-sentinel (rest-commands outputter-func input orig-mode)
   "Not documented."
@@ -1087,9 +1123,10 @@ if you set your own language configuration.")
     (setq quickrun-option-outputter outputter-func)
     (when (memq (process-status process) '(exit signal))
       (and quickrun--timeout-timer (cancel-timer quickrun--timeout-timer))
-      (delete-process process)
       (let* ((exit-status (process-exit-status process))
              (is-success (zerop exit-status)))
+        (quickrun--insert-footer process exit-status)
+        (delete-process process)
         (cond ((and is-success rest-commands)
                (quickrun--exec rest-commands input orig-mode))
               (t
@@ -1106,8 +1143,8 @@ if you set your own language configuration.")
                (quickrun--remove-temp-files)))))))
 
 ;;
-;; Composing command
-;;
+;;; Composing command
+
 (defconst quickrun--template-place-holders
   '("%c" "%o" "%s" "%S" "%a" "%d" "%n" "%N" "%e" "%E")
   "A list of place holders of each language parameter.
@@ -1236,8 +1273,7 @@ Place holders are beginning with '%' and replaced by:
         (setq str (replace-regexp-in-string holder rep str t))))))
 
 ;;
-;; initialize
-;;
+;;; initialize
 
 (defconst quickrun--support-languages
   '("asm" "applescript"
@@ -1377,8 +1413,8 @@ by quickrun.el.  But you can register your own command for some languages")
               (file-name-nondirectory buffer-file))))))
 
 ;;
-;; main
-;;
+;;; main
+
 ;;;###autoload
 (defun quickrun (&rest plist)
   "Run commands quickly for current buffer.
@@ -1473,6 +1509,7 @@ With double prefix argument(C-u C-u), run in compile-only-mode."
   "Run commands in shell for interactive programs."
   (interactive)
   (let ((quickrun--run-in-shell t)
+        (quickrun-focus-p t)
         (quickrun-timeout-seconds nil))
     (quickrun)))
 
@@ -1537,7 +1574,7 @@ With double prefix argument(C-u C-u), run in compile-only-mode."
       (let* ((cmdinfo (quickrun--command-info cmd-key))
              (tempfile-param (assoc :tempfile cmdinfo)))
         (if tempfile-param
-            (cdr tempfile-param)
+            (cadr tempfile-param)
           t)))))
 
 (defsubst quickrun--buffer-popup-p ()
@@ -1598,8 +1635,7 @@ With double prefix argument(C-u C-u), run in compile-only-mode."
     (remove-hook 'after-save-hook 'quickrun--without-focus t)))
 
 ;;
-;; helm/anything interface
-;;
+;;; helm/anything interface
 
 (defconst helm-quickrun--actions
   '(("Run this cmd-key" . quickrun--helm-action-default)

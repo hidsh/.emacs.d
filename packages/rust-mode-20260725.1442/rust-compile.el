@@ -28,6 +28,12 @@ See `compilation-error-regexp-alist' for help on their format.")
   "Specifications for matching `:::` hints in rustc invocations.
 See `compilation-error-regexp-alist' for help on their format.")
 
+(defvar rustc-backtrace-compilation-regexps
+  (let ((re (concat "^ +at " rustc-compilation-location)))
+    (cons re '(2 3 4 0 1)))
+  "Specifications for matching stack backtraces in rustc invocations.
+See `compilation-error-regexp-alist' for help on their format.")
+
 (defvar rustc-refs-compilation-regexps
   (let ((re "^\\([0-9]+\\)[[:space:]]*|"))
     (cons re '(nil 1 nil 0 1)))
@@ -35,9 +41,10 @@ See `compilation-error-regexp-alist' for help on their format.")
 See `compilation-error-regexp-alist' for help on their format.")
 
 (defvar rustc-panics-compilation-regexps
-   (let ((re (concat "thread '[^']+' panicked at " rustc-compilation-location)))
-     (cons re '(2 3 4 nil 1)))
-   "Specifications for matching panics in rustc invocations.
+  (let ((re (concat "thread '[^']+'\\(?: ([0-9]+)\\)? panicked at "
+                    rustc-compilation-location)))
+    (cons re '(2 3 4 nil 1)))
+  "Specifications for matching panics in rustc invocations.
 See `compilation-error-regexp-alist' for help on their format.")
 
 ;; Match test run failures and panics during compilation as
@@ -46,6 +53,12 @@ See `compilation-error-regexp-alist' for help on their format.")
   '("', \\(\\([^:]+\\):\\([0-9]+\\)\\)"
     2 3 nil nil 1)
   "Specifications for matching panics in cargo test invocations.
+See `compilation-error-regexp-alist' for help on their format.")
+
+(defvar rustc-dbg!-compilation-regexps
+  (let ((re (concat "\\[" rustc-compilation-location "\\]")))
+    (cons re '(2 3 4 0 1)))
+  "Specifications for matching dbg! output.
 See `compilation-error-regexp-alist' for help on their format.")
 
 (defun rustc-scroll-down-after-next-error ()
@@ -80,11 +93,17 @@ the compilation window until the top of the error is visible."
                   (cons 'rustc-colon rustc-colon-compilation-regexps))
      (add-to-list 'compilation-error-regexp-alist 'rustc-colon)
      (add-to-list 'compilation-error-regexp-alist-alist
+                  (cons 'rustc-backtrace rustc-backtrace-compilation-regexps))
+     (add-to-list 'compilation-error-regexp-alist 'rustc-backtrace)
+     (add-to-list 'compilation-error-regexp-alist-alist
                   (cons 'cargo cargo-compilation-regexps))
      (add-to-list 'compilation-error-regexp-alist-alist
                   (cons 'rustc-panics rustc-panics-compilation-regexps))
      (add-to-list 'compilation-error-regexp-alist 'rustc-panics)
      (add-to-list 'compilation-error-regexp-alist 'cargo)
+     (add-to-list 'compilation-error-regexp-alist-alist
+                  (cons 'rust-dbg! rustc-dbg!-compilation-regexps))
+     (add-to-list 'compilation-error-regexp-alist 'rust-dbg!)
      (add-hook 'next-error-hook #'rustc-scroll-down-after-next-error)))
 
 ;;; _

@@ -3855,9 +3855,9 @@ targets."
   ;; (dolist (f '(compilation-info compilation-warning compilation-error))
   ;;   (set-face-background f (face-attribute 'telephone-line-accent-inactive :background)))
 
-  :bind (
-         :map c-mode-map
-         ("C-c C-c"   . quickrun))
+  ;; :bind (
+  ;;        :map c-mode-map
+  ;;        ("C-c C-c"   . quickrun))
   )
 
 ;; ----------------------------------------------------------------------
@@ -4748,6 +4748,11 @@ file local variable `yas-table', rather than
 
   )
 ;; ----------------------------------------------------------------------
+(use-package treesit
+  :init
+  (add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode))
+  )
+
 (use-package treesit-auto
   :config
   ;; (setq treesit-auto-install 'prompt)
@@ -4944,9 +4949,13 @@ file local variable `yas-table', rather than
 
 ;; ----------------------------------------------------------------------
 (use-package rust-ts-mode
-  :defer t
   :config
-  (setq rust-mode-treesitter-derive t)
+
+  ;; *NEVER* use `xxx-mode-treesitter-derive' as below,
+  ;; use xxx-ts-mode instead directly for their keymaps
+  ;; and hooks and other all functionalities.
+  ;; (setq rust-mode-treesitter-derive t)   ;; DO NOT USE THIS!!!
+
   (add-to-list 'project-vc-extra-root-markers "Cargo.toml")
   ;; (setq electric-pair-open-newline-between-pairs t)
   ;; (evil-define-key 'insert rust-ts-mode-map (kbd "RET") 'my/newline-and-indent)
@@ -4954,6 +4963,9 @@ file local variable `yas-table', rather than
 
   (setq-default electric-indent-chars '(?\n))   ;; indent trigger: CR only
 
+  (use-package rust-mode)               ;; rust-run is in rust-mode
+  :bind (:map rust-ts-mode-map
+              ("C-c C-c" . rust-run))   ;; rather than quickrun
   )
 
 ;; ----------------------------------------------------------------------
@@ -5481,9 +5493,10 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 (use-package v-mode
   :mode ("\\(\\.v?v\\|\\.vsh\\)$" . 'v-mode)
   ;; :hook ((before-save . v-format-buffer))
-  :bind (("C-c C-c" . quickrun)
-         ("C-c C-v" . v-menu)
-         ("C-c C-f" . v-format-buffer))
+  :bind (:map v-mode-map
+              ("C-c C-c" . quickrun)
+              ("C-c C-v" . v-menu)
+              ("C-c C-f" . v-format-buffer))
 
   :config
   (defun v-build-tags ()
@@ -5497,8 +5510,8 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 ;; ----------------------------------------------------------------------
 (use-package lua-mode
   :mode "\\.lua\\'"
-  :bind (("C-c C-c" . quickrun)
-         )
+  :bind (:map lua-mode-map
+              ("C-c C-c" . quickrun))
 
   :config
   )

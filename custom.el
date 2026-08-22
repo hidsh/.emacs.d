@@ -37,12 +37,12 @@
                            lsp-ui marginalia markdown-mode migemo mode-line-bell
                            neotree nim-mode nodejs-repl orderless org-bullets
                            org-tree-slide paredit popper prescient pulsar
-                           quickrun rainbow-delimiters rainbow-mode scratch-log
-                           shift-number slime smart-jump smartparens super-save
-                           swap-buffers symbol-overlay tabbar telephone-line
-                           treesit-auto undo-fu use-package v-mode vertico vterm
-                           web-beautify web-mode wgrep-ag yaml-mode yasnippet
-                           yasnippet-capf))
+                           quickrun rainbow-delimiters rainbow-mode rust-mode
+                           scratch-log shift-number slime smart-jump smartparens
+                           super-save swap-buffers symbol-overlay tabbar
+                           telephone-line treesit-auto undo-fu use-package
+                           v-mode vertico vterm web-beautify web-mode wgrep-ag
+                           yaml-mode yasnippet yasnippet-capf))
  '(package-vc-selected-packages
    '((eglot-booster :vc-backend Git :url
                     "https://github.com/jdtsmith/eglot-booster")))
