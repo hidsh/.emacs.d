@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: struct
+# key: st
+# --
+// #[derive(Debug)]
+struct ${1:Point} {
+    ${2:x}: ${3:i32},
+    ${4:y}: ${5:i32},
+    $0
+}
+// fuga

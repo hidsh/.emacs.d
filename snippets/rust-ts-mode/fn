@@ -1,0 +1,7 @@
+# -*- mode: snippet; yas-table: rust-ts-mode -*-
+# name: fn
+# key: fn
+# --
+fn $1($2)${3: -> ($4)} {
+    println!("{}", "hello!");$0
+}

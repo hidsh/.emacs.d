@@ -41,7 +41,8 @@
                            shift-number slime smart-jump smartparens super-save
                            swap-buffers symbol-overlay tabbar telephone-line
                            treesit-auto undo-fu use-package v-mode vertico vterm
-                           web-beautify web-mode wgrep-ag yaml-mode yasnippet))
+                           web-beautify web-mode wgrep-ag yaml-mode yasnippet
+                           yasnippet-capf))
  '(package-vc-selected-packages
    '((eglot-booster :vc-backend Git :url
                     "https://github.com/jdtsmith/eglot-booster")))
@@ -56,8 +57,9 @@
      ((flymake flymake.el)) ((flymake flymake.el)) ((flymake flymake.el))
      ((flymake flymake.el))))
  '(warning-suppress-types
-   '((emacs) ((flymake flymake.el)) ((flymake flymake.el)) ((flymake flymake.el))
-     ((flymake flymake.el)) ((flymake flymake.el)) ((flymake flymake.el)))))
+   '((use-package) (emacs) ((flymake flymake.el)) ((flymake flymake.el))
+     ((flymake flymake.el)) ((flymake flymake.el)) ((flymake flymake.el))
+     ((flymake flymake.el)))))
 
 (put 'narrow-to-region 'disabled nil)
 (custom-set-faces

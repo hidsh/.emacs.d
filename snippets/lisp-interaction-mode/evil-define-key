@@ -1,0 +1,5 @@
+# -*- mode: snippet; yas-table: lisp-interaction-mode -*-
+# name: evil-define-key
+# key: key
+# --
+(evil-define-key '${1:normal} $2-map (kbd "$3") #'$4)$0

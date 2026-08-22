@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# name: use-package
+# key: use-
+# --
+(use-package $1
+  # :bind (:map -map (("key" . fn-name)
+                      ("key" . fn-name)
+                      ("key" . fn-name)))
+
+  # :bind (:map -map ("key" . fn-name))
+
+  # :bind ("key" . fn-name)
+
+  # :hook ((-mode . fn-name)
+  #        (-mode . fn-name)
+  #        (-mode . fn-name))
+  :init
+  :config
+
+
+  )

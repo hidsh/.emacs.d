@@ -1,0 +1,7 @@
+# -*- mode: snippet; yas-table: emacs-lisp-mode -*-
+# name: defun
+# key: def
+# --
+(defun $1 ($2)
+  $0
+)

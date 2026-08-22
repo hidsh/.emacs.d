@@ -1,0 +1,5 @@
+# -*- mode: snippet; yas-table: rust-ts-mode -*-
+# name: comment-separator
+# key: ---
+# --
+// -------------

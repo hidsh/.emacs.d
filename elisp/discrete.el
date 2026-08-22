@@ -1401,13 +1401,49 @@ is already narrowed."
     (evil-emacs-state +1)
     (forward-char 1)
     (redisplay)
-    (sleep-for 0.5)
-    (redisplay)
-    (forward-char -1)
+    (sit-for 0.5)
     (evil-normal-state +1))
   (kill-new (format "%S" (call-interactively 'eval-last-sexp))))
 
-(global-set-key (kbd "C-x C-e") #'my-eval-last-sexp)
+;; ----------------------------------------------------------------------
+;; todo: into normal-mode and hide spaces at insert-state
+(defun my-eval-defun ()
+  "Looks like vanilla emacs even if in evil-mode"
+  (interactive)
+  (when (and (boundp 'evil-mode)
+             (evil-normal-state-p))
+    (save-excursion
+      (beginning-of-defun)
+      (evil-next-close-paren)
+      (evil-emacs-state +1)
+      (forward-char 1)
+      ;; (eval-defun nil)   ;; no debug
+      (eval-last-sexp)
+      (redisplayt)
+      (sit-for 0.5)
+      (evil-normal-state +1))))
+
+;; (global-set-key (kbd "C-x C-e") #'my-eval-defun)
+
+;; ----------------------------------------------------------------------
+;; todo: use eval-defun inside instead of eval-last-sexp
+(defun my-eval-print-last-sexp ()
+  "Looks like vanilla emacs even if in evil-mode, and then `kill-new' the result after `eval-print-last-sexp' "
+  (interactive)
+  (if (and (boundp 'evil-mode)
+           (evil-normal-state-p))
+      (save-excursion
+        (evil-emacs-state +1)
+        (forward-char 1)
+        (redisplay)
+        (sit-for 0.5)
+        (evil-normal-state +1)
+
+        (insert (format "\n=>%S" (call-interactively 'eval-last-sexp))))
+    (eval-print-last-sexp)))
+
+(global-set-key (kbd "C-j") #'my-eval-print-last-sexp)
+(define-key lisp-interaction-mode-map (kbd "C-j") #'my-eval-print-last-sexp)
 
 ;; ----------------------------------------------------------------------
 (defun tree-derived-major-mode ()
@@ -1597,6 +1633,16 @@ not to prompt for input and return t."
   (split-window-below)
   (other-window 1))
 
+;; ----------------------------------------------------------------------
+(defun my-describe-evil-command (str)
+  "Something like a `describe-function' for the `evil-commands'"
+  (interactive "sCommand String:")
+  (condition-case err
+      ;; (message "%s" (evil-ex-completed-binding str))
+      (describe-function (evil-ex-completed-binding str))
+    (error
+     (message "Not found: \"%s\"" str))))
 
+;; ----------------------------------------------------------------------
 (provide 'discrete)
 ;; discrete.el ends here

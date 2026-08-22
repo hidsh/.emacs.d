@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: enum
+# key: en
+# --
+enum ${1:ShapeKind} {
+    ${2:POINT},
+    ${3:LINE},
+    $0
+}

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: comment-todo
+# key: todo
+# --
+// TODO: $1$0

@@ -1,0 +1,6 @@
+# -*- mode: snippet; yas-table: rust-ts-mode -*-
+# name: println
+# key: pr
+# --
+println!("{$1}", $2);
+$0

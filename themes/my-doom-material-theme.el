@@ -136,7 +136,7 @@ Can be an integer to determine the exact padding."
    ;; (modeline-bg     base4)
    (modeline-bg     base1)
 
-   (modeline-fg-alt base7)
+   (modeline-fg-alt base8)
 ;; (modeline-bg-alt (doom-darken bg 0.01))
    (modeline-bg-alt bg)
 
@@ -204,6 +204,16 @@ Can be an integer to determine the exact padding."
    ;; font-lock
    (font-lock-keyword-face :foreground yellow)
    (font-lock-variable-name-face :foreground cyan)
+
+   ;; echo-area
+   (echo-face :foreground teal)
+
+   ;; append below into init.el
+   ;;
+   ;; (defun my-echo-area-style ()
+   ;;   (with-current-buffer (get-buffer " *Echo Area 0*")
+   ;;     (face-remap-add-relative 'default 'echo-face)))
+
 
    ;; --- major-mode faces ------------------------
    ;; man-mode

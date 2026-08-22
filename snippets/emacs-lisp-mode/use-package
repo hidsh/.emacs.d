@@ -1,0 +1,9 @@
+# -*- mode: snippet; yas-table: emacs-lisp-mode -*-
+# name: use-package
+# key: use
+# --
+(use-package $1
+  :init
+  :config
+  $0
+)

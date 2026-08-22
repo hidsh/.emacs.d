@@ -2,6 +2,7 @@
 ;;; init.el --- aka. my BONSAI thing XD
 
 ;; (setq debug-on-error t)
+;; (setq debug-on-message "uncompressing rust-ts-mode.el.gz")
 
 ;; suppress to popup *warnings* buffer for emacs28's native-comp
 (setq native-comp-async-report-warnings-errors nil)
@@ -329,15 +330,19 @@
 
 ;; ----------------------------------------------------------------------
 ;; command aliases
-(defalias 'a 'my-consult-apropos-symbol-at-point)
+(defalias 'a 'my-consult-apropos-at-point)
+(defalias 'as 'my-consult-apropos-symbol-at-point)  ;; fixme
 (defalias 'reb 're-builder)
 
 (defalias 'dm 'describe-mode)
 (defalias 'dv 'describe-variable)
 (defalias 'dc 'describe-command)
 (defalias 'dfun 'describe-function)
-(defalias 'dface 'describe-face)
+;; (defalias 'dface 'describe-face)
+(defalias 'face 'describe-face)
 (defalias 'dk 'describe-key)
+(defalias 'de 'my-describe-evil-command)
+
 
 (defalias 'l 'display-line-numbers-mode)
 (defalias 'hl 'hl-line-mode)
@@ -446,18 +451,6 @@
   )
 
 ;; ----------------------------------------------------------------------
-(use-package emacs-lisp
-  ;; :defer t
-  :bind (("M-P" . my-consult-line-for-use-packages))
-  :config
-
-(defun my-consult-line-for-use-packages ()
-    (interactive)
-    (consult-line "^\(use-package "))
-
-  )
-
-;; ----------------------------------------------------------------------
 (use-package theme-loader
   ;;:disabled t
   :load-path "~/.emacs.d/themes"
@@ -480,7 +473,7 @@
 ;; ----------------------------------------------------------------------
 (use-package my-doom-material-theme
   ;; :disabled t
-  :defer t
+  ;; :defer t
   :load-path "~/.emacs.d/themes"
   :if window-system
   ;; :init
@@ -698,11 +691,17 @@
 
   (defun my-mood-line-segment-which-func ()
     "Return string for the result of `which-function'."
-    ;; (format "> %s" (which-function)))
-    (propertize (format "> %s" (or (which-function) "-"))
-                'face (if (mode-line-window-selected-p)
-                          'my-mood-line-active-dark-face
-                        'my-mood-line-inactive-dark-face)))
+      (propertize (format ">%.s"
+                    (let ((s (which-function))
+                          (limit 18))
+                      (cond ((not s)
+                             "-")
+                            ((< (length s) limit)
+                             s)
+                            (t
+                             (concat (substring s 0 (min limit (length s)))
+                                     "..")))))
+                  'face 'my-mood-line-inactive-dark-face))
 
   (defun my-mood-line-segment-cursor-position ()
     "Return string for the position of the cursor in the current buffer."
@@ -733,7 +732,8 @@
                     (make-string 6 ?\ )
             ))))
 
-  (defface my-mood-line-buffer-status-narrowed  `((t (:family "Symbols Nerd Font Mono" :height 1.0 :foreground ,(face-foreground 'warning)))) "Face that is used as my-mood-line-buffer-status-narrowed.")
+  (defface my-mood-line-buffer-status-narrowed
+    `((t (:family "JetBrainsMono NF" :height 0.7 :foreground ,(face-foreground 'warning)))) "Face that is used as my-mood-line-buffer-status-narrowed.")
 
   ;; override
   (set-face-attribute 'mood-line-major-mode nil :inverse-video t)
@@ -773,7 +773,8 @@
           ;;             'face 'mood-line-buffer-status-narrowed)
           (propertize (nerd-icons-mdicon "nf-md-arrow_collapse_vertical")
                       'face 'my-mood-line-buffer-status-narrowed)
-        " ")))
+        " ")
+      ))
 
   (defconst my-mood-line-format
     (mood-line-defformat
@@ -801,6 +802,15 @@
 
 
   (setq mood-line-format my-mood-line-format)
+  )
+
+;; ----------------------------------------------------------------------
+(use-package apropos-mode   ;; todo
+  :defer t
+  :config
+  (add-hook 'apropos-mode-hook #'my-hook--apropos)
+
+  (defun my-hook--apropos () (forward-button 1))
   )
 
 ;; ----------------------------------------------------------------------
@@ -1209,6 +1219,7 @@ That is, a string used to represent it on the tab bar."
 
   :config
   (evil-mode 1)
+  (evil-cleverparens-mode 1)
   ;; (evil-set-initial-state 'help-mode 'emacs)
   ;; (evil-set-initial-state 'Info-mode 'emacs)
   (evil-set-initial-state 'slime-editing-mode 'emacs)
@@ -1387,7 +1398,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-normal-state-map (kbd "3") #'evil-search-word-backward)      ; works as #
   (define-key evil-normal-state-map (kbd "8") #'evil-search-word-forward)       ; works as *
   (define-key evil-normal-state-map (kbd "9") #'evilmi-jump-items)
-  (define-key evil-normal-state-map (kbd "!") #'shell-command)
+  (define-key evil-normal-state-map (kbd ":") #'shell-command)
   (define-key evil-normal-state-map (kbd "q") nil)
   (define-key evil-normal-state-map (kbd "m") nil)
   (define-key evil-normal-state-map (kbd "M-.") nil)        ; evil-repeat-pop-next
@@ -1404,6 +1415,8 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-normal-state-map (kbd "g i") #'xref-find-references)
   (define-key evil-normal-state-map (kbd "g o") #'xref-find-definitions)
   (define-key evil-normal-state-map (kbd "g 0") #'xref-go-back)
+  (define-key evil-normal-state-map (kbd "g [") #'evil-previous-open-paren)
+  (define-key evil-normal-state-map (kbd "g ]") #'evil-next-close-paren)
   (define-key evil-normal-state-map (kbd "g j") #'git-gutter:next-hunk)
   (define-key evil-normal-state-map (kbd "g k") #'git-gutter:previous-hunk)
   (define-key evil-normal-state-map (kbd "g s") #'git-gutter:popup-hunk)        ;; git diff
@@ -1850,14 +1863,15 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;; :disabled
   :after evil
   :config
-  (evil-collection-init '(edebug dired info custom
-                                 neotree slime help calc ediff magit))
+  (evil-collection-init '(help calc edebug dired info apropos custom
+                                 corfu
+                                 neotree slime ediff magit))
 
-  ;; optional: this is the evil state that evil-magit will use
-  (setq evil-magit-state 'normal)
-  ;; optional: disable additional bindings for yanking text
-  (setq evil-magit-use-y-for-yank nil)
-  ;; (require 'evil-collection-magit)
+  ;; ;; optional: this is the evil state that evil-magit will use
+  ;; (setq evil-magit-state 'normal)
+  ;; ;; optional: disable additional bindings for yanking text
+  ;; (setq evil-magit-use-y-for-yank nil)
+  ;; ;; (require 'evil-collection-magit)
 
   (evil-collection-define-key 'normal 'dired-mode-map
     [return]   'dired-open-in-accordance-with-situation
@@ -1868,6 +1882,10 @@ If COUNT is given, move COUNT - 1 lines downward first."
     "L"        'kill-current-buffer-and-dired-up-directory
     "q"        'kill-current-buffer
     "r"        'revert-buffer)                                    ; reload
+
+  (evil-collection-define-key 'normal 'help-mode-map
+    (kbd "C-o") 'other-window
+    )
 
   (evil-collection-define-key 'normal 'info-mode-map
     "H"             'info-history-back
@@ -1883,6 +1901,9 @@ If COUNT is given, move COUNT - 1 lines downward first."
     "m"             'scroll-up-command
     "M"             'scroll-down-command
     (kbd "C-o")     'other-window
+    )
+
+  (evil-collection-define-key 'normal 'corfu-map
     )
   )
 
@@ -1938,9 +1959,13 @@ If COUNT is given, move COUNT - 1 lines downward first."
 ;; ----------------------------------------------------------------------
 (use-package evil-cleverparens
   :config
-  (require 'evil-cleverparens-text-objects)
-
+  (use-package evil-cleverparens-text-objects)
+  :bind (:map evil-cleverparens-mode-map
+              ("M-l" . nil)
+              ("a" . nil))
+  ;; todo
   )
+
 ;; ----------------------------------------------------------------------
 (use-package evil-escape
   :disabled
@@ -1975,13 +2000,15 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 ;; ----------------------------------------------------------------------
 (use-package orderless
+  :disabled
   :after corfu
   :hook ((corf-mode . (lambda () (setq-local orderless-matching-styles
                                              '(orderless-flex)))))
   :init
-  (setq completeion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides nil)
+  ;; DBG-SORT
+  ;; (setq completeion-styles '(orderless basic)
+  ;;       completion-category-defaults nil
+  ;;       completion-category-overrides nil)
   ;; :custom
   ;; `((completion-styles '(orderless partial-completion basic))
   ;;   (orderless-matching-styles
@@ -1992,21 +2019,21 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ;;        orderless-literal)))
   )
 
-(use-package prescient
-  :disabled t
+(use-package prescient      ;; for filter/sort
+  :disabled
   :config
   (setq prescient-aggressive-file-save t)
   (prescient-persist-mode +1))
 
 (use-package corfu-prescient
-  :disabled t
+  :disabled
   :after corfu orderless
   :config
   (setq corfu-prescient-enable-filtering nil)
   (corfu-prescient-mode +1))
 
 (use-package kind-icon
-  :disabled t
+  :disabled
   :after corfu
   :custom (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
   :config
@@ -2155,13 +2182,13 @@ Besides, it can be Specified top directory to search using prefix-argument, e.g.
       (my-consult-ripgrep)))
 
   ;; -----------------
-  (defun my-consult-apropos-symbol-at-point ()
+  (defun my-consult-apropos-symbol-at-point ()  ;; todo: fix
     (interactive)
     (consult-apropos (thing-at-point 'symbol)))
 
   (defun my-consult-buffer ()
     (interactive)
-    (consult-buffer '(consult--source-hidden-buffer consult--source-buffer)))
+      (consult-buffer '(consult-source-hidden-buffer consult-source-buffer)))
 
   ;; mod
   ;; from consult.el
@@ -2210,23 +2237,29 @@ alternative, you can run `embark-export' from commands like `M-x' and
          ("M-l" . my-consult-line-at-point)
          ("M-a" . my-consult-apropos-at-point)
          ("M-o" . my-consult-ripgrep-command)
+         ;; ("C-x C-f" . my-consult-file-only)
          ("C-x C-g" . my-consult-find-command)
          ("M-e" . embark-act)
          ("C-x C-b" . my-consult-buffer))
+         ;; ("C-x C-b" . consult-buffer))
 
  )
 
+;; ----------------------------------------------------------------------
 (use-package embark
   :bind (:map embark-general-map
            ("?" . embark-keymap-help))
   :config
+  ;; (setq embark-help-key "h")
+
   ;; face
   (set-face-foreground 'embark-collect-group-title        (face-foreground 'font-lock-comment-face))
   (set-face-foreground 'embark-collect-group-separator    (face-foreground 'font-lock-comment-face))
   (set-face-foreground 'embark-verbose-indicator-shadowed (face-foreground 'font-lock-comment-face))
 
   ;; (define-key embark-general-map "E" nil)   ;; embark-export
-  (define-key embark-general-map (kbd "M-e") 'embark-export)   ;; embark-export
+  (define-key embark-general-map (kbd "M-e") 'embark-export)
+  (define-key embark-general-map (kbd "y") 'embark-copy-as-kill)
 
   ;; re-define
   (defvar-keymap embark-file-map        ;; todo remove duplicates
@@ -2241,7 +2274,7 @@ alternative, you can run `embark-export' from commands like `M-x' and
     "r" #'rename-file
     "c" #'copy-file
     ;; ("j" embark-dired-jump)
-    "!" nil                   ;; shell-command)
+    ;; "!" nil                   ;; shell-command)
     "&" nil                   ;;async-shell-command)
     "$" nil                   ;; embark-eshell)
     "<" nil                   ;; insert-file)
@@ -2278,6 +2311,48 @@ alternative, you can run `embark-export' from commands like `M-x' and
   (define-key embark-file-map "R" nil)  ;; byte-recompile-directory)
   (define-key embark-file-map "v" nil)  ;; 'embark-vc-file-map)
   (define-key embark-file-map "x" nil)  ;; #'consult-file-externally)
+
+;; --------------
+;; https://github.com/oantolin/embark/wiki/Additional-Configuration#use-which-key-like-a-key-menu-prompt
+(require 'which-key)
+(defun embark-which-key-indicator ()
+  "An embark indicator that displays keymaps using which-key.
+The which-key help message will show the type and value of the
+current target followed by an ellipsis if there are further
+targets."
+  (lambda (&optional keymap targets prefix)
+    (if (null keymap)
+        (which-key--hide-popup-ignore-command)
+      (which-key--show-keymap
+       (if (eq (plist-get (car targets) :type) 'embark-become)
+           "Become"
+         (format "Act on %s '%s'%s"
+                 (plist-get (car targets) :type)
+                 (embark--truncate-target (plist-get (car targets) :target))
+                 (if (cdr targets) "…" "")))
+       (if prefix
+           (pcase (lookup-key keymap prefix 'accept-default)
+             ((and (pred keymapp) km) km)
+             (_ (key-binding prefix 'accept-default)))
+         keymap)
+       nil nil t (lambda (binding)
+                   (not (string-suffix-p "-argument" (cdr binding))))))))
+
+(setq embark-indicators
+  '(embark-which-key-indicator
+    embark-highlight-indicator
+    embark-isearch-highlight-indicator))
+
+(defun embark-hide-which-key-indicator (fn &rest args)
+  "Hide the which-key indicator immediately when using the completing-read prompter."
+  (which-key--hide-popup-ignore-command)
+  (let ((embark-indicators
+         (remq #'embark-which-key-indicator embark-indicators)))
+      (apply fn args)))
+
+(advice-add #'embark-completing-read-prompter
+            :around #'embark-hide-which-key-indicator)
+
   )
 
 (use-package embark-consult
@@ -2286,30 +2361,42 @@ alternative, you can run `embark-export' from commands like `M-x' and
   :hook (embark-collect-mode . consult-preview-at-point-mode)
   )
 
+;; processing order TODO: re-order `(use-package' to consult, orderless, vertico
+;;
+;; 1. list generator (consult-XXX, wrapper command for emacs builtins, etc...)
+;; 2. filter (orderless, etc.)
+;; 3. vertico-multiform-categories
+;;      e.g., 'file 'symbol
+;; 3. vertico-multiform-commands
+;;      e.g., t(as default), consult-line, etc.
+;; 4. minibuffer
 (use-package vertico
-  :ensure t
-  :custom
-  (read-buffer-completion-ignore-case t)
-  (read-file-name-completion-ignore-case t)
-  (completion-styles '(basic substring partial-completion flex))
-  (vertico-multiform-categories
-   '((symbol (vertico-sort-function . vertico-sort-alpha))
-     (file (vertico-sort-function . sort-directories-first)
-           (+vertico-transform-functions . +vertico-highlight-directory))))
-  (vertico-multiform-commands
-   '((consult-line (vertico-sort-override-function . vertico-sort-alpha))
-     (execute-extended-command
-      (+vertico-transform-functions . +vertico-highlight-enabled-mode))))
+  ;; DBG-SORT
+  ;; (vertico-multiform-categories
+  ;;  '((symbol (vertico-sort-function . vertico-sort-alpha))
+  ;;    (file (vertico-sort-function . sort-directories-first)
+  ;;          (+vertico-transform-functions . +vertico-highlight-directory))))
+  ;; (vertico-multiform-commands
+  ;;  '((consult-line (vertico-sort-function . nil))
+  ;;    ;; (consult-line (vertico-sort-override-function . vertico-sort-alpha))
+  ;;    (execute-extended-command
+  ;;     (+vertico-transform-functions . +vertico-highlight-enabled-mode))))
 
+  :after consult    ;; todo need this?
   :init
   (vertico-mode)
   (vertico-multiform-mode)
   (defvar +vertico-transform-functions nil)
 
   :config
-  (setq vertico-count 20)
-  (setq completion-styles '(substring orderless basic))     ;; In order to support completing prefixes, combine
-                                                            ;; orderless with substring in your completion-styles
+  ;; DBG-SORT
+  ;; (setq completion-styles '(basic substring partial-completion flex)
+  (setq completion-styles '(substring orderless basic)  ;; In order to support completing prefixes, combine
+                                                        ;; orderless with substring in your completion-styles
+        read-file-name-completion-ignore-case t
+        read-buffer-completion-ignore-case t
+        vertico-count-format nil    ;; hide match count at the left end (e.g., 1/9999)
+        vertico-count 20)
 
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)   ;; for vertico-repeat (M-z)
 
@@ -2361,14 +2448,15 @@ alternative, you can run `embark-export' from commands like `M-x' and
                   (tb (file-attribute-modification-time (file-attributes b))))
               (time-less-p tb ta)))))
 
-  (setq vertico-sort-function #'my/sort-by-mtime)
-
-  (setq vertico-sort-override-function
-        (lambda (files)
-          (if (and (eq minibuffer-history-variable 'file-name-history)
-                   (not (eq (car-safe minibuffer-completion-table) 'boundaries)))
-              (my/sort-by-mtime files)
-            (vertico-sort-history-length-alpha files))))
+  ;; dbg-sort
+  ;; (setq vertico-sort-function #'my/sort-by-mtime)
+  ;;
+  ;; (setq vertico-sort-override-function
+  ;;       (lambda (files)
+  ;;         (if (and (eq minibuffer-history-variable 'file-name-history)
+  ;;                  (not (eq (car-safe minibuffer-completion-table) 'boundaries)))
+  ;;             (my/sort-by-mtime files)
+  ;;           (vertico-sort-history-length-alpha files))))
 
   (defun my/toggle-vertico-file-sorting ()
     "Toggle between different sorting methods for files in Vertico."
@@ -2415,6 +2503,8 @@ alternative, you can run `embark-export' from commands like `M-x' and
 	  (propertize cmd 'face 'font-lock-constant-face)
 	cmd)))
 
+  ;; advices
+
   ;; "Tab" = `minibuffer-complete' or `vertico-insert' (vertico minibuffers)
   (defun my-minibuffer-complete-or-vertico-insert ()
     (interactive)
@@ -2422,15 +2512,59 @@ alternative, you can run `embark-export' from commands like `M-x' and
         (minibuffer-complete)
       (vertico-insert)))
 
+  ;; quit vertico and related windows
+  (defun my-vertico-quit-1 (w)
+    (ignore-errors
+      (when (window-minibuffer-p w)
+        (with-selected-window w
+          (abort-recursive-edit)
+          (exit-minibuffer)
+          (keyboard-quit)))
+      (when (string= (buffer-name (window-buffer w))
+                     "*Help*")
+        (quit-window t w))))
+
+  (defun my-vertico-quit ()
+    (interactive)
+    (walk-windows #'my-vertico-quit-1 t t)
+    (walk-windows #'my-vertico-quit-1 t t))
+
   :bind (:map vertico-map
          ("TAB" . my-minibuffer-complete-or-vertico-insert)
+         ("C-g" . my-vertico-quit)
          ("C-j" . vertico-next)
          ("C-k" . vertico-previous)
-         ("M-y" . vertico-save)
+         ("C-t" . toggle-truncate-lines)
+         ;; ("M-y" . vertico-save)
          ("M-s" . my/toggle-vertico-file-sorting)
 
          :map evil-motion-state-map
-         ("M-z" .  vertico-repeat))
+         ("M-z" . vertico-repeat)
+
+         :map help-mode-map
+         ("C-g" . my-vertico-quit))
+  )
+
+;; for vertico
+(use-package emacs
+  ;; https://qiita.com/ayatakesi/items/2a700d06f1684decd171#%E6%A7%8B%E6%88%90
+  :init
+  ;; don't move cursor into minibuffer prompt
+  (setq minibuffer-prompt-properties
+            '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  :config
+  (setq enable-recursive-minibuffers t)
+  (setq read-extended-command-predicate #'command-completion-default-include-p)
+  (setq minibuffer-default-prompt-format "")    ;; don't need " (default %s)"
+  )
+
+(use-package dirvish
+  ;; live preview for find-file
+
+  :config
+  ;; (dirvish-peek-mode 1)
   )
 
 (use-package vertico-directory
@@ -4176,7 +4310,7 @@ See URL `https://github.com/htacg/tidy-html5'."
 
 ;; ----------------------------------------------------------------------
 (use-package flymake
-  :disabled t
+  ;; :disabled t
   :config
 
   ;; fringe indicator for HiDPI
@@ -4439,17 +4573,16 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
     (redraw-display)            ;; for evil state indicator
     )
 
-;;   (defun my-corfu-quit ()
-;;     (interactive)
-;;     ;; (message "!!!")
-;;     (corfu--popup-hide)
-;;     (corfu-quit)
-;;     ;; (with-no-message (undo))
-;;     ;; (evil-normal-state)
-;;     ;; (evil-forward-char)
-;;     (redraw-display)            ;; for evil state indicator
-;;     )
-;;   )
+  (defun my-pred ()
+    nil)
+    ;; (and (not (and (bound-and-true-p yas--active-field-overlay)
+    ;;                (overlay-buffer yas--active-field-overlay)))
+    ;;      ;; 以下はcorfu標準のデフォルト条件（必要に応じて残す）
+    ;;      (not (annotation-list-p (completion-at-point-functions)))
+    ;;      nil
+    ;;      t))
+  (setq-local corfu-auto-predicate (my-pred))
+  )
 
 ;; ----------------------------------------------------------------------
 (use-package cape
@@ -4472,12 +4605,14 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
 
 ;; ----------------------------------------------------------------------
 (use-package yasnippet
+  :defer t
   :commands (yas-new-snippet)
   :hook (snippet-mode . my-yas-keybindings)
   ;; :bind ("<C-return>" . yas-expand)     ;; C-RET
 
   :init
   (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+  (setq yas-alias-to-yas/prefix-p nil)
   (defalias 'yas 'yas-new-snippet)
   (defalias 'yas-edit 'yas-visit-snippet-file)
 
@@ -4623,39 +4758,160 @@ file local variable `yas-table', rather than
 )
 
 ;; ----------------------------------------------------------------------
-(use-package eglot
+(use-package lspce
   :disabled t
-  :ensure t
-  :hook ((rust-ts-mode . eglot-ensure)     ;; rust: need `rustup component add rust-analyzer` in terminal
-         (eglot-managed-mode . my-fix-eglot-hook-func)
-         ;; (c-mode-common . eglot-ensure)     ;; C/C++
+  :load-path "~/.emacs.d/bin-lspce/lspce"
+  ;; :hook ((rust-mode-hook . lspce-mode)
+         ;; (rust-ts-mode-hook . lspce-mode))
+  :config
+  (setq lspce-send-changes-idle-time 0.1)
+  (setq lspce-show-log-level-in-modeline t) ;; show log level in mode line
+
+  ;; You should call this first if you want lspce to write logs
+  (lspce-set-log-file "~/.emacs.d/lspce.log")
+
+  ;; By default, lspce will not write log out to anywhere.
+  ;; To enable logging, you can add the following line
+  (lspce-enable-logging)
+  ;; You can enable/disable logging on the fly by calling `lspce-enable-logging' or `lspce-disable-logging'.
+
+  ;; enable lspce in particular buffers
+  ;; (add-hook 'rust-mode-hook 'lspce-mode)
+
+  ;; modify `lspce-server-programs' to add or change a lsp server, see document
+  ;; of `lspce-lsp-type-function' to understand how to get buffer's lsp type.
+  ;; Bellow is what I use
+  (setq lspce-server-programs `(("rust"  "rust-analyzer" "" lspce-ra-initializationOptions)
+                                ;; ("python" "pylsp" "" )
+                                ;; ("C" "clangd" "--all-scopes-completion --clang-tidy --enable-config --header-insertion-decorators=0")
+                                ;; ("java" "java" lspce-jdtls-cmd-args lspce-jdtls-initializationOptions)
+                                ))
+
+  ;; front, back-end           front,  back-end
+  ;; corfu + cape      = alt (campany + capf)
+
+  ;; corfu
+
+  )
+
+;; ----------------------------------------------------------------------
+(use-package lsp-bridge
+  :disabled t
+  :load-path "~/.emacs.d/bin-lsp-bridge/lsp-bridge"
+  :hook (
+         ;; (lsp-bridge-mode . my-fix-eglot-prog-hook-func)
+         (minibuffer-setup . my-fix-lsp-bridge-minibuffer-hook-func)
          )
 
   :config
-  (defun my-fix-eglot-hook-func ()
+  (defun my-fix-lsp-bridge-minibuffer-hook-func ()
+    "Prevent confricting with eglot and electric-indent in minibuffer"
+    ;; check details --> ```M-x toggle-debug-on-error``` yourself!!
+    (setq-local electric-indent-functions nil)
+    ;; (electric-indent-local-mode -1)
+    )
+
+
+  (setq lsp-bridge-python-command "~/.local/share/mise/installs/python/3.13/bin/python")
+
+  ;; (advice-add 'acm-frame-init-colors :override #'ignore)    ;; disable auto-revert frame attributes
+
+  (set-face-background 'acm-frame-default-face "#110000")
+  (set-face-foreground 'acm-frame-default-face "#00ff00")
+
+
+  (setq acm-frame-border-width 10)
+  (set-face-foreground 'acm-frame-border-face "orange")
+  (set-face-background 'acm-frame-border-face "gray")
+
+  (global-lsp-bridge-mode)
+
+  )
+
+;; ----------------------------------------------------------------------
+(use-package eglot
+  ;; :disabled t
+  :hook (
+         ;; (rust-ts-mode . eglot-ensure)     ;; rust: need `rustup component add rust-analyzer` in terminal
+         (prog-mode . eldoc-box-hover-mode)
+         (prog-mode . corfu-mode)
+         (prog-mode . eglot-ensure)
+         (eglot-managed-mode . my-fix-eglot-prog-hook-func)
+         (minibuffer-setup . my-fix-eglot-minibuffer-hook-func)
+         (rust-ts-mode . my-eglot-settings-func-rust)
+         )
+
+  :init
+  (defun my-fix-eglot-prog-hook-func ()
+    "Prevent confricting with eglot and electric-indent in prog-mode"
     ;; check details --> ```M-x toggle-debug-on-error``` yourself!!
     (setq-default electric-indent-chars '(?\n))
     )
 
+  (defun my-fix-eglot-minibuffer-hook-func ()
+    "Prevent confricting with eglot and electric-indent in minibuffer"
+    ;; check details --> ```M-x toggle-debug-on-error``` yourself!!
+    (setq-local electric-indent-functions nil)
+    (electric-indent-local-mode -1))
 
-  (setq gc-cons-threshold 100000000)    ;; 100 MB <-- 800KB at default
+  :config
+  (add-hook 'minibuffer-setup-hook
+            (lambda () (setq gc-cons-threshold 100000000)))   ;; 100 MB <-- 800kB
+  (add-hook 'minibuffer-exit-hook
+            (lambda () (setq gc-cons-threshold 800000)))      ;; 100 MB --> 800kB
 
   (setq eglot-ignored-server-capabilities
-        '( :inlayHintProvider)      ;; disabled because this feature modify buffer on-the-fly arbitrarily sucks!
+        '( :inlayHintProvider)      ;; disabled because this feature modifies .rs buffer on-the-fly arbitrarily, sucks!
         )
 
+  ;; other settings
+  (setq eglot-events-buffer-config '(:size 0 :format full))
+  (fset #'jsonrpc--log-event #'ignore)
+
   ;; lang servers
-  (add-to-list 'eglot-server-programs '((rust-mode) "rust-analyzer"))
-  (add-to-list 'eglot-workspace-configuration
-               '(:rust-analyzer
-                 (:checkOnSave t
-                  :workspace (:symbol (:search (:limit 100)))
-                  :numThreads 2)))
+  (add-to-list 'eglot-server-programs
+               '((rust-mode rust-ts-mode) "rust-analyzer"))
+
+  ;; (with-eval-after-load 'eglot
+  ;;   (add-to-list 'eglot-server-programs
+  ;;                `((rust-mode rust-ts-mode) . ,(eglot-alternative-installer '("rust-analyzer")))))
+
+  (defun my-eglot-settings-func-rust ()
+
+    ;; `cargo check` and lint settings
+    (setq-default eglot-workspace-configuration
+                  '((:rust-analyzer . (
+                         :checkOnSave (:enable :json-false)       ;; disable `cargo check` on save (heavy)
+                         :diagnostics (:enable t :experimental t) ;; enable ra built-in lint while dirty buffer (light weight)
+                         ))))
+
+    (defun my-adv--eglot-cargo-check-on-save (&rest _)
+      "cargo check after save-buffer"
+      (if-let ((server (eglot-current-server)))
+          ;; See https://github.com/rust-lang/rust-analyzer/blob/master/docs/book/src/contributing/lsp-extensions.md#controlling-flycheck
+          (jsonrpc-notify server :rust-analyzer/runFlycheck
+                          `(:textDocument ,(eglot--TextDocumentIdentifier)))
+
+        (message "Error: LSP server not found from eglot")))
+
+    (advice-add 'evil-write :after #'my-adv--eglot-cargo-check-on-save)     ;; :w
+    (advice-add 'my-save-buffer :after #'my-adv--eglot-cargo-check-on-save) ;; C-x C-s
+
+    ;; other rust-analyzer settings
+    (add-to-list 'eglot-workspace-configuration
+                 '(:rust-analyzer
+                   (:workspace (:symbol (:search (:limit 100)))
+                    :numThreads 2
+                    ;; and more ...
+
+                    ))
+                 t)         ;; t: `append` to list for lower priority configs
+    )
   )
 
 ;; ----------------------------------------------------------------------
 (use-package eglot-booster
-  :disabled t
+  ;; :disabled t
   :after eglot
   :config
   (setq eglot-booster-io-only t)        ;; >= emacs-30
@@ -4665,23 +4921,30 @@ file local variable `yas-table', rather than
 
 ;; ----------------------------------------------------------------------
 (use-package lsp-proxy
+  :disabled t
   :load-path "~/.emacs.d/lsp-proxy"
   :hook ((prog-mode . eldoc-box-hover-mode)
          (prog-mode . corfu-mode)
-         (prog-mode . lsp-proxy-mode))
+         (prog-mode . lsp-proxy-mode)
+         )
   :config
   (setq lsp-proxy-server-path "~/.emacs.d/lsp-proxy/emacs-lsp-proxy"
+        lsp-proxy-log-level 3
         lsp-proxy-diagnostics-provider :flymake
 
-        lsp-proxy-max-completion-item 10
+        ;; lsp-proxy-max-completion-item 10
         lsp-proxy-trim-trailing-whitespace nil)
 
   ;; (add-hook 'prog-mode-hook #'lsp-proxy-mode)
-
+  ;; (add-hook 'rust-ts-mode-hook
+  ;; (add-hook 'rust-mode-hook
+  (add-hook 'lsp-proxy-mode-hook
+            #'(lambda () (setenv "RA_LOG" "project_model=debug")))
   )
 
 ;; ----------------------------------------------------------------------
 (use-package rust-ts-mode
+  :defer t
   :config
   (setq rust-mode-treesitter-derive t)
   (add-to-list 'project-vc-extra-root-markers "Cargo.toml")
@@ -4689,8 +4952,7 @@ file local variable `yas-table', rather than
   ;; (evil-define-key 'insert rust-ts-mode-map (kbd "RET") 'my/newline-and-indent)
   ;; (setq-local electric-pair-mode)
 
-  ;; 改行時の自動インデント以外を極力減らす
-  (setq electric-indent-chars t)
+  (setq-default electric-indent-chars '(?\n))   ;; indent trigger: CR only
 
   )
 
@@ -5037,7 +5299,7 @@ file local variable `yas-table', rather than
   (defun my-popper-echo () (interactive) (popper-echo))
 
   (defun my-adv--before--close-popper (&rest _)
-    "Close popper window prior to execute specified　command.
+    "Close popper window prior to execute specified command.
 For example, `consult-recent-file' try to embed its preview into popper window if popper already opened. This advice can be used to prevent these glitch."
     (when popper-popup-status
       ;; (message "close popper")
@@ -5248,7 +5510,7 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 
 ;; ----------------------------------------------------------------------
-(use-package sift-number
+(use-package shift-number
   :bind (("M-k" . shift-number-up)
          ("M-j" . shift-number-down))
   )
@@ -5325,6 +5587,19 @@ For example, `consult-recent-file' try to embed its preview into popper window i
   )
 
 ;; ----------------------------------------------------------------------
+;; (use-package help-mode ;; todo need this?
+;;   :bind (("C-g" . my-vertico-quit))
+;;   :config
+;;   (define-key help-mode-map (kbd "C-g")  #'my-vertico-quit)
+;;   )
+
+;; ----------------------------------------------------------------------
+(use-package debugger-mode
+  :defer t
+  :hook (debugger-mode . (lambda () (setq truncate-lines nil)))     ;; eneble line wrap
+  )
+
+;; ----------------------------------------------------------------------
 ;; macrostep-c-mode (minor-mode)
 (use-package macro-step-c-mode
   :disabled t   ;; error occurs on 30.2
@@ -5356,8 +5631,42 @@ For example, `consult-recent-file' try to embed its preview into popper window i
 
 
 ;; ----------------------------------------------------------------------
-;; QUICK HACKS
-;;
+;; QUICK-HACKS, override,
+
+;; 30.2 2026-0813 -> consult-line in consult.el
+(defun consult-line (&optional initial start)
+  "Search for a matching line.
+
+Depending on the setting `consult-point-placement' the command
+jumps to the beginning or the end of the first match on the line
+or the line beginning.  The default candidate is the non-empty
+line next to point.  This command obeys narrowing.  Optional
+INITIAL input can be provided.  The search starting point is
+changed if the START prefix argument is set.  The symbol at point
+and the last `isearch-string' is added to the future history."
+  (interactive (list nil (not (not current-prefix-arg))))
+  (let* ((curr-line (line-number-at-pos (point) consult-line-numbers-widen))
+         (top (not (eq start consult-line-start-from-top)))
+         (candidates (consult--slow-operation "Collecting lines..."
+                       (consult--line-candidates top curr-line))))
+    (consult--read
+     candidates
+     ;; :prompt (if top "Go to line from top: " "Go to line: ")
+     :prompt ": "
+     :annotate (consult--line-fontify curr-line)
+     :category 'consult-location
+     :sort nil
+     :require-match t
+     ;; Always add last `isearch-string' to future history
+     :add-history (list (thing-at-point 'symbol) isearch-string)
+     :history '(:input consult--line-history)
+     :lookup #'consult--line-match
+     :default (car candidates)
+     ;; Add `isearch-string' as initial input if starting from Isearch
+     :initial (or initial
+                  (and isearch-mode
+                       (prog1 isearch-string (isearch-done))))
+     :state (consult--location-state candidates))))
 
 ;; 30.2 2026-05-21 -> global-text-scale-adjust in face-remap.el
 (defun global-text-scale-adjust (increment)
