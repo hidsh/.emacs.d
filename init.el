@@ -453,6 +453,7 @@
 ;; ----------------------------------------------------------------------
 (use-package theme-loader
   ;;:disabled t
+  :after tabbar
   :load-path "~/.emacs.d/themes"
   :init
   (setq theme-loader-theme 'my-doom-material)
@@ -1125,7 +1126,6 @@ This makes use of the fact that by `message' a newline, the window configuration
 ;; ----------------------------------------------------------------------
 (use-package tabbar
   :if window-system
-  ;; :disabled
   :hook ((after-save   . tabbar-on-saving-buffer)
          (first-change . tabbar-on-modifying-buffer))
   :config
