@@ -4358,9 +4358,6 @@ See URL `https://github.com/htacg/tidy-html5'."
                          `((margin left-margin)
                            (space :width 5))))))))
 
-;; flymake-error
-  ;; (set-face-attribute 'flymake-error nil :underline `(:color ,(mycolor 'red) :style wave))
-  (set-face-attribute 'flymake-error nil :inverse-video t :underline `(:color ,(face-attribute 'flymake-error :foreground) :style wave))
   )
 
 ;; ----------------------------------------------------------------------

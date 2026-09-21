@@ -228,7 +228,7 @@ Can be an integer to determine the exact padding."
    ;; paren
    ;; (show-paren-match :background black)
    ;; (show-paren-match :background "#3A537E")
-   (show-paren-match :background dark-yellow :weight 'bold)
+   (show-paren-match :box `(:line-width (-1 . -1) :color "yellow") :bold nil)
    (paren-face-match :foreground 'unspecified :background dark-yellow)
    (sp-show-pair-match-face :background dark-yellow)
 
@@ -275,9 +275,9 @@ Can be an integer to determine the exact padding."
    (compilation-warning :background 'unspecified :foreground yellow)
    (compilation-error   :background 'unspecified :foreground red)
 
-   (flymake-note    :background 'unspecified :foreground teal)
-   (flymake-warning :background 'unspecified :foreground yellow)
-   (flymake-error   :background 'unspecified :foreground red)
+   (flymake-note    :background 'unspecified :underline `(:color ,teal :style: wave))
+   (flymake-warning :background 'unspecified :underline `(:color ,yellow :style: wave))
+   (flymake-error   :background 'unspecified :underline `(:color ,red :style: wave))
 
    ;; css-mode / scss-mode
    (css-proprietary-property :foreground yellow)
