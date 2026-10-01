@@ -1,5 +1,0 @@
-# -*- mode: snippet; yas-table: emacs-lisp-mode -*-
-# name: comment-line-separator
-# key: line-separator
-# --
-;; ----------------------------------------------------------------------
