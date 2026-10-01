@@ -895,6 +895,16 @@ end-of-buffer signals; pass the rest to the default handler."
 
 ;; key-bind
 (global-set-key "\C-x\C-s" 'my-save-buffer)
+;; ----------------------------------------------------------------------
+;; @@ `my-write-file'
+(defun my-write-file ()
+  (interactive)
+  (when vertico-mode
+   (let ((vertico-preselect 'prompt))
+     (call-interactively #'write-file))))
+
+;; key-bind
+(global-set-key "\C-x\C-w" 'my-write-file)
 
 ;; ----------------------------------------------------------------------
 ;; @@ `my-find-file'
