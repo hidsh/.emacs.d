@@ -2355,6 +2355,7 @@ targets."
 
   )
 
+;; ----------------------------------------------------------------------
 (use-package embark-consult
   :ensure t
   :after (embark consult)
@@ -4597,7 +4598,7 @@ Thx to https://qiita.com/duloxetine/items/0adf103804b29090738a"
   ;; (add-to-list 'completion-at-point-functions #'cape-symbol)
   ;; (add-to-list 'completion-at-point-functions #'cape-line)
 
-  ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)    ;; forcely clear cache for lsp-server
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)    ;; forcely clear cache for lsp-server
   )
 
 ;; ----------------------------------------------------------------------
@@ -4666,7 +4667,7 @@ file local variable `yas-table', rather than
       (error "Not found `yas-table' in shebang  (e.g., \"-*- mode: snippet; yas-table: cc-mode -*-\")"))
 
     (unless (symbolp yas-table)
-      (error "Unexpected error occured: `yas-table' should be symbol"))
+      (error "Unexpected error occured: `yas-table' should be a symbol"))
     yas-table)
 
   (defun my-yas-load-snippet-buffer-and-close ()
@@ -4718,13 +4719,18 @@ file local variable `yas-table', rather than
     (setq-local completion-at-point-functions
                 (list (cape-capf-super
                        #'yasnippet-capf
+                       #'eglot-completion-at-point
                        ;; #'lspce-completion-at-point
-                       #'lsp-proxy-completion-at-point
+                       ;; #'lsp-proxy-completion-at-point
                        #'cape-dabbrev
                        #'cape-file
-                       ))))
+                       )))
+    ;; (message "** my-corfu-yasnippet-capf-setup")
+    )
 
-  (advice-add 'lsp-proxy-mode :after #'my-corfu-yasnippet-capf-setup)
+
+  (add-hook 'eglot-managed-mode-hook #'my-corfu-yasnippet-capf-setup)
+  ;; (advice-add 'lsp-proxy-mode :after #'my-corfu-yasnippet-capf-setup)
 )
 
 ;; ----------------------------------------------------------------------
@@ -4909,6 +4915,9 @@ file local variable `yas-table', rather than
                     ))
                  t)         ;; t: `append` to list for lower priority configs
     )
+
+  ;; global settings
+  (add-to-list 'completion-at-point-functions #'eglot-completion-at-point)  ;; workaround for vanish closing paren after selecting capf candidate
   )
 
 ;; ----------------------------------------------------------------------
