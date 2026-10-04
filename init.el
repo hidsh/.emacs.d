@@ -1414,6 +1414,7 @@ That is, a string used to represent it on the tab bar."
   (define-key evil-normal-state-map (kbd "g I") #'my-put-file-compile-flags)
   (define-key evil-normal-state-map (kbd "g i") #'xref-find-references)
   (define-key evil-normal-state-map (kbd "g o") #'xref-find-definitions)
+  (define-key evil-normal-state-map (kbd "g O") #'xref-find-definitions-other-window)
   (define-key evil-normal-state-map (kbd "g 0") #'xref-go-back)
   (define-key evil-normal-state-map (kbd "g [") #'evil-previous-open-paren)
   (define-key evil-normal-state-map (kbd "g ]") #'evil-next-close-paren)
@@ -4729,6 +4730,7 @@ file local variable `yas-table', rather than
 
 ;; ----------------------------------------------------------------------
 (use-package eee
+  :disabled t
   ;; Requirements:
   ;;   devicon-lookup:  cargo install devicon-lookup --force
   ;;
