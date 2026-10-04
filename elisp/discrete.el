@@ -896,15 +896,18 @@ end-of-buffer signals; pass the rest to the default handler."
 ;; key-bind
 (global-set-key "\C-x\C-s" 'my-save-buffer)
 ;; ----------------------------------------------------------------------
-;; @@ `my-write-file'
-(defun my-write-file ()
+;; @@ `my-save-as'
+(defun my-save-as ()
   (interactive)
-  (when vertico-mode
-   (let ((vertico-preselect 'prompt))
-     (call-interactively #'write-file))))
+  (let ((orig-file (buffer-file-name)))
+    (when vertico-mode
+      (let ((vertico-preselect 'prompt))
+        (call-interactively #'write-file))
+      (when (y-or-n-p "Re-open the original file?")
+        (find-alternate-file orig-file)))))
 
 ;; key-bind
-(global-set-key "\C-x\C-w" 'my-write-file)
+(global-set-key "\C-x\C-w" 'my-save-as)
 
 ;; ----------------------------------------------------------------------
 ;; @@ `my-find-file'

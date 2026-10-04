@@ -11,6 +11,7 @@ url/*
 .cache/*
 auto-save-list/*
 \.scratch-log*
+\.persistent-scratch
 scratch-log*
 history
 .emacs-places
