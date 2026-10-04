@@ -5769,7 +5769,11 @@ increment."
 
 
 ;; ----------------------------------------------------------------------
-;; customize setting
+;; open files via `emacsclient %1' from yazi
+(server-start)
+
+;; ----------------------------------------------------------------------
+;; after startup
 (setq custom-file "~/.emacs.d/custom.el") ; write custom settings into external file instead of init.el
 (load custom-file nil t)
 
