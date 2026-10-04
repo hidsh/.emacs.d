@@ -4969,6 +4969,11 @@ file local variable `yas-table', rather than
 
   (setq-default electric-indent-chars '(?\n))   ;; indent trigger: CR only
 
+  ;; fix indent
+  (add-hook 'rust-ts-mode-hook #'(lambda ()
+      (evil-local-set-key 'insert (kbd "RET") 'my-newline-and-indent)))
+
+  ;; fix rust-run
   (use-package rust-mode)               ;; rust-run is in rust-mode
   :bind (:map rust-ts-mode-map
               ("C-c C-c" . rust-run))   ;; rather than quickrun

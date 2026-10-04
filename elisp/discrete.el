@@ -1633,6 +1633,18 @@ not to prompt for input and return t."
 
 
 ;; ----------------------------------------------------------------------
+;; fix indent
+(defun my-newline-and-indent ()
+  (interactive)
+  (newline-and-indent)
+  (let ((flymake-active-p flymake-mode))
+    (flymake-mode nil)
+    (save-excursion
+      (next-line 1)
+      (indent-region (pos-bol) (pos-eol)))
+    (flymake-mode flymake-active-p)))
+
+;; ----------------------------------------------------------------------
 (defun my-split-window-right ()
   (interactive)
   (split-window-right)
