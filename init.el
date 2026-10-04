@@ -3378,16 +3378,10 @@ targets."
   )
 
 ;; ----------------------------------------------------------------------
-(use-package scratch-log
-  :after recentf
-  :if window-system
-  :ensure t
+(use-package persistent-scratch
   :config
-  (add-to-list 'recentf-exclude "scratch-log-autoloads.el")
-
-  (defun my-adv--sl-restore-scratch--no-modified (&rest _)
-    (set-buffer-modified-p nil))
-  (advice-add 'sl-restore-scratch :after #'my-adv--sl-restore-scratch--no-modified)
+  (persistent-scratch-setup-default)
+  (custom-set-variables '(persistent-scratch-what-to-save '(point)))
   )
 
 ;; ----------------------------------------------------------------------

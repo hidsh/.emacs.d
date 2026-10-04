@@ -36,16 +36,17 @@
                            ido-yes-or-no json-mode kconfig-mode langdoc lsp-mode
                            lsp-ui marginalia markdown-mode migemo mode-line-bell
                            neotree nim-mode nodejs-repl orderless org-bullets
-                           org-tree-slide paredit popper prescient pulsar
-                           quickrun rainbow-delimiters rainbow-mode rust-mode
-                           scratch-log shift-number slime smart-jump smartparens
-                           super-save swap-buffers symbol-overlay tabbar
-                           telephone-line treesit-auto undo-fu use-package
-                           v-mode vertico vterm web-beautify web-mode wgrep-ag
-                           yaml-mode yasnippet yasnippet-capf))
+                           org-tree-slide paredit persistent-scratch popper
+                           prescient pulsar quickrun rainbow-delimiters
+                           rainbow-mode rust-mode shift-number slime smart-jump
+                           smartparens super-save swap-buffers symbol-overlay
+                           tabbar telephone-line treesit-auto undo-fu
+                           use-package v-mode vertico vterm web-beautify
+                           web-mode wgrep-ag yaml-mode yasnippet yasnippet-capf))
  '(package-vc-selected-packages
    '((eglot-booster :vc-backend Git :url
                     "https://github.com/jdtsmith/eglot-booster")))
+ '(persistent-scratch-what-to-save '(point))
  '(recentf-auto-cleanup 'never)
  '(rust-ts-mode-indent-offset 4)
  '(vertico-group-format
